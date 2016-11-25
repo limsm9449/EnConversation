@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">최고의 영어회화</string>
+    <string name="action_delete">단어장 삭제</string>
+    <string name="action_email">Email</string>
+    <string name="action_help">도움말</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_patch">패치 정보</string>
+    <string name="action_backup">백업/복구</string>
+    <string name="action_edit">편집</string>
+    <string name="action_exit">취소</string>
+
+    <string name="action_dictionary">사전</string>
+    <string name="action_vocabulary">나의 단어장</string>
+    <string name="action_study">단어 학습</string>
+    <string name="action_other">기타 기능</string>
+
+    <string name="action_copy">복사</string>
+    <string name="action_all_copy">전체복사</string>
+    <string name="action_word_search">단어검색</string>
+    <string name="action_word_view">단어보기</string>
+    <string name="action_sentence_view">문장보기</string>
+    <string name="action_tts">TTS</string>
+    <string name="action_tts_all">전체 TTS</string>
+    <string name="action_bookmark">페이지 북마크</string>
+    <string name="action_translate">번역</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="title_activity_word_view">WordViewActivity</string>
+    <string name="title_activity_webview">WebviewActivity</string>
+    <string name="title_activity_study2">Study2Activity</string>
+    <string name="title_activity_study4">Study4Activity</string>
+    <string name="title_activity_vocabulary">VocabularyActivity</string>
+    <string name="title_activity_sentence_view">SentenceViewActivity</string>
+    <string name="title_activity_study5">Study5Activity</string>
+    <string name="title_activity_web_view">영어 사이트</string>
+    <string name="title_activity_help">도움말</string>
+    <string name="title_activity_patch">PatchActivity</string>
+    <string name="title_activity_my_sample">MySampleActivity</string>
+    <string name="banner_ad_unit_id">ca-app-pub-3860766380986792/2092125867</string>
+    <string name="title_activity_web_dictionary">WebDictionaryActivity</string>
+    <string name="title_activity_web_translate">WebTranslateActivity</string>
+</resources>
