@@ -39,4 +39,7 @@
     <string name="banner_ad_unit_id">ca-app-pub-3860766380986792/2092125867</string>
     <string name="title_activity_web_dictionary">WebDictionaryActivity</string>
     <string name="title_activity_web_translate">WebTranslateActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
