@@ -300,8 +300,8 @@ public class VocabularyFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v) {
         if ( v.getId() == R.id.my_f_voc_b_1 ) {
-            Intent intent = new Intent(this.getActivity().getApplication(), MySampleActivity.class);
-            startActivity(intent);
+            //Intent intent = new Intent(this.getActivity().getApplication(), MySampleActivity.class);
+            //startActivity(intent);
         } else if ( v.getId() == R.id.my_f_voc_b_2 ) {
             Intent intent = new Intent(this.getActivity().getApplication(), StudyActivity.class);
             startActivity(intent);

@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 class DbHelper extends SQLiteOpenHelper {
-    private static String DB_NAME = "ennewsvoc.db";
+    private static String DB_NAME = "enconversation.db";
     private String DB_PATH = "";
     private static final int DATABASE_VERSION = 103;
     private final Context mContext;

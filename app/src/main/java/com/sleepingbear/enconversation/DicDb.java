@@ -132,8 +132,9 @@ public class DicDb {
         if ( sentence != null ) {
             StringBuffer sql = new StringBuffer();
             sql.append("SELECT COUNT(*) CNT  " + CommConstants.sqlCR);
-            sql.append("  FROM DIC_MY_SAMPLE " + CommConstants.sqlCR);
-            sql.append(" WHERE SENTENCE1 = '" + sentence.replaceAll("'", "''") + "'" + CommConstants.sqlCR);
+            sql.append("  FROM DIC_CONVERSATION " + CommConstants.sqlCR);
+            sql.append(" WHERE CODE = 'C0002'" + CommConstants.sqlCR);
+            sql.append("   AND FOREIGN = '" + sentence.replaceAll("'", "''") + "'" + CommConstants.sqlCR);
             DicUtils.dicSqlLog(sql.toString());
 
             Cursor cursor = db.rawQuery(sql.toString(), null);
@@ -150,22 +151,22 @@ public class DicDb {
 
     public static void initSample(SQLiteDatabase db) {
         StringBuffer sql = new StringBuffer();
-        sql.append("DELETE FROM DIC_MY_SAMPLE" + CommConstants.sqlCR);
+        sql.append("DELETE FROM DIC_CONVERSATION WHERE CODE = 'C0002' " + CommConstants.sqlCR);
         DicUtils.dicSqlLog(sql.toString());
         db.execSQL(sql.toString());
     }
 
     public static void delDicMySample(SQLiteDatabase db, String sentence) {
         StringBuffer sql = new StringBuffer();
-        sql.append("DELETE FROM DIC_MY_SAMPLE " + CommConstants.sqlCR);
-        sql.append(" WHERE SENTENCE1 = '" + sentence.replaceAll("'" ,"''") + "'" + CommConstants.sqlCR);
+        sql.append("DELETE FROM DIC_CONVERSATION " + CommConstants.sqlCR);
+        sql.append(" WHERE CODE = 'C0002' AND FOREIGN = '" + sentence.replaceAll("'" ,"''") + "'" + CommConstants.sqlCR);
         DicUtils.dicLog(sql.toString());
         db.execSQL(sql.toString());
     }
 
     public static void insDicMySample(SQLiteDatabase db, String sentence1, String sentence2, String today) {
         StringBuffer sql = new StringBuffer();
-        sql.append("INSERT INTO DIC_MY_SAMPLE (TODAY, SENTENCE1, SENTENCE2)" + CommConstants.sqlCR);
+        sql.append("INSERT INTO DIC_CONVERSATION (CODE, SENTENCE1, SENTENCE2)" + CommConstants.sqlCR);
         sql.append("VALUES( '" + today + "', '" + sentence1.replaceAll("'" ,"''") + "', '" + sentence2.replaceAll("'" ,"''") + "')" +  CommConstants.sqlCR);
         DicUtils.dicLog(sql.toString());
         db.execSQL(sql.toString());

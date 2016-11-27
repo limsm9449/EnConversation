@@ -181,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 isEditing = false;
                 invalidateOptionsMenu();
 
+                /*
                 if ( selectedTab == 1 ) {
                     ((ClickwordFragment) adapter.getItem(selectedTab)).changeListView();
                     ((ClickwordFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
@@ -188,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     ((BookmarkFragment) adapter.getItem(selectedTab)).changeListView();
                     ((BookmarkFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
                 }
+                */
 
                 //메뉴 구성
                 invalidateOptionsMenu();
@@ -458,20 +460,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             isEditing = true;
             invalidateOptionsMenu();
 
+            /*
             if ( selectedTab == 1 ) {
                 ((ClickwordFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
             } else if ( selectedTab == 2 ) {
                 ((BookmarkFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
             }
+            */
         } else if (id == R.id.action_exit) {
             isEditing = false;
             invalidateOptionsMenu();
 
+            /*
             if ( selectedTab == 1 ) {
                 ((ClickwordFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
             } else if ( selectedTab == 2 ) {
                 ((BookmarkFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
             }
+            */
         }
 
         return super.onOptionsItemSelected(item);
@@ -514,9 +520,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void changeListView() {
         if ( selectedTab == 1 ) {
-            ((ClickwordFragment) adapter.getItem(selectedTab)).changeListView();
+            ((ConversationFragment) adapter.getItem(selectedTab)).changeListView(false);
         } else if ( selectedTab == 2 ) {
-            ((BookmarkFragment) adapter.getItem(selectedTab)).changeListView();
+            ((ConversationNoteFragment) adapter.getItem(selectedTab)).changeListView();
         } else if ( selectedTab == 3 ) {
             ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
         }
@@ -537,14 +543,11 @@ class MainPagerAdapter extends FragmentPagerAdapter {
     public MainPagerAdapter(FragmentManager fm, AppCompatActivity activity) {
         super(fm);
 
-        mFragmentList.add(new NewsFragment());
-        mFragmentTitleList.add("뉴스");
+        mFragmentList.add(new ConversationFragment());
+        mFragmentTitleList.add("회화 검색");
 
-        mFragmentList.add(new ClickwordFragment());
-        mFragmentTitleList.add("클릭 단어");
-
-        mFragmentList.add(new BookmarkFragment());
-        mFragmentTitleList.add("북마크");
+        mFragmentList.add(new ConversationNoteFragment());
+        mFragmentTitleList.add("회화 노트");
 
         mFragmentList.add(new VocabularyFragment());
         mFragmentTitleList.add("단어장");

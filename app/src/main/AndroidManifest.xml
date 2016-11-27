@@ -59,11 +59,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
         <activity
-            android:name=".WebViewActivity"
-            android:label="@string/title_activity_web_view"
-            android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme" />
-        <activity
             android:name=".HelpActivity"
             android:label="@string/title_activity_help"
             android:screenOrientation="portrait"
@@ -89,10 +84,6 @@
             android:name=".WebDictionaryActivity"
             android:label="@string/title_activity_web_dictionary"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".WebTranslateActivity"
-            android:label="@string/title_activity_web_translate"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
         <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
         <meta-data
