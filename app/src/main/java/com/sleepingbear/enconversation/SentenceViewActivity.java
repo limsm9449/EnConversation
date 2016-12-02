@@ -79,29 +79,7 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
             notHan = b.getString("foreign");
             han = b.getString("han");
 
-            if ( "".equals(han) ) {
-                new Thread() {
-                    public void run() {
-                        Translate.setClientId("limsm9449");
-                        Translate.setClientSecret("4uv10iwHn+rZrUr9reTDRBML5l1JdpgHXOlgfaKYOjQ=");
-
-                        try {
-                            han = Translate.execute(notHan, Language.AUTO_DETECT, Language.KOREAN);
-
-                            Bundle bundle = new Bundle();
-                            bundle.putString("han", han);
-
-                            Message msg = handler.obtainMessage();
-                            msg.setData(bundle);
-                            handler.sendMessage(msg);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }.start();
-            } else {
-                changeListView();
-            }
+            changeListView();
         }
 
         ImageButton mySample = (ImageButton) findViewById(R.id.my_c_sv_ib_mysample);

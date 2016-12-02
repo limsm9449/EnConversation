@@ -162,6 +162,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
             Bundle bundle = new Bundle();
             bundle.putString("foreign", cur.getString(cur.getColumnIndexOrThrow("SENTENCE1")));
             bundle.putString("han", cur.getString(cur.getColumnIndexOrThrow("SENTENCE2")));
+            bundle.putString("seq", cur.getString(cur.getColumnIndexOrThrow("SEQ")));
 
             Intent intent = new Intent(getActivity().getApplication(), SentenceViewActivity.class);
             intent.putExtras(bundle);
