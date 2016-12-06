@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -30,12 +31,15 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
+import java.util.HashMap;
+
 
 public class ConversationFragment extends Fragment implements View.OnClickListener {
     private DbHelper dbHelper;
     private SQLiteDatabase db;
     private View mainView;
     private EditText et_search;
+    private CheckBox cb_foreignView;
     private ConversationCursorAdapter adapter;
 
     private Activity mActivity;
@@ -64,6 +68,15 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
                 }
 
                 return false;
+            }
+        });
+
+        cb_foreignView = (CheckBox) mainView.findViewById(R.id.my_cb_foreign_view);
+        cb_foreignView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                adapter.setForeignView(cb_foreignView.isChecked());
+                adapter.notifyDataSetChanged();
             }
         });
 
@@ -106,23 +119,20 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
 
         StringBuffer sql = new StringBuffer();
 
+        sql.append("SELECT SEQ _id, SEQ, SENTENCE1, SENTENCE2" + CommConstants.sqlCR);
+        sql.append("  FROM DIC_SAMPLE" + CommConstants.sqlCR);
         if ( !"".equals(et_search.getText().toString()) ) {
-            if ( DicUtils.isHangule(et_search.getText().toString()) ) {
-                sql.append("SELECT SEQ _id, SENTENCE1, SENTENCE2, 'H' KIND" + CommConstants.sqlCR);
-                sql.append("  FROM DIC_SAMPLE" + CommConstants.sqlCR);
-                sql.append(" WHERE SENTENCE2 LIKE '%" + et_search.getText().toString() + "%'" + CommConstants.sqlCR);
-                sql.append(" ORDER BY SENTENCE2" + CommConstants.sqlCR);
-            } else {
-                sql.append("SELECT SEQ _id, SENTENCE1, SENTENCE2, 'F' KIND" + CommConstants.sqlCR);
-                sql.append("  FROM DIC_SAMPLE" + CommConstants.sqlCR);
-                sql.append(" WHERE SENTENCE1 LIKE '%" + et_search.getText().toString() + "%'" + CommConstants.sqlCR);
-                sql.append(" ORDER BY ORD" + CommConstants.sqlCR);
+            String[] search = et_search.getText().toString().split(" ");
+            String condi1 = "";
+            String condi2 = "";
+            for ( int i = 0; i < search.length; i++ ) {
+                condi1 += ("".equals(condi1) ? "" : " AND ") + " SENTENCE1 LIKE '%" + search[i] + "%'";
+                condi2 += ("".equals(condi2) ? "" : " AND ") + " SENTENCE2 LIKE '%" + search[i] + "%'";
             }
-        } else {
-            sql.append("SELECT SEQ _id, SENTENCE1, SENTENCE2, 'F' KIND" + CommConstants.sqlCR);
-            sql.append("  FROM DIC_SAMPLE" + CommConstants.sqlCR);
-            sql.append(" ORDER BY ORD" + CommConstants.sqlCR);
+            sql.append(" WHERE ( " + condi1 + " ) OR" + CommConstants.sqlCR);
+            sql.append("         ( " + condi2 + " )" + CommConstants.sqlCR);
         }
+        sql.append(" ORDER BY ORD" + CommConstants.sqlCR);
         DicUtils.dicSqlLog(sql.toString());
 
         dictionaryCursor = db.rawQuery(sql.toString(), null);
@@ -157,17 +167,21 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Cursor cur = (Cursor) adapter.getItem(position);
+            adapter.setStatus( cur.getString(cur.getColumnIndexOrThrow("SEQ")) );
+            adapter.notifyDataSetChanged();
+            /*
             cur.moveToPosition(position);
 
             Bundle bundle = new Bundle();
             bundle.putString("foreign", cur.getString(cur.getColumnIndexOrThrow("SENTENCE1")));
             bundle.putString("han", cur.getString(cur.getColumnIndexOrThrow("SENTENCE2")));
-            bundle.putString("seq", cur.getString(cur.getColumnIndexOrThrow("SEQ")));
+            bundle.putString("sampleSeq", cur.getString(cur.getColumnIndexOrThrow("SEQ")));
 
             Intent intent = new Intent(getActivity().getApplication(), SentenceViewActivity.class);
             intent.putExtras(bundle);
 
             startActivity(intent);
+            */
         }
     };
 
@@ -235,6 +249,8 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
 }
 
 class ConversationCursorAdapter extends CursorAdapter {
+    public boolean isForeignView = false;
+    public HashMap statusData = new HashMap();
 
     public ConversationCursorAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, 0);
@@ -247,13 +263,19 @@ class ConversationCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        if ( "F".equals(String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("KIND")))) ) {
-            ((TextView) view.findViewById(R.id.my_f_dict_tv_foreign)).setText(String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1"))));
-            ((TextView) view.findViewById(R.id.my_f_dict_tv_mean)).setText(String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE2"))));
+        ((TextView) view.findViewById(R.id.my_tv_han)).setText(String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE2"))));
+        if ( isForeignView || statusData.containsKey(cursor.getString(cursor.getColumnIndexOrThrow("SEQ")))  ) {
+            ((TextView) view.findViewById(R.id.my_tv_foreign)).setText(String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1"))));
         } else {
-            ((TextView) view.findViewById(R.id.my_f_dict_tv_foreign)).setText(String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE2"))));
-            ((TextView) view.findViewById(R.id.my_f_dict_tv_mean)).setText(String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1"))));
+            ((TextView) view.findViewById(R.id.my_tv_foreign)).setText("Click..");
         }
-        ((TextView) view.findViewById(R.id.my_f_dict_tv_spelling)).setText("");
+    }
+
+    public void setForeignView(boolean foreignView) {
+        isForeignView = foreignView;
+    }
+
+    public void setStatus(String sampleSeq) {
+        statusData.put(sampleSeq, "Y");
     }
 }

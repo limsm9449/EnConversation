@@ -28,8 +28,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
                     android:id="@+id/my_f_conv_rl_search"
-                    android:layout_toLeftOf="@+id/my_f_conv_ib_search"
-                    android:layout_marginTop="6dp">
+                    android:layout_toLeftOf="@+id/my_f_conv_ib_search">
 
                     <EditText
                         android:layout_width="wrap_content"
@@ -58,11 +57,19 @@
                     app:srcCompat="@mipmap/ic_search_black_24dp"
                     android:layout_centerVertical="true"
                     android:id="@+id/my_f_conv_ib_search"
-                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentEnd="false"
                     android:background="@android:color/transparent"
                     android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_toLeftOf="@+id/my_cb_foreign_view" />
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="영문보기"
+                    android:id="@+id/my_cb_foreign_view"
+                    android:checked="false"
+                    android:layout_alignParentEnd="true"
                     android:layout_marginRight="10dp" />
-
             </RelativeLayout>
 
             <LinearLayout

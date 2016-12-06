@@ -126,25 +126,23 @@ public class DicDb {
     }
 
 
-    public static boolean isExistMySample(SQLiteDatabase db, String sentence) {
+    public static boolean isExistMySample(SQLiteDatabase db, String sampleSeq) {
         boolean rtn = false;
 
-        if ( sentence != null ) {
-            StringBuffer sql = new StringBuffer();
-            sql.append("SELECT COUNT(*) CNT  " + CommConstants.sqlCR);
-            sql.append("  FROM DIC_CONVERSATION " + CommConstants.sqlCR);
-            sql.append(" WHERE CODE = 'C0002'" + CommConstants.sqlCR);
-            sql.append("   AND FOREIGN = '" + sentence.replaceAll("'", "''") + "'" + CommConstants.sqlCR);
-            DicUtils.dicSqlLog(sql.toString());
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT COUNT(*) CNT  " + CommConstants.sqlCR);
+        sql.append("  FROM DIC_CONVERSATION " + CommConstants.sqlCR);
+        sql.append(" WHERE CODE = 'C02'" + CommConstants.sqlCR);
+        sql.append("   AND SAMPLE_SEQ = " + sampleSeq +  CommConstants.sqlCR);
+        DicUtils.dicSqlLog(sql.toString());
 
-            Cursor cursor = db.rawQuery(sql.toString(), null);
-            if (cursor.moveToNext()) {
-                if (cursor.getInt(cursor.getColumnIndexOrThrow("CNT")) > 0) {
-                    rtn = true;
-                }
+        Cursor cursor = db.rawQuery(sql.toString(), null);
+        if (cursor.moveToNext()) {
+            if (cursor.getInt(cursor.getColumnIndexOrThrow("CNT")) > 0) {
+                rtn = true;
             }
-            cursor.close();
         }
+        cursor.close();
 
         return rtn;
     }

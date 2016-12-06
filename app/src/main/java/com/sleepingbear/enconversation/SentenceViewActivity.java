@@ -47,6 +47,7 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
     public int mSelect = 0;
     public String han;
     public String notHan;
+    public String sampleSeq;
     public boolean isMySample = false;
     public boolean isChange = false;
 
@@ -72,19 +73,15 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
         db = dbHelper.getWritableDatabase();
 
         Bundle b = getIntent().getExtras();
-        if ( "".equals(b.getString("foreign")) ) {
-            ((TextView) findViewById(R.id.my_c_sv_tv_foreign)).setText("");
-            ((TextView) findViewById(R.id.my_c_sv_tv_han)).setText("");
-        } else {
-            notHan = b.getString("foreign");
-            han = b.getString("han");
+        notHan = b.getString("foreign");
+        han = b.getString("han");
+        sampleSeq = b.getString("sampleSeq");
 
-            changeListView();
-        }
+        changeListView();
 
         ImageButton mySample = (ImageButton) findViewById(R.id.my_c_sv_ib_mysample);
         mySample.setOnClickListener(this);
-        if ( DicDb.isExistMySample(db, notHan) ) {
+        if ( DicDb.isExistMySample(db, sampleSeq) ) {
             isMySample = true;
             mySample.setImageResource(android.R.drawable.star_on);
         } else {
