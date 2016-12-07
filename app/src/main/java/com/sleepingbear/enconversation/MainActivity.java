@@ -501,7 +501,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                   .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                       @Override
                       public void onClick(DialogInterface dialog, int which) {
-                          if (selectedTab == 3) {
+                          if (selectedTab == 4) {
                               DicDb.initVocabulary(db);
 
                               DicUtils.writeNewInfoToFile(getApplicationContext(), db);
@@ -520,10 +520,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void changeListView() {
         if ( selectedTab == 1 ) {
-            ((ConversationFragment) adapter.getItem(selectedTab)).changeListView(false);
+            ((ConversationStudyFragment) adapter.getItem(selectedTab)).changeListView(false);
         } else if ( selectedTab == 2 ) {
-            ((ConversationNoteFragment) adapter.getItem(selectedTab)).changeListView();
+            ((ConversationNoteFragment) adapter.getItem(selectedTab)).changeListView(false);
         } else if ( selectedTab == 3 ) {
+            ((ConversationFragment) adapter.getItem(selectedTab)).changeListView(false);
+        } else if ( selectedTab == 4 ) {
             ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
         }
     }
@@ -543,11 +545,14 @@ class MainPagerAdapter extends FragmentPagerAdapter {
     public MainPagerAdapter(FragmentManager fm, AppCompatActivity activity) {
         super(fm);
 
-        mFragmentList.add(new ConversationFragment());
-        mFragmentTitleList.add("회화 검색");
+        mFragmentList.add(new ConversationStudyFragment());
+        mFragmentTitleList.add("회화 학습");
 
         mFragmentList.add(new ConversationNoteFragment());
         mFragmentTitleList.add("회화 노트");
+
+        mFragmentList.add(new ConversationFragment());
+        mFragmentTitleList.add("회화 검색");
 
         mFragmentList.add(new VocabularyFragment());
         mFragmentTitleList.add("단어장");

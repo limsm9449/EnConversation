@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    tools:context="com.sleepingbear.enconversation.BookmarkFragment">
+    tools:context="com.sleepingbear.enconversation.ConversationNoteFragment">
 
     <!-- TODO: Update blank fragment layout -->
 

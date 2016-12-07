@@ -67,7 +67,7 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
         editRl.setVisibility(View.GONE);
 
         //리스트 내용 변경
-        changeListView();
+        changeListView(true);
 
         AdView av = (AdView)mainView.findViewById(R.id.adView);
         AdRequest adRequest = new  AdRequest.Builder().build();
@@ -76,7 +76,7 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
         return mainView;
     }
 
-    public void changeListView() {
+    public void changeListView(boolean isKeyin) {
         if ( db != null ) {
             /*
             Cursor listCursor = db.rawQuery(DicQuery.getClickword(), null);
@@ -134,7 +134,7 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     adapter.delete();
-                                    changeListView();
+                                    changeListView(true);
 
                                     DicUtils.writeNewInfoToFile(getContext(), db);
                                 }
@@ -175,7 +175,7 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
                                 db.execSQL(DicQuery.getInsNewCategory("MY", insCategoryCode, et_ins.getText().toString()));
 
                                 adapter.save(insCategoryCode);
-                                changeListView();
+                                changeListView(true);
 
                                 DicUtils.writeNewInfoToFile(getContext(), db);
 
@@ -225,7 +225,7 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             adapter.save(kindCodes[mSelect]);
-                            changeListView();
+                            changeListView(true);
 
                             DicUtils.writeNewInfoToFile(getContext(), db);
 
