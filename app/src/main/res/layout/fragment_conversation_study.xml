@@ -19,8 +19,100 @@
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:id="@+id/my_ll_conversation_btn"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:elevation="0dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:checkedButton="@+id/my_rb_easy"
+                        android:id="@+id/my_rg_difficulty"
+                        android:layout_marginRight="10dp"
+                        android:orientation="horizontal"
+                        android:background="@drawable/my_toggle_outline"
+                        android:layout_toLeftOf="@+id/my_iv_refresh"
+                        android:layout_alignParentStart="true">
+
+                        <RadioButton
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:text="Easy"
+                            android:id="@+id/my_rb_easy"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginBottom="1dp"
+                            android:background="@drawable/my_toggle_bg"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="1dp"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:textColor="@color/my_white"
+                            android:checked="true"
+                            android:layout_marginRight="1dp" />
+
+                        <RadioButton
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:text="Noraml"
+                            android:id="@+id/my_rb_normal"
+                            android:background="@drawable/my_toggle_bg"
+                            android:layout_weight="1"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginRight="1dp"
+                            android:layout_marginBottom="1dp"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:textColor="@color/my_white" />
+
+                        <RadioButton
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:text="Hard"
+                            android:id="@+id/my_rb_hard"
+                            android:background="@drawable/my_toggle_bg"
+                            android:layout_weight="1"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginRight="1dp"
+                            android:layout_marginBottom="1dp"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:textColor="@color/my_white" />
+
+                    </RadioGroup>
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@mipmap/ic_refresh_black_24dp"
+                        android:id="@+id/my_iv_refresh"
+                        android:layout_weight="1"
+                        android:layout_marginRight="10dp"
+                        android:layout_toLeftOf="@+id/my_iv_foreign_view"
+                        android:layout_marginTop="3dp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@mipmap/ic_visibility_black_24dp"
+                        android:id="@+id/my_iv_foreign_view"
+                        android:layout_weight="1"
+                        android:layout_marginRight="5dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginTop="3dp" />
+
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/my_ll_conversation_han"
-                android:layout_weight="1"
                 android:background="@drawable/my_border"
                 android:layout_marginTop="5dp"
                 android:layout_marginLeft="5dp"
@@ -29,11 +121,14 @@
                 <TextView
                     android:text="TextView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="50dp"
                     android:id="@+id/my_tv_han"
                     android:layout_weight="1"
-                    android:layout_margin="5dp"
-                    android:gravity="center_vertical" />
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp" />
 
             </LinearLayout>
 
@@ -42,7 +137,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/my_ll_conversation_foreign"
-                android:layout_weight="1"
                 android:background="@drawable/my_border"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
@@ -51,11 +145,14 @@
                 <TextView
                     android:text="TextView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="50dp"
                     android:id="@+id/my_tv_foreign"
                     android:layout_weight="1"
-                    android:layout_margin="5dp"
-                    android:gravity="center_vertical" />
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp" />
 
             </LinearLayout>
 
@@ -64,12 +161,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/my_ll_conversation_button"
-                android:layout_weight="2"
                 android:background="@drawable/my_border"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp">
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1">
 
                 <RelativeLayout
                     android:layout_width="match_parent"

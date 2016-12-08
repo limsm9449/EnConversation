@@ -1,20 +1,27 @@
 package com.sleepingbear.enconversation;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +40,12 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
     private Cursor cursor;
     private TextView my_tv_han;
     private TextView my_tv_foreign;
+    private String currForeign;
+    private String currSeq;
+    private int difficult = 1;
+    private boolean isSolve = false;
+
+    ConversationStudySearchTask task;
 
     public ConversationStudyFragment() {
     }
@@ -51,6 +64,14 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
         ((ImageView) mainView.findViewById(R.id.my_iv_left)).setOnClickListener(this);
         ((ImageView) mainView.findViewById(R.id.my_iv_right)).setOnClickListener(this);
 
+        ((ImageView) mainView.findViewById(R.id.my_iv_foreign_view)).setOnClickListener(this);
+        ((ImageView) mainView.findViewById(R.id.my_iv_refresh)).setOnClickListener(this);
+
+        ((RadioButton) mainView.findViewById(R.id.my_rb_easy)).setOnClickListener(this);
+        ((RadioButton) mainView.findViewById(R.id.my_rb_normal)).setOnClickListener(this);
+        ((RadioButton) mainView.findViewById(R.id.my_rb_hard)).setOnClickListener(this);
+
+
         //리스트 내용 변경
         changeListView(true);
 
@@ -62,22 +83,21 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
     }
 
     public void changeListView(boolean isKeyin) {
-        DicUtils.dicLog(this.getClass().toString() + " changeListView");
-        if ( db != null && isKeyin) {
-            StringBuffer sql = new StringBuffer();
+        if ( isKeyin ) {
+            if (task != null) {
+                return;
+            }
+            task = new ConversationStudyFragment.ConversationStudySearchTask();
+            task.execute();
+        }
+    }
 
-            sql.append("SELECT SEQ _id, SEQ, SENTENCE1, SENTENCE2" + CommConstants.sqlCR);
-            sql.append("  FROM DIC_SAMPLE" + CommConstants.sqlCR);
-            sql.append(" ORDER BY ORD" + CommConstants.sqlCR);
-            sql.append(" LIMIT 1000" + CommConstants.sqlCR);
-            DicUtils.dicSqlLog(sql.toString());
-
-            cursor = db.rawQuery(sql.toString(), null);
+    public void getData() {
+        DicUtils.dicLog(this.getClass().toString() + " getData");
+        if ( db != null ) {
+            cursor = db.rawQuery(DicQuery.getConversationStudy(difficult), null);
 
             if ( cursor.getCount() == 0 ) {
-            } else {
-                cursor.moveToFirst();
-                conversationShow();
             }
         }
     }
@@ -91,8 +111,14 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                     cursor.moveToPrevious();
                     conversationShow();
                 }
+
+                isSolve = false;
+
                 break;
             case R.id.my_iv_right:
+                if ( isSolve ) {
+                    DicUtils. writeInfoToFile(getContext(), "C_STUDY_INS" + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
+                }
                 if ( !cursor.isLast() ) {
                     cursor.moveToNext();
                     conversationShow();
@@ -100,11 +126,45 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                     changeListView(true);
                 }
                 break;
+            case R.id.my_iv_foreign_view:
+                my_tv_foreign.setText(foreign);
+                break;
+            case R.id.my_iv_refresh:
+                conversationShow();
+                break;
+            case R.id.my_rb_easy:
+                difficult = 1;
+                changeListView(true);
+                break;
+            case R.id.my_rb_normal:
+                difficult = 2;
+                changeListView(true);
+                break;
+            case R.id.my_rb_hard:
+                difficult = 3;
+                changeListView(true);
+                break;
             default:
-                if ( "".equals(my_tv_foreign.getText()) ) {
-                    my_tv_foreign.setText((String)v.getTag());
+                String foreign = (String)my_tv_foreign.getText();
+                if ( "".equals(foreign) ) {
+                    foreign = (String)v.getTag();
                 } else {
-                    my_tv_foreign.setText(my_tv_foreign.getText() + (String)v.getTag());
+                    foreign += " " + (String)v.getTag();
+                }
+
+                if ( foreign.equals( currForeign.substring( 0, foreign.length() ) ) ) {
+                    my_tv_foreign.setText(foreign);
+                } else {
+                    Toast.makeText(getContext(), "틀린 단어를 선택하셨습니다.\n다른 단어를 선택해주세요.", Toast.LENGTH_SHORT).show();
+                }
+
+                if ( foreign.equals( currForeign) ) {
+                    Toast.makeText(getContext(), "맞는 문장입니다.\n다음 회화 문제를 풀어보세요.", Toast.LENGTH_SHORT).show();
+
+                    FlowLayout wordArea = (FlowLayout) mainView.findViewById(R.id.my_ll_conversation_word);
+                    wordArea.removeAllViews();
+
+                    isSolve = true;
                 }
 
                 break;
@@ -115,7 +175,9 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
     private String[] foreignArr;
     public void conversationShow() {
         if ( cursor.getCount() > 0 ) {
-            my_tv_han.setText(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE2")) + " : " + cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1")));
+            currSeq = cursor.getString(cursor.getColumnIndexOrThrow("SEQ"));
+            currForeign = cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1"));
+            my_tv_han.setText(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE2")));
             my_tv_foreign.setText("");
 
             foreign = cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1"));
@@ -127,7 +189,10 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
             for ( int i = 0; i < foreignArr.length; i++ ) {
                 Button btn = new Button(getContext());
                 btn.setText(foreignArr[i]);
-                //btn.setWidth(66);
+                btn.setAllCaps(false);
+                btn.setLayoutParams(new FlowLayout.LayoutParams(3, 3));
+                btn.getLayoutParams().width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                btn.getLayoutParams().height = ActionBar.LayoutParams.WRAP_CONTENT;
                 btn.setTextSize(11);
                 btn.setId(i);
                 btn.setTag(foreignArr[i]);
@@ -135,9 +200,12 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
 
                 wordArea.addView(btn);
             }
+
+            isSolve = false;
         } else {
             my_tv_han.setText("");
             my_tv_foreign.setText("");
+            currForeign = "";
         }
     }
 
@@ -168,5 +236,42 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
         DicUtils.dicLog(str1 + " : " + str2);
 
         return rtnArr;
+    }
+
+    private class ConversationStudySearchTask extends AsyncTask<Void, Void, Void> {
+
+        private ProgressDialog pd;
+
+        @Override
+        protected void onPreExecute() {
+            pd = new ProgressDialog(getContext());
+            pd.setIndeterminate(true);
+            pd.setCancelable(false);
+            pd.show();
+            pd.setContentView(R.layout.custom_progress);
+
+            pd.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            pd.show();
+
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            getData();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            cursor.moveToFirst();
+            conversationShow();
+
+            pd.dismiss();
+            task = null;
+
+            super.onPostExecute(result);
+        }
     }
 }

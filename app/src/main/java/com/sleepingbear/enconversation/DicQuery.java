@@ -383,4 +383,24 @@ public class DicQuery {
 
         return sql.toString();
     }
+
+    public static String getConversationStudy(int difficult) {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("SELECT SEQ _id, SEQ, SENTENCE1, SENTENCE2" + CommConstants.sqlCR);
+        sql.append("  FROM DIC_SAMPLE" + CommConstants.sqlCR);
+        if ( difficult == 1) {
+            sql.append("  WHERE WORD_CNT < 6" + CommConstants.sqlCR);
+        } else if ( difficult == 2) {
+            sql.append("  WHERE WORD_CNT BETWEEN 6 AND 9" + CommConstants.sqlCR);
+        } else {
+            sql.append("  WHERE WORD_CNT > 9" + CommConstants.sqlCR);
+        }
+        sql.append(" ORDER BY RANDOM()" + CommConstants.sqlCR);
+        sql.append(" LIMIT 1000" + CommConstants.sqlCR);
+
+        DicUtils.dicSqlLog(sql.toString());
+
+        return sql.toString();
+    }
 }
