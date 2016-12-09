@@ -32,6 +32,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -217,6 +218,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.commit();
         };
 		*/
+        //소프트 키보드 없애기
+        //InputMethodManager imm= (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        //imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
 
 		checkPermission();
     }

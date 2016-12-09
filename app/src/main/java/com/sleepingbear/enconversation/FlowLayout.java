@@ -2,6 +2,7 @@ package com.sleepingbear.enconversation;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -105,12 +106,17 @@ public class FlowLayout extends ViewGroup {
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
-                final int childw = child.getMeasuredWidth();
-                final int childh = child.getMeasuredHeight();
+                //final int childw = child.getMeasuredWidth();
+                //final int childh = child.getMeasuredHeight();
+                final int textLength = ((String)child.getTag()).length();
+                final int childw = (textLength < 5 ? 100 : (textLength) * 40 + 20);
+                final int childh = 170;
+
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
                 if (xpos + childw > width) {
                     xpos = getPaddingLeft();
-                    ypos += line_height;
+                    //ypos += line_height;
+                    ypos += childh + lp.vertical_spacing;
                 }
                 child.layout(xpos, ypos, xpos + childw, ypos + childh);
                 xpos += childw + lp.horizontal_spacing;

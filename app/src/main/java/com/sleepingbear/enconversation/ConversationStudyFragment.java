@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -145,7 +147,15 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                 changeListView(true);
                 break;
             default:
+                DicUtils.dicLog("click word : " + (String)v.getTag());
                 String foreign = (String)my_tv_foreign.getText();
+
+                DicUtils.dicLog(foreign.length() + " : " + currForeign.length() );
+                //영문보기를 클릭하고 단어 클릭시 오류가 발생해서 체크를 해줌.
+                if ( foreign.length() >= currForeign.length() ) {
+                    return;
+                }
+
                 if ( "".equals(foreign) ) {
                     foreign = (String)v.getTag();
                 } else {
@@ -154,6 +164,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
 
                 if ( foreign.equals( currForeign.substring( 0, foreign.length() ) ) ) {
                     my_tv_foreign.setText(foreign);
+                    ((Button)v).setBackgroundColor(Color.rgb(189, 195, 195));
                 } else {
                     Toast.makeText(getContext(), "틀린 단어를 선택하셨습니다.\n다른 단어를 선택해주세요.", Toast.LENGTH_SHORT).show();
                 }
@@ -188,19 +199,22 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
             foreignArr = getRandForeign(foreign.split(" "));
             for ( int i = 0; i < foreignArr.length; i++ ) {
                 Button btn = new Button(getContext());
+                btn.setBackgroundColor(Color.rgb(249, 151, 53));
+                btn.setTextColor(Color.rgb(255, 255, 255));
                 btn.setText(foreignArr[i]);
                 btn.setAllCaps(false);
                 btn.setLayoutParams(new FlowLayout.LayoutParams(3, 3));
-                btn.getLayoutParams().width = LinearLayout.LayoutParams.WRAP_CONTENT;
-                btn.getLayoutParams().height = ActionBar.LayoutParams.WRAP_CONTENT;
-                btn.setTextSize(11);
+                btn.setTextSize(12);
                 btn.setId(i);
                 btn.setTag(foreignArr[i]);
+                btn.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
                 btn.setOnClickListener(this);
+                btn.invalidate();
 
                 wordArea.addView(btn);
             }
-
+            wordArea.invalidate();
+            wordArea.requestLayout();
             isSolve = false;
         } else {
             my_tv_han.setText("");
