@@ -209,7 +209,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                 Button btn = new Button(getContext());
                 btn.setBackgroundColor(Color.rgb(249, 151, 53));
                 btn.setTextColor(Color.rgb(255, 255, 255));
-                btn.setText(foreignArr[i]);
+                btn.setText(" " + foreignArr[i] + " ");
                 btn.setAllCaps(false);
                 btn.setTextSize(12);
 
@@ -217,7 +217,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
 
                 btn.setId(i);
                 btn.setTag(foreignArr[i]);
-                btn.setGravity(Gravity.CENTER_HORIZONTAL);
+                btn.setGravity(Gravity.LEFT);
                 btn.setOnClickListener(this);
                 System.out.println(foreignArr[i]);
                 wordArea.addView(btn);

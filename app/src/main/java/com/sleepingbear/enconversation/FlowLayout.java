@@ -103,7 +103,8 @@ public class FlowLayout extends ViewGroup {
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
-                final int childw = child.getMeasuredWidth();
+                //final int childw = child.getMeasuredWidth();
+                final int childw = (((String)child.getTag()).length() <= 3 ? 100 : ((String)child.getTag()).length() * 35);
                 //final int childh = child.getMeasuredHeight();
                 final int childh = 140;
                 //System.out.println(childh);
