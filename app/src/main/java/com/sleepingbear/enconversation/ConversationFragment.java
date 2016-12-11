@@ -42,7 +42,6 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     private CheckBox cb_foreignView;
     private ConversationCursorAdapter adapter;
 
-    private Activity mActivity;
     private Cursor dictionaryCursor;
 
     DicSearchTask task;
@@ -53,7 +52,6 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         // Inflate the layout for this fragment
         mainView = inflater.inflate(R.layout.fragment_conversation, container, false);
 
-        mActivity = this.getActivity();
 
         dbHelper = new DbHelper(getContext());
         db = dbHelper.getWritableDatabase();
@@ -97,7 +95,8 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         AdRequest adRequest = new AdRequest.Builder().build();
         av.loadAd(adRequest);
 
-        et_search.requestFocus();
+        //IME 을 열도록 포커스를 준다.
+        //et_search.requestFocus();
 
         return mainView;
     }

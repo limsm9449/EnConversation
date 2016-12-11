@@ -5,6 +5,7 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 public class FlowLayout extends ViewGroup {
 
@@ -15,10 +16,6 @@ public class FlowLayout extends ViewGroup {
         public final int horizontal_spacing;
         public final int vertical_spacing;
 
-        /**
-         * @param horizontal_spacing Pixels between items, horizontally
-         * @param vertical_spacing Pixels between items, vertically
-         */
         public LayoutParams(int horizontal_spacing, int vertical_spacing) {
             super(0, 0);
             this.horizontal_spacing = horizontal_spacing;
@@ -53,15 +50,15 @@ public class FlowLayout extends ViewGroup {
             childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
         }
 
-
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
                 child.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST), childHeightMeasureSpec);
                 final int childw = child.getMeasuredWidth();
-                line_height = Math.max(line_height, child.getMeasuredHeight() + lp.vertical_spacing);
-
+                //line_height = Math.max(line_height, child.getMeasuredHeight() + lp.vertical_spacing);
+                line_height = Math.max(line_height, 140 + lp.vertical_spacing);
+                //System.out.println(child.getMeasuredHeight());
                 if (xpos + childw > width) {
                     xpos = getPaddingLeft();
                     ypos += line_height;
@@ -106,17 +103,15 @@ public class FlowLayout extends ViewGroup {
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
-                //final int childw = child.getMeasuredWidth();
+                final int childw = child.getMeasuredWidth();
                 //final int childh = child.getMeasuredHeight();
-                final int textLength = ((String)child.getTag()).length();
-                final int childw = (textLength < 5 ? 100 : (textLength) * 40 + 20);
-                final int childh = 170;
-
+                final int childh = 140;
+                //System.out.println(childh);
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
                 if (xpos + childw > width) {
                     xpos = getPaddingLeft();
                     //ypos += line_height;
-                    ypos += childh + lp.vertical_spacing;
+                    ypos += 140 + lp.vertical_spacing;
                 }
                 child.layout(xpos, ypos, xpos + childw, ypos + childh);
                 xpos += childw + lp.horizontal_spacing;

@@ -10,7 +10,7 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/my_f_ci_ll"
+        android:id="@+id/my_c_pi_ll"
         android:layout_alignParentTop="true">
 
         <TextView
@@ -51,7 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/my_c_vi_ll_2"
-        android:layout_below="@+id/my_f_ci_ll"
+        android:layout_below="@+id/my_c_pi_ll"
         android:gravity="center"
         android:layout_alignParentBottom="true">
 
@@ -69,12 +69,12 @@
             android:layout_alignWithParentIfMissing="false"
             android:layout_alignParentTop="true"
             android:gravity="center_vertical|left"
-            android:layout_toLeftOf="@+id/my_f_ci_cb_check" />
+            android:layout_toLeftOf="@+id/my_cb_check" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/my_f_ci_cb_check"
+            android:id="@+id/my_cb_check"
             android:layout_alignParentRight="true"
             android:button="@drawable/my_checkbox_img"
             android:textSize="10dp"

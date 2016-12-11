@@ -184,17 +184,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //상단 편집 버튼 갱신
                 isEditing = false;
                 invalidateOptionsMenu();
-
-                /*
-                if ( selectedTab == 1 ) {
-                    ((ClickwordFragment) adapter.getItem(selectedTab)).changeListView();
-                    ((ClickwordFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
-                } else if ( selectedTab == 2 ) {
-                    ((BookmarkFragment) adapter.getItem(selectedTab)).changeListView();
-                    ((BookmarkFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
+/*
+                if ( selectedTab == CommConstants.f_ConversationNote ) {
+                    ((ConversationNoteFragment) adapter.getItem(selectedTab)).changeListView(true);
+                    ((ConversationNoteFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
+                } else if ( selectedTab == CommConstants.f_Vocabulary ) {
+                    ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
+                    ((VocabularyFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
                 }
-                */
-
+*/
                 //메뉴 구성
                 invalidateOptionsMenu();
             }
@@ -266,13 +264,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return;
             }
 
-            if (position == 0) {
-            } else if (position == 1) {
-                //클릭단어
-            } else if (position == 2) {
-                //북마크
-            } else if (position == 3) {
-                //단어장
+            if (position == CommConstants.f_Vocabulary) {
                 fab.setVisibility(View.VISIBLE);
                 if ( ((VocabularyFragment) adapter.getItem(position)) != null ) {
                     ((VocabularyFragment) adapter.getItem(position)).changeListView();
@@ -312,14 +304,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ((MenuItem)menu.findItem(R.id.action_edit)).setVisible(false);
         ((MenuItem)menu.findItem(R.id.action_exit)).setVisible(false);
 
-        if ( selectedTab == 1 || selectedTab == 2 ) {
+        if ( selectedTab == CommConstants.f_ConversationNote || selectedTab == CommConstants.f_Vocabulary ) {
             if ( isEditing ) {
                 ((MenuItem)menu.findItem(R.id.action_exit)).setVisible(true);
             } else {
                 ((MenuItem)menu.findItem(R.id.action_edit)).setVisible(true);
             }
 
-        } else if ( selectedTab == 3 ) {
+        } else if ( selectedTab == CommConstants.f_Vocabulary ) {
             ((MenuItem)menu.findItem(R.id.action_delete)).setVisible(true);
         }
 
@@ -330,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
 
         if (id == R.id.action_delete) {
-            if (selectedTab == 3) {
+            if (selectedTab == CommConstants.f_Vocabulary) {
                 new AlertDialog.Builder(this)
                         .setTitle("알림")
                         .setMessage("단어장을 초기화 하시겠습니까?")
@@ -349,13 +341,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         } else if (id == R.id.action_help) {
             Bundle bundle = new Bundle();
-            if ( selectedTab == 0 ) {
+            if ( selectedTab == CommConstants.f_ConversationStudy ) {
                 bundle.putString("SCREEN", "NEWS");
-            } else if ( selectedTab == 1 ) {
+            } else if ( selectedTab == CommConstants.f_ConversationPattern ) {
                 bundle.putString("SCREEN", "CLICKWORD");
-            } else if ( selectedTab == 2 ) {
+            } else if ( selectedTab == CommConstants.f_ConversationNote ) {
                 bundle.putString("SCREEN", "BOOKMARK");
-            } else if ( selectedTab == 3 ) {
+            } else if ( selectedTab == CommConstants.f_Conversation ) {
+                bundle.putString("SCREEN", "VOCABULARY");
+            } else if ( selectedTab == CommConstants.f_Vocabulary ) {
                 bundle.putString("SCREEN", "VOCABULARY");
             }
 
@@ -467,24 +461,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             isEditing = true;
             invalidateOptionsMenu();
 
-            /*
-            if ( selectedTab == 1 ) {
-                ((ClickwordFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
-            } else if ( selectedTab == 2 ) {
-                ((BookmarkFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
+            if ( selectedTab == CommConstants.f_ConversationNote ) {
+                //((ConversationNoteFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
+            } else if ( selectedTab == CommConstants.f_Vocabulary ) {
+                ((VocabularyFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
             }
-            */
         } else if (id == R.id.action_exit) {
             isEditing = false;
             invalidateOptionsMenu();
 
-            /*
-            if ( selectedTab == 1 ) {
-                ((ClickwordFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
-            } else if ( selectedTab == 2 ) {
-                ((BookmarkFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
+            if ( selectedTab == CommConstants.f_ConversationNote ) {
+                //((ConversationNoteFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
+            } else if ( selectedTab == CommConstants.f_Vocabulary  ) {
+                ((VocabularyFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
             }
-            */
         }
 
         return super.onOptionsItemSelected(item);
@@ -508,7 +498,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                   .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                       @Override
                       public void onClick(DialogInterface dialog, int which) {
-                          if (selectedTab == 4) {
+                          if (selectedTab == CommConstants.f_Vocabulary) {
                               DicDb.initVocabulary(db);
 
                               DicUtils.writeNewInfoToFile(getApplicationContext(), db);
@@ -526,13 +516,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void changeListView() {
-        if ( selectedTab == 1 ) {
+        if ( selectedTab == CommConstants.f_ConversationStudy ) {
             ((ConversationStudyFragment) adapter.getItem(selectedTab)).changeListView(false);
-        } else if ( selectedTab == 2 ) {
+        } else if ( selectedTab == CommConstants.f_ConversationPattern ) {
+            ((ConversationPatternFragment) adapter.getItem(selectedTab)).changeListView(false);
+        } else if ( selectedTab == CommConstants.f_ConversationNote ) {
             ((ConversationNoteFragment) adapter.getItem(selectedTab)).changeListView(false);
-        } else if ( selectedTab == 3 ) {
+        } else if ( selectedTab == CommConstants.f_Conversation ) {
             ((ConversationFragment) adapter.getItem(selectedTab)).changeListView(false);
-        } else if ( selectedTab == 4 ) {
+        } else if ( selectedTab == CommConstants.f_Vocabulary ) {
             ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
         }
     }
@@ -555,11 +547,14 @@ class MainPagerAdapter extends FragmentPagerAdapter {
         mFragmentList.add(new ConversationStudyFragment());
         mFragmentTitleList.add("회화 학습");
 
-        mFragmentList.add(new ConversationNoteFragment());
-        mFragmentTitleList.add("회화 노트");
+        mFragmentList.add(new ConversationPatternFragment());
+        mFragmentTitleList.add("회화 패턴");
 
         mFragmentList.add(new ConversationFragment());
         mFragmentTitleList.add("회화 검색");
+
+        mFragmentList.add(new ConversationNoteFragment());
+        mFragmentTitleList.add("회화 노트");
 
         mFragmentList.add(new VocabularyFragment());
         mFragmentTitleList.add("단어장");

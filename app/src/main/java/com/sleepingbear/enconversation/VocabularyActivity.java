@@ -266,17 +266,17 @@ class VocabularyCursorAdapter extends CursorAdapter {
 
         ViewHolder viewHolder = new ViewHolder();
         //암기 체크
-        viewHolder.memorizationCheck = (CheckBox) view.findViewById(R.id.my_f_ci_cb_check);
+        viewHolder.memorizationCheck = (CheckBox) view.findViewById(R.id.my_cb_check);
         viewHolder.memorizationCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 HashMap hm = (HashMap) v.getTag();
                 String entryId = (String) hm.get("entryId");
 
-                DicDb.updMemory(mDb, entryId, (((CheckBox) v.findViewById(R.id.my_f_ci_cb_check)).isChecked() ? "Y" : "N"));
+                DicDb.updMemory(mDb, entryId, (((CheckBox) v.findViewById(R.id.my_cb_check)).isChecked() ? "Y" : "N"));
 
                 //기록...
-                DicUtils.writeInfoToFile(context, "MEMORY" + ":" + entryId + ":" + (((CheckBox) v.findViewById(R.id.my_f_ci_cb_check)).isChecked() ? "Y" : "N"));
+                DicUtils.writeInfoToFile(context, "MEMORY" + ":" + entryId + ":" + (((CheckBox) v.findViewById(R.id.my_cb_check)).isChecked() ? "Y" : "N"));
 
                 dataChange();
             }
@@ -307,7 +307,7 @@ class VocabularyCursorAdapter extends CursorAdapter {
 
         //암기 체크박스
         String memorization = cursor.getString(cursor.getColumnIndexOrThrow("MEMORIZATION"));
-        CheckBox cb_memorization = (CheckBox)view.findViewById(R.id.my_f_ci_cb_check);
+        CheckBox cb_memorization = (CheckBox)view.findViewById(R.id.my_cb_check);
         cb_memorization.setTag(param);
         if ( "Y".equals(memorization) ) {
             cb_memorization.setChecked(true);

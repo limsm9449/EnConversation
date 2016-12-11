@@ -403,4 +403,81 @@ public class DicQuery {
 
         return sql.toString();
     }
+
+    public static String getConversationPattern() {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("SELECT SEQ _id, SEQ, PATTERN, DESC, SQL_WHERE" + CommConstants.sqlCR);
+        sql.append("  FROM DIC_PATTERN" + CommConstants.sqlCR);
+        DicUtils.dicSqlLog(sql.toString());
+
+        return sql.toString();
+    }
+
+    public static String getPatternSample(String pattern) {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("SELECT  SEQ _id, SEQ, SENTENCE1, SENTENCE2" + CommConstants.sqlCR);
+        sql.append("FROM    DIC_SAMPLE" + CommConstants.sqlCR);
+        sql.append("WHERE   SENTENCE1 LIKE '" + pattern + "'" + CommConstants.sqlCR);
+        sql.append("ORDER   BY WORD_CNT, ORD" + CommConstants.sqlCR);
+        DicUtils.dicSqlLog(sql.toString());
+
+        return sql.toString();
+    }
+
+    public static String getMyConversationKindContextMenu() {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("SELECT CODE KIND, CODE_NAME KIND_NAME" + CommConstants.sqlCR);
+        sql.append("  FROM DIC_CODE" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP = 'C01'" + CommConstants.sqlCR);
+        sql.append(" ORDER BY CODE_NAME" + CommConstants.sqlCR);
+
+        DicUtils.dicSqlLog(sql.toString());
+
+        return sql.toString();
+    }
+
+    public static String getConversationGroup() {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("SELECT SEQ _id,CODE KIND, CODE_NAME KIND_NAME" + CommConstants.sqlCR);
+        sql.append("  FROM DIC_CODE" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP = 'CONVERSATION'" + CommConstants.sqlCR);
+        sql.append(" ORDER BY CODE" + CommConstants.sqlCR);
+
+        DicUtils.dicSqlLog(sql.toString());
+
+        return sql.toString();
+    }
+
+    public static String getConversationKind(String groupCode) {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("SELECT SEQ _id,CODE KIND, CODE_NAME KIND_NAME" + CommConstants.sqlCR);
+        sql.append("  FROM DIC_CODE" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP = '" + groupCode + "'" + CommConstants.sqlCR);
+        sql.append(" ORDER BY CODE" + CommConstants.sqlCR);
+
+        DicUtils.dicSqlLog(sql.toString());
+
+        return sql.toString();
+    }
+
+    public static String getConversation(String code) {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("SELECT  B.SEQ _id, B.SEQ, B.SENTENCE1, B.SENTENCE2, A.INS_DATE" + CommConstants.sqlCR);
+        sql.append("FROM    DIC_CONVERSATION A" + CommConstants.sqlCR);
+        sql.append("        JOIN DIC_SAMPLE B" + CommConstants.sqlCR);
+        sql.append("WHERE   A.SAMPLE_SEQ = B.SEQ " + CommConstants.sqlCR);
+        sql.append("AND     A.CODE = '" + code + "'" + CommConstants.sqlCR);
+        sql.append("ORDER   BY B.ORD" + CommConstants.sqlCR);
+
+        DicUtils.dicSqlLog(sql.toString());
+
+        return sql.toString();
+    }
+
 }

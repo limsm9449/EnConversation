@@ -31,11 +31,11 @@ dependencies {
     })
     compile files('libs/microsoft-translator-java-api-0.6.2-jar-with-dependencies.jar')
     compile files('libs/jsoup-1.7.2.jar')
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile 'com.android.support:design:24.2.0'
-    compile 'com.android.support:support-v4:24.2.0'
-    compile 'com.google.android.gms:play-services:9.6.1'
-    compile 'com.google.android.gms:play-services-ads:9.6.1'
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
+    compile 'com.android.support:support-v4:24.2.1'
+    compile 'com.google.android.gms:play-services:9.8.00'
+    compile 'com.google.android.gms:play-services-ads:9.8.00'
     compile 'com.android.support:multidex:1.0.0'
     testCompile 'junit:junit:4.12'
 }

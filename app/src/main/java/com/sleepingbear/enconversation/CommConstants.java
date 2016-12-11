@@ -23,4 +23,13 @@ public class CommConstants {
 
     public final static int a_news = 1;
     public final static int a_vocabulary = 2;
+
+    public static int f_ConversationStudy = 0;
+    public static int f_ConversationPattern = 1;
+    public static int f_Conversation = 2;
+    public static int f_ConversationNote = 3;
+    public static int f_Vocabulary = 4;
+
+    public static String f_tag_c_study_ins = "C_STUDY_INS" ;
+    public static String f_tag_c_note_ins = "C_NOTE_INS" ;
 }

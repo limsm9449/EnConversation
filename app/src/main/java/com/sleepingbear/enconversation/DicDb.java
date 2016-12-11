@@ -291,4 +291,57 @@ public class DicDb {
         DicUtils.dicSqlLog(sql.toString());
         db.execSQL(sql.toString());
     }
+
+    public static void insConversationStudy(SQLiteDatabase db, String sampleSeq, String insDate) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT  COUNT(*) CNT" + CommConstants.sqlCR);
+        sql.append("FROM    DIC_CODE " + CommConstants.sqlCR);
+        sql.append("WHERE   CODE_GROUP = 'C02'" +  CommConstants.sqlCR);
+        sql.append("AND     CODE = '" + insDate + "'" + CommConstants.sqlCR);
+        Cursor cursor = db.rawQuery(sql.toString(), null);
+        if ( cursor.moveToNext() ) {
+            if ( cursor.getInt(cursor.getColumnIndexOrThrow("CNT")) == 0 ) {
+                sql.setLength(0);
+                sql.append("INSERT INTO DIC_CODE(CODE_GROUP, CODE, CODE_NAME) " + CommConstants.sqlCR);
+                sql.append("VALUES('C02', '" + insDate + "', '" + insDate + "')" + CommConstants.sqlCR);
+                db.execSQL(sql.toString());
+            }
+        }
+        cursor.close();
+
+        sql.setLength(0);
+        sql.append("DELETE  FROM DIC_CONVERSATION " + CommConstants.sqlCR);
+        sql.append("WHERE   CODE = 'C02'" + CommConstants.sqlCR);
+        sql.append("AND     SAMPLE_SEQ = '" + sampleSeq + "'" + CommConstants.sqlCR);
+        sql.append("AND     INS_DATE = '" + insDate + "'" + CommConstants.sqlCR);
+        db.execSQL(sql.toString());
+
+        sql.setLength(0);
+        sql.append("INSERT INTO DIC_CONVERSATION (CODE, SAMPLE_SEQ, INS_DATE) " + CommConstants.sqlCR);
+        sql.append("VALUES('" + insDate + "', " + sampleSeq + ", '" + insDate + "') " + CommConstants.sqlCR);
+        DicUtils.dicSqlLog(sql.toString());
+        db.execSQL(sql.toString());
+
+        sql.setLength(0);
+        sql.append("UPDATE  DIC_CODE " + CommConstants.sqlCR);
+        sql.append("SET     CODE_NAME = CODE || ' - ' || ( SELECT COUNT(*) FROM DIC_CONVERSATION WHERE CODE = DIC_CODE.CODE ) || '개를 학습 하셨습니다.'  " + CommConstants.sqlCR);
+        sql.append("WHERE   CODE_GROUP = 'C02' AND CODE = '" + insDate + "'" + CommConstants.sqlCR);
+        DicUtils.dicSqlLog(sql.toString());
+        db.execSQL(sql.toString());
+    }
+
+    public static void insConversationNote(SQLiteDatabase db, String code, String sampleSeq, String insDate) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("DELETE  FROM DIC_CONVERSATION " + CommConstants.sqlCR);
+        sql.append("WHERE   CODE = '" + code + "'" + CommConstants.sqlCR);
+        sql.append("AND     SAMPLE_SEQ = '" + sampleSeq + "'" + CommConstants.sqlCR);
+        sql.append("AND     INS_DATE = '" + insDate + "'" + CommConstants.sqlCR);
+        db.execSQL(sql.toString());
+
+        sql.setLength(0);
+        sql.append("INSERT INTO DIC_CONVERSATION (CODE, SAMPLE_SEQ, INS_DATE) " + CommConstants.sqlCR);
+        sql.append("VALUES('" + code + "', " + sampleSeq + ", '" + insDate + "') " + CommConstants.sqlCR);
+        DicUtils.dicSqlLog(sql.toString());
+        db.execSQL(sql.toString());
+    }
 }

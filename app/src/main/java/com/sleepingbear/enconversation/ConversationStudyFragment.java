@@ -34,6 +34,8 @@ import com.google.android.gms.ads.AdView;
 import java.util.HashMap;
 import java.util.Random;
 
+import static com.sleepingbear.enconversation.R.style.myButton;
+
 
 public class ConversationStudyFragment extends Fragment implements View.OnClickListener {
     private DbHelper dbHelper;
@@ -45,7 +47,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
     private String currForeign;
     private String currSeq;
     private int difficult = 1;
-    private boolean isSolve = false;
+    private boolean isStart = false;
 
     ConversationStudySearchTask task;
 
@@ -73,13 +75,17 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
         ((RadioButton) mainView.findViewById(R.id.my_rb_normal)).setOnClickListener(this);
         ((RadioButton) mainView.findViewById(R.id.my_rb_hard)).setOnClickListener(this);
 
-
         //리스트 내용 변경
         changeListView(true);
 
         AdView av = (AdView)mainView.findViewById(R.id.adView);
         AdRequest adRequest = new  AdRequest.Builder().build();
         av.loadAd(adRequest);
+
+
+        //소프트 키보드 없애기
+        //InputMethodManager imm= (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        //imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
 
         return mainView;
     }
@@ -114,12 +120,13 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                     conversationShow();
                 }
 
-                isSolve = false;
+                isStart = false;
 
                 break;
             case R.id.my_iv_right:
-                if ( isSolve ) {
-                    DicUtils. writeInfoToFile(getContext(), "C_STUDY_INS" + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
+                if ( isStart ) {
+                    DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
+                    DicUtils. writeInfoToFile(getContext(), CommConstants.f_tag_c_study_ins + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
                 }
                 if ( !cursor.isLast() ) {
                     cursor.moveToNext();
@@ -153,6 +160,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                 DicUtils.dicLog(foreign.length() + " : " + currForeign.length() );
                 //영문보기를 클릭하고 단어 클릭시 오류가 발생해서 체크를 해줌.
                 if ( foreign.length() >= currForeign.length() ) {
+                    Toast.makeText(getContext(), "Refresh 버튼을 클릭한 후에 단어를 선택해 주세요.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -166,7 +174,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                     my_tv_foreign.setText(foreign);
                     ((Button)v).setBackgroundColor(Color.rgb(189, 195, 195));
                 } else {
-                    Toast.makeText(getContext(), "틀린 단어를 선택하셨습니다.\n다른 단어를 선택해주세요.", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), "틀린 단어를 선택하셨습니다.\n다른 단어를 선택해주세요.", Toast.LENGTH_SHORT).show();
                 }
 
                 if ( foreign.equals( currForeign) ) {
@@ -175,7 +183,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                     FlowLayout wordArea = (FlowLayout) mainView.findViewById(R.id.my_ll_conversation_word);
                     wordArea.removeAllViews();
 
-                    isSolve = true;
+                    isStart = true;
                 }
 
                 break;
@@ -203,19 +211,19 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                 btn.setTextColor(Color.rgb(255, 255, 255));
                 btn.setText(foreignArr[i]);
                 btn.setAllCaps(false);
-                btn.setLayoutParams(new FlowLayout.LayoutParams(3, 3));
                 btn.setTextSize(12);
+
+                btn.setLayoutParams((new FlowLayout.LayoutParams(3, 3)));
+
                 btn.setId(i);
                 btn.setTag(foreignArr[i]);
-                btn.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+                btn.setGravity(Gravity.CENTER_HORIZONTAL);
                 btn.setOnClickListener(this);
-                btn.invalidate();
-
+                System.out.println(foreignArr[i]);
                 wordArea.addView(btn);
             }
-            wordArea.invalidate();
-            wordArea.requestLayout();
-            isSolve = false;
+
+            isStart = false;
         } else {
             my_tv_han.setText("");
             my_tv_foreign.setText("");
