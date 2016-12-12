@@ -215,6 +215,8 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                             } else {
                                 changeListView(true);
                             }
+
+                            alertDialog.dismiss();
                         }
                     });
                     ((Button) dialog_layout.findViewById(R.id.my_b_close)).setOnClickListener(new View.OnClickListener() {
