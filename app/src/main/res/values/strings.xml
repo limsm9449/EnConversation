@@ -37,6 +37,7 @@
     <string name="title_activity_patch">PatchActivity</string>
     <string name="title_activity_my_sample">MySampleActivity</string>
     <string name="banner_ad_unit_id">ca-app-pub-3860766380986792/2092125867</string>
+    <string name="banner_ad_unit_id2">ca-app-pub-3860766380986792/4618602260</string>
     <string name="title_activity_web_dictionary">WebDictionaryActivity</string>
     <string name="title_activity_web_translate">WebTranslateActivity</string>
 

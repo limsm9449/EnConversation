@@ -96,45 +96,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-                final View dialog_layout = inflater.inflate(R.layout.dialog_category_add, (ViewGroup) findViewById(R.id.my_d_category_root));
+                if ( selectedTab == CommConstants.f_Vocabulary ) {
+                    LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+                    final View dialog_layout = inflater.inflate(R.layout.dialog_category_add, (ViewGroup) findViewById(R.id.my_d_category_root));
 
-                //dialog 생성..
-                AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-                builder.setView(dialog_layout);
-                final AlertDialog alertDialog = builder.create();
+                    //dialog 생성..
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setView(dialog_layout);
+                    final AlertDialog alertDialog = builder.create();
 
-                ((TextView) dialog_layout.findViewById(R.id.my_d_category_add_tv_title)).setText("단어장 추가");
-                final EditText et_ins = ((EditText) dialog_layout.findViewById(R.id.my_d_category_add_et_ins));
-                ((Button) dialog_layout.findViewById(R.id.my_d_category_add_b_ins)).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if ("".equals(et_ins.getText().toString())) {
-                            Toast.makeText(getApplicationContext(), "단어장 이름을 입력하세요.", Toast.LENGTH_SHORT).show();
-                        } else {
-                            alertDialog.dismiss();
+                    ((TextView) dialog_layout.findViewById(R.id.my_d_category_add_tv_title)).setText("단어장 추가");
+                    final EditText et_ins = ((EditText) dialog_layout.findViewById(R.id.my_d_category_add_et_ins));
+                    ((Button) dialog_layout.findViewById(R.id.my_d_category_add_b_ins)).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if ("".equals(et_ins.getText().toString())) {
+                                Toast.makeText(getApplicationContext(), "단어장 이름을 입력하세요.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                alertDialog.dismiss();
 
-                            String insCategoryCode = DicQuery.getInsCategoryCode(db);
-                            db.execSQL(DicQuery.getInsNewCategory("MY", insCategoryCode, et_ins.getText().toString()));
+                                String insCategoryCode = DicQuery.getInsCategoryCode(db);
+                                db.execSQL(DicQuery.getInsNewCategory("MY", insCategoryCode, et_ins.getText().toString()));
 
-                            //기록
-                            DicUtils.writeInfoToFile(getApplicationContext(), "CATEGORY_INSERT" + ":" + insCategoryCode + ":" + et_ins.getText().toString());
+                                //기록
+                                DicUtils.writeInfoToFile(getApplicationContext(), "CATEGORY_INSERT" + ":" + insCategoryCode + ":" + et_ins.getText().toString());
 
-                            ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
+                                ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
 
-                            Toast.makeText(getApplicationContext(), "단어장을 추가하였습니다.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "단어장을 추가하였습니다.", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                });
-                ((Button) dialog_layout.findViewById(R.id.my_d_category_add_b_close)).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        alertDialog.dismiss();
-                    }
-                });
+                    });
+                    ((Button) dialog_layout.findViewById(R.id.my_d_category_add_b_close)).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alertDialog.dismiss();
+                        }
+                    });
 
-                alertDialog.setCanceledOnTouchOutside(false);
-                alertDialog.show();
+                    alertDialog.setCanceledOnTouchOutside(false);
+                    alertDialog.show();
+                } else if ( selectedTab == CommConstants.f_ConversationNote ) {
+
+                }
             }
         });
 

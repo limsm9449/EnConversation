@@ -3,6 +3,7 @@ package com.sleepingbear.enconversation;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -29,11 +30,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
 import java.util.HashMap;
 import java.util.Random;
 
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 import static com.sleepingbear.enconversation.R.style.myButton;
 
 
@@ -178,7 +182,65 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                 }
 
                 if ( foreign.equals( currForeign) ) {
-                    Toast.makeText(getContext(), "맞는 문장입니다.\n다음 회화 문제를 풀어보세요.", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), "맞는 문장입니다.\n다음 회화 문제를 풀어보세요.", Toast.LENGTH_SHORT).show();
+                    LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+                    final View dialog_layout = inflater.inflate(R.layout.dialog_correct_answer, null);
+
+                    //dialog 생성..
+                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+                    builder.setView(dialog_layout);
+                    final android.app.AlertDialog alertDialog = builder.create();
+
+                    ((TextView) dialog_layout.findViewById(R.id.my_tv_han)).setText(my_tv_han.getText());
+                    ((TextView) dialog_layout.findViewById(R.id.my_tv_foreign)).setText(my_tv_foreign.getText());
+
+                    /*
+                    AdView av = (AdView)dialog_layout.findViewById(R.id.adView);
+                    AdRequest adRequest = new  AdRequest.Builder().build();
+                    AdSize customAdSize = new AdSize(300, 250);
+                    av.setAdSizes(AdSize.BANNER, new AdSize(120, 20), new AdSize(250, 250))
+                    av.loadAd(adRequest);
+                    */
+
+                    ((Button) dialog_layout.findViewById(R.id.my_b_next)).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if ( isStart ) {
+                                DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
+                                DicUtils. writeInfoToFile(getContext(), CommConstants.f_tag_c_study_ins + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
+                            }
+                            if ( !cursor.isLast() ) {
+                                cursor.moveToNext();
+                                conversationShow();
+                            } else {
+                                changeListView(true);
+                            }
+                        }
+                    });
+                    ((Button) dialog_layout.findViewById(R.id.my_b_close)).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alertDialog.dismiss();
+                        }
+                    });
+                    ((Button) dialog_layout.findViewById(R.id.my_b_detail)).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("foreign", (String)my_tv_foreign.getText());
+                            bundle.putString("han", (String)my_tv_han.getText());
+                            bundle.putString("seq", currSeq);
+
+                            Intent intent = new Intent(getContext(), SentenceViewActivity.class);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+
+                            alertDialog.dismiss();
+                        }
+                    });
+
+                    alertDialog.setCanceledOnTouchOutside(false);
+                    alertDialog.show();
 
                     FlowLayout wordArea = (FlowLayout) mainView.findViewById(R.id.my_ll_conversation_word);
                     wordArea.removeAllViews();
