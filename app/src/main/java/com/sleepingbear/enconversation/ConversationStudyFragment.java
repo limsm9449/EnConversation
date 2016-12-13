@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
 import java.util.HashMap;
@@ -85,11 +86,6 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
         AdView av = (AdView)mainView.findViewById(R.id.adView);
         AdRequest adRequest = new  AdRequest.Builder().build();
         av.loadAd(adRequest);
-
-
-        //소프트 키보드 없애기
-        //InputMethodManager imm= (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        //imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
 
         return mainView;
     }
@@ -158,10 +154,10 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                 changeListView(true);
                 break;
             default:
-                DicUtils.dicLog("click word : " + (String)v.getTag());
+                isStart = true;
+
                 String foreign = (String)my_tv_foreign.getText();
 
-                DicUtils.dicLog(foreign.length() + " : " + currForeign.length() );
                 //영문보기를 클릭하고 단어 클릭시 오류가 발생해서 체크를 해줌.
                 if ( foreign.length() >= currForeign.length() ) {
                     Toast.makeText(getContext(), "Refresh 버튼을 클릭한 후에 단어를 선택해 주세요.", Toast.LENGTH_SHORT).show();
@@ -177,12 +173,9 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                 if ( foreign.equals( currForeign.substring( 0, foreign.length() ) ) ) {
                     my_tv_foreign.setText(foreign);
                     ((Button)v).setBackgroundColor(Color.rgb(189, 195, 195));
-                } else {
-                    //Toast.makeText(getContext(), "틀린 단어를 선택하셨습니다.\n다른 단어를 선택해주세요.", Toast.LENGTH_SHORT).show();
                 }
 
                 if ( foreign.equals( currForeign) ) {
-                    //Toast.makeText(getContext(), "맞는 문장입니다.\n다음 회화 문제를 풀어보세요.", Toast.LENGTH_SHORT).show();
                     LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(LAYOUT_INFLATER_SERVICE);
                     final View dialog_layout = inflater.inflate(R.layout.dialog_correct_answer, null);
 
@@ -194,13 +187,23 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                     ((TextView) dialog_layout.findViewById(R.id.my_tv_han)).setText(my_tv_han.getText());
                     ((TextView) dialog_layout.findViewById(R.id.my_tv_foreign)).setText(my_tv_foreign.getText());
 
-                    /*
-                    AdView av = (AdView)dialog_layout.findViewById(R.id.adView);
-                    AdRequest adRequest = new  AdRequest.Builder().build();
-                    AdSize customAdSize = new AdSize(300, 250);
-                    av.setAdSizes(AdSize.BANNER, new AdSize(120, 20), new AdSize(250, 250))
-                    av.loadAd(adRequest);
-                    */
+                    // 광고 추가
+                    // Create a banner ad. The ad size and ad unit ID must be set before calling loadAd.
+                    PublisherAdView mPublisherAdView = new PublisherAdView(getContext());
+                    mPublisherAdView.setAdSizes(AdSize.SMART_BANNER);
+                    mPublisherAdView.setAdUnitId(getResources().getString(R.string.banner_ad_unit_id2));
+
+                    // Create an ad request.
+                    PublisherAdRequest.Builder publisherAdRequestBuilder = new PublisherAdRequest.Builder();
+
+                    // Optionally populate the ad request builder.
+                    //publisherAdRequestBuilder.addTestDevice(PublisherAdRequest.DEVICE_ID_EMULATOR);
+
+                    // Add the PublisherAdView to the view hierarchy.
+                    ((LinearLayout) dialog_layout.findViewById(R.id.my_ll_admob)).addView(mPublisherAdView);
+
+                    // Start loading the ad.
+                    mPublisherAdView.loadAd(publisherAdRequestBuilder.build());
 
                     ((Button) dialog_layout.findViewById(R.id.my_b_next)).setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -246,8 +249,6 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
 
                     FlowLayout wordArea = (FlowLayout) mainView.findViewById(R.id.my_ll_conversation_word);
                     wordArea.removeAllViews();
-
-                    isStart = true;
                 }
 
                 break;

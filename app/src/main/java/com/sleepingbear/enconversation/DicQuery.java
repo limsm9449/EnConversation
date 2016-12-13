@@ -439,6 +439,21 @@ public class DicQuery {
         return sql.toString();
     }
 
+    public static String getMyConversationKindContextMenu(String code) {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("SELECT CODE KIND, CODE_NAME KIND_NAME" + CommConstants.sqlCR);
+        sql.append("  FROM DIC_CODE" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP = 'C01'" + CommConstants.sqlCR);
+        sql.append("   AND CODE != '" + code + "'" + CommConstants.sqlCR);
+        sql.append(" ORDER BY CODE_NAME" + CommConstants.sqlCR);
+
+        DicUtils.dicSqlLog(sql.toString());
+
+        return sql.toString();
+    }
+
+
     public static String getConversationGroup() {
         StringBuffer sql = new StringBuffer();
 

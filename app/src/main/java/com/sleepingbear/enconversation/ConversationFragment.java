@@ -3,6 +3,7 @@ package com.sleepingbear.enconversation;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -43,6 +44,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     private ConversationCursorAdapter adapter;
 
     private Cursor dictionaryCursor;
+    private int mSelect = 0;
 
     DicSearchTask task;
 
@@ -94,9 +96,6 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         AdView av = (AdView)mainView.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         av.loadAd(adRequest);
-
-        //IME 을 열도록 포커스를 준다.
-        //et_search.requestFocus();
 
         return mainView;
     }
@@ -152,6 +151,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
 
         dictionaryListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         dictionaryListView.setOnItemClickListener(itemClickListener);
+        dictionaryListView.setOnItemLongClickListener(itemLongClickListener);
         dictionaryListView.setSelection(0);
 
         //소프트 키보드 없애기
@@ -168,19 +168,65 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
             Cursor cur = (Cursor) adapter.getItem(position);
             adapter.setStatus( cur.getString(cur.getColumnIndexOrThrow("SEQ")) );
             adapter.notifyDataSetChanged();
+        }
+    };
+
+    AdapterView.OnItemLongClickListener itemLongClickListener = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            final int curPosition = position;
+
+            //메뉴 선택 다이얼로그 생성
+            Cursor cursor = db.rawQuery(DicQuery.getMyConversationKindContextMenu(), null);
+            final String[] kindCodes = new String[]{"M1","M2"};
+            final String[] kindCodeNames = new String[]{"회화 학습","문장 상세"};
+
+            final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(getContext());
+            dlg.setTitle("메뉴 선택");
+            dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+                    mSelect = arg1;
+                }
+            });
+            dlg.setNegativeButton("취소", null);
+            dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if ( mSelect == 0 ) {
+                        Cursor cur = (Cursor) adapter.getItem(curPosition);
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString("code", "");
+                        bundle.putString("title", "회화 학습");
+                        bundle.putString("sampleSeq", cur.getString(cur.getColumnIndexOrThrow("SEQ")));
+
+                        Intent intent = new Intent(getActivity().getApplication(), ConversationStudyActivity.class);
+                        intent.putExtras(bundle);
+
+                        startActivity(intent);
+                    } else {
+                        Cursor cur = (Cursor) adapter.getItem(curPosition);
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString("foreign", cur.getString(cur.getColumnIndexOrThrow("SENTENCE1")));
+                        bundle.putString("han", cur.getString(cur.getColumnIndexOrThrow("SENTENCE2")));
+                        bundle.putString("sampleSeq", cur.getString(cur.getColumnIndexOrThrow("SEQ")));
+
+                        Intent intent = new Intent(getActivity().getApplication(), SentenceViewActivity.class);
+                        intent.putExtras(bundle);
+
+                        startActivity(intent);
+                    }
+                }
+            });
+            dlg.show();
             /*
             cur.moveToPosition(position);
 
-            Bundle bundle = new Bundle();
-            bundle.putString("foreign", cur.getString(cur.getColumnIndexOrThrow("SENTENCE1")));
-            bundle.putString("han", cur.getString(cur.getColumnIndexOrThrow("SENTENCE2")));
-            bundle.putString("sampleSeq", cur.getString(cur.getColumnIndexOrThrow("SEQ")));
-
-            Intent intent = new Intent(getActivity().getApplication(), SentenceViewActivity.class);
-            intent.putExtras(bundle);
-
-            startActivity(intent);
             */
+
+            return true;
         }
     };
 

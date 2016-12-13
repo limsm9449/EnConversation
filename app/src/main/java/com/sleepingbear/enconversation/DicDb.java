@@ -344,4 +344,11 @@ public class DicDb {
         DicUtils.dicSqlLog(sql.toString());
         db.execSQL(sql.toString());
     }
+    public static void delConversationNote(SQLiteDatabase db, int seq) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("DELETE FROM DIC_CONVERSATION " + CommConstants.sqlCR);
+        sql.append(" WHERE SEQ = " + seq + "" + CommConstants.sqlCR);
+        DicUtils.dicSqlLog(sql.toString());
+        db.execSQL(sql.toString());
+    }
 }

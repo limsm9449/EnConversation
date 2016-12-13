@@ -103,7 +103,7 @@ public class PatternActivity extends AppCompatActivity {
                 cursor.close();
 
                 final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(PatternActivity.this);
-                dlg.setTitle("메뉴 선택");
+                dlg.setTitle("회화 노트 선택");
                 dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {

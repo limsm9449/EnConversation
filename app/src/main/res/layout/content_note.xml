@@ -8,14 +8,75 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.sleepingbear.enconversation.NoteActivity"
     tools:showIn="@layout/activity_note">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="false"
         android:layout_alignParentStart="false"
-        android:id="@+id/my_c_rl_top">
+        android:id="@+id/my_c_rl_top"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@mipmap/ic_done_all_black_24dp"
+            android:id="@+id/my_iv_all"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@mipmap/ic_delete_black_24dp"
+            android:id="@+id/my_iv_delete"
+            android:layout_toRightOf="@+id/my_iv_all"
+            android:layout_marginLeft="10dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@mipmap/ic_content_copy_black_24dp"
+            android:id="@+id/my_iv_copy"
+            android:layout_toRightOf="@+id/my_iv_delete"
+            android:layout_marginLeft="20dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@mipmap/ic_content_cut_black_24dp"
+            android:id="@+id/my_iv_move"
+            android:layout_toRightOf="@+id/my_iv_copy"
+            android:layout_marginLeft="10dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@mipmap/ic_exit_to_app_black_24dp"
+            android:id="@+id/my_iv_exit"
+            android:layout_toLeftOf="@+id/my_iv_edit"
+            android:layout_marginRight="10dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@mipmap/ic_mode_edit_black_24dp"
+            android:id="@+id/my_iv_edit"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp" />
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/my_divider"
+        android:layout_alignParentTop="false"
+        android:id="@+id/my_ll_1"
+        android:layout_below="@+id/my_c_rl_top" />
 
     <ListView
         android:layout_width="match_parent"
@@ -24,17 +85,18 @@
         android:layout_gravity="center_horizontal"
         android:divider="@color/my_divider"
         android:dividerHeight="0.5dp"
-        android:layout_above="@+id/adView"
-        android:layout_below="@+id/my_c_rl_top" >
+        android:layout_below="@+id/my_c_rl_top"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/adView">
     </ListView>
 
     <com.google.android.gms.ads.AdView
-        xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/adView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        ads:adSize="BANNER"
-        ads:adUnitId="@string/banner_ad_unit_id"
+        app:adSize="BANNER"
+        app:adUnitId="@string/banner_ad_unit_id"
         android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

@@ -62,8 +62,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final int MY_PERMISSIONS_REQUEST = 0;
 
-    private boolean isEditing = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -186,17 +184,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mPager.setCurrentItem(selectedTab);
 
                 //상단 편집 버튼 갱신
-                isEditing = false;
                 invalidateOptionsMenu();
-/*
+
                 if ( selectedTab == CommConstants.f_ConversationNote ) {
-                    ((ConversationNoteFragment) adapter.getItem(selectedTab)).changeListView(true);
-                    ((ConversationNoteFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
+                    ((ConversationNoteFragment) adapter.getItem(selectedTab)).changeListView();
                 } else if ( selectedTab == CommConstants.f_Vocabulary ) {
                     ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
-                    ((VocabularyFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
                 }
-*/
+
                 //메뉴 구성
                 invalidateOptionsMenu();
             }
@@ -220,9 +215,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             editor.commit();
         };
 		*/
-        //소프트 키보드 없애기
-        //InputMethodManager imm= (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        //imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
 
 		checkPermission();
     }
@@ -270,9 +262,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             if (position == CommConstants.f_Vocabulary) {
                 fab.setVisibility(View.VISIBLE);
+                /*
                 if ( ((VocabularyFragment) adapter.getItem(position)) != null ) {
                     ((VocabularyFragment) adapter.getItem(position)).changeListView();
                 }
+                */
             }
         } catch ( Exception e ) {
             e.printStackTrace();
@@ -305,17 +299,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         ((MenuItem)menu.findItem(R.id.action_delete)).setVisible(false);
-        ((MenuItem)menu.findItem(R.id.action_edit)).setVisible(false);
-        ((MenuItem)menu.findItem(R.id.action_exit)).setVisible(false);
 
-        if ( selectedTab == CommConstants.f_ConversationNote || selectedTab == CommConstants.f_Vocabulary ) {
-            if ( isEditing ) {
-                ((MenuItem)menu.findItem(R.id.action_exit)).setVisible(true);
-            } else {
-                ((MenuItem)menu.findItem(R.id.action_edit)).setVisible(true);
-            }
-
-        } else if ( selectedTab == CommConstants.f_Vocabulary ) {
+        if ( selectedTab == CommConstants.f_Vocabulary ) {
             ((MenuItem)menu.findItem(R.id.action_delete)).setVisible(true);
         }
 
@@ -461,24 +446,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             alertDialog.setCanceledOnTouchOutside(false);
             alertDialog.show();
-        } else if (id == R.id.action_edit) {
-            isEditing = true;
-            invalidateOptionsMenu();
-
-            if ( selectedTab == CommConstants.f_ConversationNote ) {
-                //((ConversationNoteFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
-            } else if ( selectedTab == CommConstants.f_Vocabulary ) {
-                ((VocabularyFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
-            }
-        } else if (id == R.id.action_exit) {
-            isEditing = false;
-            invalidateOptionsMenu();
-
-            if ( selectedTab == CommConstants.f_ConversationNote ) {
-                //((ConversationNoteFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
-            } else if ( selectedTab == CommConstants.f_Vocabulary  ) {
-                ((VocabularyFragment) adapter.getItem(selectedTab)).changeEdit(isEditing);
-            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -520,14 +487,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void changeListView() {
-        if ( selectedTab == CommConstants.f_ConversationStudy ) {
-            ((ConversationStudyFragment) adapter.getItem(selectedTab)).changeListView(false);
-        } else if ( selectedTab == CommConstants.f_ConversationPattern ) {
-            ((ConversationPatternFragment) adapter.getItem(selectedTab)).changeListView(false);
-        } else if ( selectedTab == CommConstants.f_ConversationNote ) {
-            ((ConversationNoteFragment) adapter.getItem(selectedTab)).changeListView(false);
-        } else if ( selectedTab == CommConstants.f_Conversation ) {
-            ((ConversationFragment) adapter.getItem(selectedTab)).changeListView(false);
+        if ( selectedTab == CommConstants.f_ConversationNote ) {
+            ((ConversationNoteFragment) adapter.getItem(selectedTab)).changeListView();
         } else if ( selectedTab == CommConstants.f_Vocabulary ) {
             ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
         }

@@ -33,13 +33,9 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
     private SQLiteDatabase db;
     private View mainView;
     private ConversationNoteCursorAdapter adapter;
-    private boolean isAllCheck = false;
 
     public Spinner s_group;
     public String groupCode;
-    public int mSelect = 0;
-
-    private boolean isEditing;
 
     public ConversationNoteFragment() {
     }
@@ -64,7 +60,7 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 groupCode = ((Cursor) s_group.getSelectedItem()).getString(1);
 
-                changeListView(true);
+                changeListView();
             }
 
             @Override
@@ -74,7 +70,7 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
         });
 
         //리스트 내용 변경
-        changeListView(true);
+        changeListView();
 
         AdView av = (AdView)mainView.findViewById(R.id.adView);
         AdRequest adRequest = new  AdRequest.Builder().build();
@@ -83,7 +79,7 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
         return mainView;
     }
 
-    public void changeListView(boolean isKeyin) {
+    public void changeListView() {
         if ( db != null ) {
             Cursor listCursor = db.rawQuery(DicQuery.getConversationKind(groupCode), null);
             ListView listView = (ListView) mainView.findViewById(R.id.my_f_conversation_note_lv);
@@ -91,6 +87,7 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
             listView.setAdapter(adapter);
             listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
             listView.setOnItemClickListener(itemClickListener);
+            listView.setOnItemLongClickListener(itemLongClickListener);
             listView.setSelection(0);
         }
     }
@@ -98,17 +95,32 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
     AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            if ( !isEditing ) {
-                Cursor cur = (Cursor) adapter.getItem(position);
+            Cursor cur = (Cursor) adapter.getItem(position);
 
-                Bundle bundle = new Bundle();
-                bundle.putString("kind", cur.getString(cur.getColumnIndexOrThrow("KIND")));
-                bundle.putString("kindName", cur.getString(cur.getColumnIndexOrThrow("KIND_NAME")));
+            Bundle bundle = new Bundle();
+            bundle.putString("kind", cur.getString(cur.getColumnIndexOrThrow("KIND")));
+            bundle.putString("kindName", cur.getString(cur.getColumnIndexOrThrow("KIND_NAME")));
 
-                Intent intent = new Intent(getContext(), NoteActivity.class);
-                intent.putExtras(bundle);
-                startActivity(intent);
-            }
+            Intent intent = new Intent(getContext(), NoteActivity.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
+    };
+
+    AdapterView.OnItemLongClickListener itemLongClickListener = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            Cursor cur = (Cursor) adapter.getItem(position);
+
+            Bundle bundle = new Bundle();
+            bundle.putString("code", cur.getString(cur.getColumnIndexOrThrow("KIND")));
+            bundle.putString("title", cur.getString(cur.getColumnIndexOrThrow("KIND_NAME")));
+
+            Intent intent = new Intent(getContext(), ConversationStudyActivity.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
+
+            return true;
         }
     };
 
