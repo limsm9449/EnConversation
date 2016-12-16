@@ -83,6 +83,7 @@ public class VocabularyFragment extends Fragment implements View.OnClickListener
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 if ( ((MainActivity)getActivity()).checkPermission() == false ) {
+                    Toast.makeText(getContext(), "파일 권한이 없어서 실행하실 수 없습니다.", Toast.LENGTH_SHORT).show();
                     return true;
                 }
 				
@@ -128,7 +129,7 @@ public class VocabularyFragment extends Fragment implements View.OnClickListener
                     public void onClick(View v) {
                         final String code = (String) v.getTag();
 
-                        if ("MY0000".equals(code)) {
+                        if (CommConstants.voc_code.equals(code)) {
                             Toast.makeText(getContext(), "기본 단어장은 삭제할 수 없습니다.", Toast.LENGTH_SHORT).show();
                             alertDialog.dismiss();
                         } else {

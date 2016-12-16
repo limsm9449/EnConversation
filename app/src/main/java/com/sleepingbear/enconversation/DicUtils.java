@@ -203,9 +203,8 @@ public class DicUtils {
         try {
             //데이타 초기화
             DicDb.initVocabulary(db);
-            DicDb.initSample(db);
-            DicDb.initClickword(db);
-            DicDb.initBookmark(db);
+            DicDb.initNote(db, "C01");
+            DicDb.initNote(db, "C02");
 
             if ( fileName == null || fileName.length() == 0 ) {
                 fis = ctx.openFileInput(CommConstants.infoFileName);
@@ -222,21 +221,28 @@ public class DicUtils {
                 dicLog(readString);
 
                 String[] row = readString.split(":");
+                if ( row[0] ==  CommConstants.tag_code_ins) {
+                    DicDb.insCode(db, row[1], row[2], row[3]);
+                } else if ( row[0] ==  CommConstants.tag_code_upd) {
+                } else if ( row[0] ==  CommConstants.tag_code_del) {
+                } else if ( row[0] ==  CommConstants.tag_note_ins) {
+                } else if ( row[0] ==  CommConstants.tag_note_del) {
+                } else if ( row[0] ==  CommConstants.tag_note_del_all) {
+                } else if ( row[0] ==  CommConstants.tag_voc_ins) {
+                    DicDb.insDicVoc(db, row[3], row[1], row[2]);
+                } else if ( row[0] ==  CommConstants.tag_voc_del) {
+                    DicDb.delDicVoc(db, row[2], row[1]);
+                } else if ( row[0] ==  CommConstants.tag_voc_del_all) {
+                    DicDb.delDicVocAll(db, row[1]);
+                } else if ( row[0] ==  CommConstants.tag_voc_memory) {
+                }
+
+
                 switch (row[0]) {
-                    case "MYWORD_INSERT":
-                        //단어장 추가
-                        //DicUtils.writeInfoToFile(context, "MYWORD_INSERT" + ":" + "MY" + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".") + ":" + viewHolder.entryId);
-                        DicDb.insDicVoc(db, row[3], row[1], row[2]);
-                        break;
-                    case "MYWORD_DELETE":
-                        //단어장 삭제
-                        //DicUtils. writeInfoToFile(getApplicationContext(), "MYWORD_DELETE" + ":" + kindCodes[mSelect] + ":" + entryId);
-                        DicDb.delDicVoc(db, row[2], row[1]);
-                        break;
                     case "MYWORD_DELETE_ALL":
                         //단어장 전체 삭제
                         //DicUtils. writeInfoToFile(getApplicationContext(), "MYWORD_DELETE_ALL" + ":" + entryId);
-                        DicDb.delDicVocAll(db, row[1]);
+
                         break;
                     case "CATEGORY_INSERT":
                         //DicUtils. writeInfoToFile(getContext(), "CATEGORY_INSERT" + ":" + insCategoryCode + ":" + et_ins.getText().toString());
@@ -255,16 +261,7 @@ public class DicUtils {
                         //DicUtils.writeInfoToFile(context, "MEMORY" + ":" + entryId + ":" + (((CheckBox) v.findViewById(R.id.my_c_vi_cb_memorization)).isChecked() ? "Y" : "N"));
                         DicDb.updMemory(db, row[1], row[2]);
                         break;
-                    case "MYSAMPLE_INSERT":
-                        DicDb.insDicMySample(db, row[1], row[2], row[3]);
-                        break;
-                    case "CLICK_WORD":
-                        DicDb.insDicClickWord(db, row[1], row[2]);
-                        break;
-                    case "BOOKMARK":
-                        DicDb.insDicBoolmark(db, row[1], row[2], row[3], "");
-                        DicDb.updMemory(db, row[1], row[2]);
-                        break;
+
                 }
                 readString = buffreader.readLine();
             }

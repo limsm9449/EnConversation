@@ -323,68 +323,36 @@ public class DicQuery {
         return sql.toString();
     }
 
-    public static String getClickword() {
-        StringBuffer sql = new StringBuffer();
-
-        sql.append("SELECT B.SEQ _id, A.SEQ, B.ENTRY_ID, B.WORD, B.MEAN, B.SPELLING, A.INS_DATE" + CommConstants.sqlCR);
-        sql.append("FROM   DIC_CLICK_WORD A, DIC B" + CommConstants.sqlCR);
-        sql.append("WHERE  A.ENTRY_ID = B.ENTRY_ID " + CommConstants.sqlCR);
-        sql.append("ORDER  BY A.INS_DATE DESC, B.WORD" + CommConstants.sqlCR);
-
-        DicUtils.dicSqlLog(sql.toString());
-
-        return sql.toString();
-    }
-
-    public static String getBookmark() {
-        StringBuffer sql = new StringBuffer();
-
-        sql.append("SELECT SEQ _id, SEQ, KIND, TITLE, URL, INS_DATE" + CommConstants.sqlCR);
-        sql.append("FROM   DIC_BOOKMARK" + CommConstants.sqlCR);
-        sql.append("ORDER  BY INS_DATE DESC, TITLE" + CommConstants.sqlCR);
-
-        DicUtils.dicSqlLog(sql.toString());
-
-        return sql.toString();
-    }
-
     public static String getWriteData() {
         StringBuffer sql = new StringBuffer();
 
-        sql.append("SELECT 'CATEGORY_INSERT'||':'||A.CODE||':'||A.CODE_NAME WRITE_DATA" + CommConstants.sqlCR);
+        sql.append("SELECT '" + CommConstants.tag_code_ins + "'||':'||A.CODE||':'||A.CODE_NAME WRITE_DATA" + CommConstants.sqlCR);
         sql.append("  FROM DIC_CODE A" + CommConstants.sqlCR);
-        sql.append(" WHERE CODE_GROUP = 'MY'" + CommConstants.sqlCR);
-        sql.append("   AND CODE != 'MY0000'" + CommConstants.sqlCR);
-        sql.append("UNION" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP IN ('MY','C01','C02')" + CommConstants.sqlCR);
+        sql.append("   AND CODE NOT IN ('MY0001','C010001')" + CommConstants.sqlCR);
 
-        sql.append("SELECT 'MYWORD_INSERT'||':'||A.KIND||':'||A.INS_DATE||':'||A.ENTRY_ID WRITE_DATA " + CommConstants.sqlCR);
+        sql.append("UNION" + CommConstants.sqlCR);
+        sql.append("SELECT '" + CommConstants.tag_note_ins + "'||':'||CODE||':'||SAMPLE_SEQ WRITE_DATA " + CommConstants.sqlCR);
+        sql.append(" FROM DIC_NOTE" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE IN (SELECT CODE FROM DIC_CODE WHERE CODE_GROUP IN ('C01','C02') )" + CommConstants.sqlCR);
+
+        sql.append("UNION" + CommConstants.sqlCR);
+        sql.append("SELECT '" + CommConstants.tag_voc_ins + "'||':'||A.KIND||':'||A.INS_DATE||':'||A.ENTRY_ID WRITE_DATA " + CommConstants.sqlCR);
         sql.append(" FROM DIC_VOC A, DIC B" + CommConstants.sqlCR);
         sql.append(" WHERE A.ENTRY_ID = B.ENTRY_ID" + CommConstants.sqlCR);
-        sql.append("UNION" + CommConstants.sqlCR);
 
-        sql.append("SELECT 'MEMORY'||':'||A.ENTRY_ID||'Y' WRITE_DATA " + CommConstants.sqlCR);
+        sql.append("UNION" + CommConstants.sqlCR);
+        sql.append("SELECT '" + CommConstants.tag_voc_memory + "'||':'||A.ENTRY_ID||'Y' WRITE_DATA " + CommConstants.sqlCR);
         sql.append("  FROM DIC_VOC A, DIC B" + CommConstants.sqlCR);
         sql.append(" WHERE A.ENTRY_ID = B.ENTRY_ID" + CommConstants.sqlCR);
         sql.append("   AND A.MEMORIZATION = 'Y'" + CommConstants.sqlCR);
-        sql.append("UNION" + CommConstants.sqlCR);
-
-        sql.append("SELECT 'MYSAMPLE_INSERT'||':'||SENTENCE1||':'||SENTENCE2||':'||TODAY WRITE_DATA " + CommConstants.sqlCR);
-        sql.append("  FROM DIC_MY_SAMPLE" + CommConstants.sqlCR);
-        sql.append("UNION" + CommConstants.sqlCR);
-
-        sql.append("SELECT 'CLICK_WORD'||':'||ENTRY_ID||':'||INS_DATE WRITE_DATA " + CommConstants.sqlCR);
-        sql.append("  FROM DIC_CLICK_WORD" + CommConstants.sqlCR);
-        sql.append("UNION" + CommConstants.sqlCR);
-
-        sql.append("SELECT 'BOOKMARK'||':'||KIND||':'||TITLE||':'||URL||':'||INS_DATE WRITE_DATA " + CommConstants.sqlCR);
-        sql.append("  FROM DIC_BOOKMARK" + CommConstants.sqlCR);
 
         DicUtils.dicSqlLog(sql.toString());
 
         return sql.toString();
     }
 
-    public static String getConversationStudy(int difficult) {
+    public static String getConversationStudyList(int difficult) {
         StringBuffer sql = new StringBuffer();
 
         sql.append("SELECT SEQ _id, SEQ, SENTENCE1, SENTENCE2" + CommConstants.sqlCR);
@@ -404,7 +372,7 @@ public class DicQuery {
         return sql.toString();
     }
 
-    public static String getConversationPattern() {
+    public static String getPatternList() {
         StringBuffer sql = new StringBuffer();
 
         sql.append("SELECT SEQ _id, SEQ, PATTERN, DESC, SQL_WHERE" + CommConstants.sqlCR);
@@ -414,7 +382,7 @@ public class DicQuery {
         return sql.toString();
     }
 
-    public static String getPatternSample(String pattern) {
+    public static String getPatternSampleList(String pattern) {
         StringBuffer sql = new StringBuffer();
 
         sql.append("SELECT  SEQ _id, SEQ, SENTENCE1, SENTENCE2" + CommConstants.sqlCR);
@@ -426,20 +394,36 @@ public class DicQuery {
         return sql.toString();
     }
 
-    public static String getMyConversationKindContextMenu() {
+    /**
+     * 회화 context Menu
+     * @param isStudyAndDetail
+     * @return
+     */
+    public static String getNoteKindContextMenu(boolean isStudyAndDetail) {
         StringBuffer sql = new StringBuffer();
 
-        sql.append("SELECT CODE KIND, CODE_NAME KIND_NAME" + CommConstants.sqlCR);
+        if ( isStudyAndDetail ) {
+            sql.append("SELECT 1 ORD, 'M1' KIND, '회화 학습' KIND_NAME" + CommConstants.sqlCR);
+            sql.append("UNION ALL" + CommConstants.sqlCR);
+            sql.append("SELECT 2 ORD, 'M2' KIND, '문장 상세' KIND_NAME" + CommConstants.sqlCR);
+            sql.append("UNION ALL" + CommConstants.sqlCR);
+        }
+        sql.append("SELECT 3 ORD, CODE KIND, CODE_NAME KIND_NAME" + CommConstants.sqlCR);
         sql.append("  FROM DIC_CODE" + CommConstants.sqlCR);
         sql.append(" WHERE CODE_GROUP = 'C01'" + CommConstants.sqlCR);
-        sql.append(" ORDER BY CODE_NAME" + CommConstants.sqlCR);
+        sql.append(" ORDER BY ORD, CODE_NAME" + CommConstants.sqlCR);
 
         DicUtils.dicSqlLog(sql.toString());
 
         return sql.toString();
     }
 
-    public static String getMyConversationKindContextMenu(String code) {
+    /**
+     * 나를 제외한 노트 종류
+     * @param code
+     * @return
+     */
+    public static String getNoteKindMeExceptContextMenu(String code) {
         StringBuffer sql = new StringBuffer();
 
         sql.append("SELECT CODE KIND, CODE_NAME KIND_NAME" + CommConstants.sqlCR);
@@ -453,8 +437,11 @@ public class DicQuery {
         return sql.toString();
     }
 
-
-    public static String getConversationGroup() {
+    /**
+     * 노트 그룹 종류
+     * @return
+     */
+    public static String getNoteGroupKind() {
         StringBuffer sql = new StringBuffer();
 
         sql.append("SELECT SEQ _id,CODE KIND, CODE_NAME KIND_NAME" + CommConstants.sqlCR);
@@ -467,28 +454,143 @@ public class DicQuery {
         return sql.toString();
     }
 
-    public static String getConversationKind(String groupCode) {
+    /**
+     * 노트 코드들..
+     * @param groupCode
+     * @return
+     */
+    public static String getNoteKind(String groupCode) {
         StringBuffer sql = new StringBuffer();
 
         sql.append("SELECT SEQ _id,CODE KIND, CODE_NAME KIND_NAME" + CommConstants.sqlCR);
         sql.append("  FROM DIC_CODE" + CommConstants.sqlCR);
         sql.append(" WHERE CODE_GROUP = '" + groupCode + "'" + CommConstants.sqlCR);
-        sql.append(" ORDER BY CODE" + CommConstants.sqlCR);
+        if ( "C03".equals(groupCode) ) {
+            sql.append(" ORDER BY CODE" + CommConstants.sqlCR);
+        } else if ( "C02".equals(groupCode) ) {
+            sql.append(" ORDER BY CODE_NAME DESC" + CommConstants.sqlCR);
+        } else {
+            sql.append(" ORDER BY CODE_NAME" + CommConstants.sqlCR);
+        }
 
         DicUtils.dicSqlLog(sql.toString());
 
         return sql.toString();
     }
 
-    public static String getConversation(String code) {
+    /**
+     * 노트 데이타
+     * @param code
+     * @return
+     */
+    public static String getNoteList(String code) {
         StringBuffer sql = new StringBuffer();
 
-        sql.append("SELECT  B.SEQ _id, B.SEQ, B.SENTENCE1, B.SENTENCE2, A.INS_DATE" + CommConstants.sqlCR);
-        sql.append("FROM    DIC_CONVERSATION A" + CommConstants.sqlCR);
-        sql.append("        JOIN DIC_SAMPLE B" + CommConstants.sqlCR);
+        sql.append("SELECT  B.SEQ _id, B.SEQ, B.SENTENCE1, B.SENTENCE2" + CommConstants.sqlCR);
+        sql.append("FROM    DIC_NOTE A" + CommConstants.sqlCR);
+        sql.append("        ,DIC_SAMPLE B" + CommConstants.sqlCR);
         sql.append("WHERE   A.SAMPLE_SEQ = B.SEQ " + CommConstants.sqlCR);
         sql.append("AND     A.CODE = '" + code + "'" + CommConstants.sqlCR);
-        sql.append("ORDER   BY B.ORD" + CommConstants.sqlCR);
+        if ( "C03".equals(code.substring(0, 3)) ) {
+            //네이버 회화는 SEQ로...
+            sql.append("ORDER   BY A.SEQ" + CommConstants.sqlCR);
+        } else {
+            sql.append("ORDER   BY B.ORD" + CommConstants.sqlCR);
+        }
+
+        DicUtils.dicSqlLog(sql.toString());
+
+        return sql.toString();
+    }
+
+    /**
+     * 추가할 노트 Max
+     * @param mDb
+     * @return
+     */
+    public static String getMaxNoteCode(SQLiteDatabase mDb) {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("SELECT MAX(CODE) CODE" + CommConstants.sqlCR);
+        sql.append("  FROM DIC_CODE" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP = 'C01'" + CommConstants.sqlCR);
+        DicUtils.dicSqlLog(sql.toString());
+
+        String insCategoryCode = "";
+        Cursor maxCategoryCursor = mDb.rawQuery(sql.toString(), null);
+        if ( maxCategoryCursor.moveToNext() ) {
+            String max = maxCategoryCursor.getString(maxCategoryCursor.getColumnIndexOrThrow("CODE"));
+            int maxCategory = Integer.parseInt(max.substring(3,max.length()));
+            insCategoryCode = "C01" + DicUtils.lpadding(Integer.toString(maxCategory + 1), 4, "0");
+            DicUtils.dicSqlLog("insConversationCode : " + insCategoryCode);
+        }
+
+        return insCategoryCode;
+    }
+
+    /**
+     * 코드 추가
+     * @param code
+     * @param codeName
+     * @return
+     */
+    public static String getInsNewNoteCode(String code, String codeName) {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("INSERT INTO DIC_CODE(CODE_GROUP, CODE, CODE_NAME)" + CommConstants.sqlCR);
+        sql.append("VALUES('C01', '" + code + "', '" + codeName + "')" + CommConstants.sqlCR);
+
+        DicUtils.dicSqlLog(sql.toString());
+
+        return sql.toString();
+    }
+
+    /**
+     * 코드명 변경
+     * @param code
+     * @param codeName
+     * @return
+     */
+    public static String getUpdCode(String code, String codeName) {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("UPDATE DIC_CODE" + CommConstants.sqlCR);
+        sql.append("   SET CODE_NAME = '" + codeName + "'" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP = 'C01'" + CommConstants.sqlCR);
+        sql.append("   AND CODE = '" + code + "'" + CommConstants.sqlCR);
+
+        DicUtils.dicSqlLog(sql.toString());
+
+        return sql.toString();
+    }
+
+    /**
+     * 노트 코드 삭제
+     * @param code
+     * @return
+     */
+    public static String getDelCode(String code) {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("DELETE FROM DIC_CODE" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP = 'C01'" + CommConstants.sqlCR);
+        sql.append("   AND CODE = '" + code + "'" + CommConstants.sqlCR);
+
+        DicUtils.dicSqlLog(sql.toString());
+
+        return sql.toString();
+    }
+
+    /**
+     * 노트 전체 내용 삭제
+     * @param code
+     * @return
+     */
+    public static String getDelNote(String code) {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("DELETE FROM DIC_NOTE" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE = '" + code + "'" + CommConstants.sqlCR);
 
         DicUtils.dicSqlLog(sql.toString());
 

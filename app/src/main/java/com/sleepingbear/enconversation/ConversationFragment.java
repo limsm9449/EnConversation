@@ -75,8 +75,10 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         cb_foreignView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                adapter.setForeignView(cb_foreignView.isChecked());
-                adapter.notifyDataSetChanged();
+                if ( adapter != null ) {
+                    adapter.setForeignView(cb_foreignView.isChecked());
+                    adapter.notifyDataSetChanged();
+                }
             }
         });
 
@@ -159,9 +161,6 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         imm.hideSoftInputFromWindow(et_search.getWindowToken(), 0);
     }
 
-    /**
-     * 단어가 선택되면은 단어 상세창을 열어준다.
-     */
     AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -174,14 +173,25 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     AdapterView.OnItemLongClickListener itemLongClickListener = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            final int curPosition = position;
+            Cursor cur = (Cursor) adapter.getItem(position);
+            final String sampleSeq = cur.getString(cur.getColumnIndexOrThrow("SEQ"));
+            final String foreign = cur.getString(cur.getColumnIndexOrThrow("SENTENCE1"));
+            final String han = cur.getString(cur.getColumnIndexOrThrow("SENTENCE2"));
 
             //메뉴 선택 다이얼로그 생성
-            Cursor cursor = db.rawQuery(DicQuery.getMyConversationKindContextMenu(), null);
-            final String[] kindCodes = new String[]{"M1","M2"};
-            final String[] kindCodeNames = new String[]{"회화 학습","문장 상세"};
+            Cursor cursor = db.rawQuery(DicQuery.getNoteKindContextMenu(true), null);
+            final String[] kindCodes = new String[cursor.getCount()];
+            final String[] kindCodeNames = new String[cursor.getCount()];
 
-            final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(getContext());
+            int idx = 0;
+            while (cursor.moveToNext()) {
+                kindCodes[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND"));
+                kindCodeNames[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND_NAME"));
+                idx++;
+            }
+            cursor.close();
+
+            final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(getActivity());
             dlg.setTitle("메뉴 선택");
             dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
                 @Override
@@ -194,39 +204,33 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if ( mSelect == 0 ) {
-                        Cursor cur = (Cursor) adapter.getItem(curPosition);
-
                         Bundle bundle = new Bundle();
                         bundle.putString("code", "");
-                        bundle.putString("title", "회화 학습");
-                        bundle.putString("sampleSeq", cur.getString(cur.getColumnIndexOrThrow("SEQ")));
+                        bundle.putString("sampleSeq", sampleSeq);
 
                         Intent intent = new Intent(getActivity().getApplication(), ConversationStudyActivity.class);
                         intent.putExtras(bundle);
 
                         startActivity(intent);
-                    } else {
-                        Cursor cur = (Cursor) adapter.getItem(curPosition);
-
+                    } else if ( mSelect == 1 ) {
                         Bundle bundle = new Bundle();
-                        bundle.putString("foreign", cur.getString(cur.getColumnIndexOrThrow("SENTENCE1")));
-                        bundle.putString("han", cur.getString(cur.getColumnIndexOrThrow("SENTENCE2")));
-                        bundle.putString("sampleSeq", cur.getString(cur.getColumnIndexOrThrow("SEQ")));
+                        bundle.putString("foreign", foreign);
+                        bundle.putString("han", han);
+                        bundle.putString("sampleSeq", sampleSeq);
 
                         Intent intent = new Intent(getActivity().getApplication(), SentenceViewActivity.class);
                         intent.putExtras(bundle);
 
                         startActivity(intent);
+                    } else {
+                        DicDb.insConversationToNote(db, kindCodes[mSelect], sampleSeq);
+                        DicUtils.writeInfoToFile(getActivity().getApplicationContext(), CommConstants.tag_note_ins + ":" + kindCodes[mSelect] + ":" + sampleSeq);
                     }
                 }
             });
             dlg.show();
-            /*
-            cur.moveToPosition(position);
 
-            */
-
-            return true;
+            return false;
         }
     };
 

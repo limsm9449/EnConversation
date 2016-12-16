@@ -17,13 +17,16 @@
             android:id="@+id/my_f_conversation_note_rl">
 
             <Spinner
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_alignParentBottom="false"
                 android:id="@+id/my_s_conversation_note"
                 android:layout_marginLeft="10dp"
                 android:layout_toLeftOf="@+id/my_iv_all"
                 android:layout_alignParentStart="true"
-                android:layout_height="25dp" />
+                android:layout_height="25dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="10dp" />
 
         </RelativeLayout>
 

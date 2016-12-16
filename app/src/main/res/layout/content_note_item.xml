@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_width="match_parent" android:layout_height="match_parent"
     android:paddingLeft="10dp"
     android:paddingTop="8dp"
     android:paddingRight="5dp"
@@ -30,32 +30,6 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/my_rl_left">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/my_rl_top">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Foreign"
-                android:id="@+id/my_tv_foreign"
-                android:layout_alignParentTop="false"
-                android:layout_alignParentLeft="true"
-                android:textColor="@color/my_text_word"
-                android:textSize="15dp"
-                android:textStyle="normal|bold"
-                android:layout_toLeftOf="@+id/my_tv_date" />
-
-            <TextView
-                android:text="Date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/my_tv_date"
-                android:layout_alignParentEnd="true" />
-
-        </RelativeLayout>
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -70,8 +44,19 @@
             android:layout_alignWithParentIfMissing="false"
             android:layout_alignParentTop="false"
             android:gravity="center_vertical|left"
-            android:layout_toLeftOf="@+id/my_cb_check"
-            android:layout_below="@+id/my_rl_top"
+            android:layout_toLeftOf="@+id/my_cb_check" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Foreign"
+            android:id="@+id/my_tv_foreign"
+            android:layout_alignParentLeft="true"
+            android:textColor="@color/my_text_word"
+            android:textSize="15dp"
+            android:textStyle="normal|bold"
+            android:layout_alignParentTop="false"
+            android:layout_below="@+id/my_tv_han"
             android:layout_marginTop="5dp" />
 
     </RelativeLayout>

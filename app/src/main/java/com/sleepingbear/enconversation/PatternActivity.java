@@ -14,6 +14,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,12 +25,15 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
+import java.util.HashMap;
+
 public class PatternActivity extends AppCompatActivity {
     private DbHelper dbHelper;
     private SQLiteDatabase db;
     private PatternCursorAdapter adapter;
     public String sqlWhere;
     public int mSelect = 0;
+    private boolean isForeignView = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +65,7 @@ public class PatternActivity extends AppCompatActivity {
     }
 
     public void getListView() {
-        Cursor cursor = db.rawQuery(DicQuery.getPatternSample(sqlWhere), null);
+        Cursor cursor = db.rawQuery(DicQuery.getPatternSampleList(sqlWhere), null);
 
         ListView listView = (ListView) this.findViewById(R.id.my_c_pattern_lv);
         adapter = new PatternCursorAdapter(getApplicationContext(), cursor, this);
@@ -71,26 +75,20 @@ public class PatternActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Cursor cur = (Cursor) adapter.getItem(i);
-
-                Bundle bundle = new Bundle();
-                bundle.putString("foreign", cur.getString(cur.getColumnIndexOrThrow("SENTENCE1")));
-                bundle.putString("han", cur.getString(cur.getColumnIndexOrThrow("SENTENCE2")));
-                bundle.putString("seq", cur.getString(cur.getColumnIndexOrThrow("SEQ")));
-
-                Intent intent = new Intent(getApplication(), SentenceViewActivity.class);
-                intent.putExtras(bundle);
-                startActivity(intent);
+                adapter.setStatus( cur.getString(cur.getColumnIndexOrThrow("SEQ")) );
+                adapter.notifyDataSetChanged();
             }
         });
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cur = (Cursor) adapter.getItem(position);
-
                 final String sampleSeq = cur.getString(cur.getColumnIndexOrThrow("SEQ"));
+                final String foreign = cur.getString(cur.getColumnIndexOrThrow("SENTENCE1"));
+                final String han = cur.getString(cur.getColumnIndexOrThrow("SENTENCE2"));
 
                 //메뉴 선택 다이얼로그 생성
-                Cursor cursor = db.rawQuery(DicQuery.getMyConversationKindContextMenu(), null);
+                Cursor cursor = db.rawQuery(DicQuery.getNoteKindContextMenu(true), null);
                 final String[] kindCodes = new String[cursor.getCount()];
                 final String[] kindCodeNames = new String[cursor.getCount()];
 
@@ -103,7 +101,7 @@ public class PatternActivity extends AppCompatActivity {
                 cursor.close();
 
                 final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(PatternActivity.this);
-                dlg.setTitle("회화 노트 선택");
+                dlg.setTitle("메뉴 선택");
                 dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
@@ -114,8 +112,29 @@ public class PatternActivity extends AppCompatActivity {
                 dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        DicDb.insConversationNote(db, kindCodes[mSelect], sampleSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), "."));
-                        DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.f_tag_c_note_ins + ":" + kindCodes[mSelect] + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".") + ":" + sampleSeq);
+                        if ( mSelect == 0 ) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("code", "");
+                            bundle.putString("sampleSeq", sampleSeq);
+
+                            Intent intent = new Intent(getApplication(), ConversationStudyActivity.class);
+                            intent.putExtras(bundle);
+
+                            startActivity(intent);
+                        } else if ( mSelect == 1 ) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("foreign", foreign);
+                            bundle.putString("han", han);
+                            bundle.putString("sampleSeq", sampleSeq);
+
+                            Intent intent = new Intent(getApplication(), SentenceViewActivity.class);
+                            intent.putExtras(bundle);
+
+                            startActivity(intent);
+                        } else {
+                            DicDb.insConversationToNote(db, kindCodes[mSelect], sampleSeq);
+                            DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_note_ins + ":" + kindCodes[mSelect] + ":" + sampleSeq);
+                        }
                     }
                 });
                 dlg.show();
@@ -127,11 +146,36 @@ public class PatternActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if ( isForeignView ) {
+            ((MenuItem) menu.findItem(R.id.action_view)).setVisible(false);
+            ((MenuItem) menu.findItem(R.id.action_hide)).setVisible(true);
+        } else {
+            ((MenuItem) menu.findItem(R.id.action_view)).setVisible(true);
+            ((MenuItem) menu.findItem(R.id.action_hide)).setVisible(false);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
             onBackPressed();
+        } else if (id == R.id.action_view) {
+            isForeignView = true;
+            invalidateOptionsMenu();
+
+            adapter.setForeignView(isForeignView);
+            adapter.notifyDataSetChanged();
+        } else if (id == R.id.action_hide) {
+            isForeignView = false;
+            invalidateOptionsMenu();
+
+            adapter.setForeignView(isForeignView);
+            adapter.notifyDataSetChanged();
         } else if (id == R.id.action_help) {
             Bundle bundle = new Bundle();
             bundle.putString("SCREEN", "DIC_CATEGORY");
@@ -146,6 +190,9 @@ public class PatternActivity extends AppCompatActivity {
 }
 
 class PatternCursorAdapter extends CursorAdapter {
+    public HashMap statusData = new HashMap();
+    public boolean isForeignView = false;
+
     public PatternCursorAdapter(Context context, Cursor cursor, Activity activity) {
         super(context, cursor, 0);
     }
@@ -159,7 +206,19 @@ class PatternCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        ((TextView) view.findViewById(R.id.my_tv_foreign)).setText(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1")));
-        ((TextView) view.findViewById(R.id.my_tv_han)).setText(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE2")));
+        ((TextView) view.findViewById(R.id.my_tv_han)).setText(String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE2"))));
+        if ( isForeignView || statusData.containsKey(cursor.getString(cursor.getColumnIndexOrThrow("SEQ")))  ) {
+            ((TextView) view.findViewById(R.id.my_tv_foreign)).setText(String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1"))));
+        } else {
+            ((TextView) view.findViewById(R.id.my_tv_foreign)).setText("Click..");
+        }
+    }
+
+    public void setForeignView(boolean foreignView) {
+        isForeignView = foreignView;
+    }
+
+    public void setStatus(String sampleSeq) {
+        statusData.put(sampleSeq, "Y");
     }
 }

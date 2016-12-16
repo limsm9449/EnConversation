@@ -81,7 +81,7 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
 
         ImageButton mySample = (ImageButton) findViewById(R.id.my_c_sv_ib_mysample);
         mySample.setOnClickListener(this);
-        if ( DicDb.isExistMySample(db, sampleSeq) ) {
+        if ( DicDb.isExistInNote(db, sampleSeq) ) {
             isMySample = true;
             mySample.setImageResource(android.R.drawable.star_on);
         } else {
@@ -217,20 +217,46 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
                     isMySample = false;
                     mySample.setImageResource(android.R.drawable.star_off);
 
-                    DicDb.delDicMySample(db, notHan);
+                    DicDb.delAllConversationFromNote(db, Integer.parseInt(sampleSeq));
 
                     // 기록..
-                    DicUtils.writeInfoToFile(getApplicationContext(), "MYSAMPLE_DELETE" + ":" + notHan);
+                    DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_note_ins + ":" + sampleSeq);
 
                     isChange = true;
                 } else {
                     isMySample = true;
                     mySample.setImageResource(android.R.drawable.star_on);
 
-                    DicDb.insDicMySample(db, notHan, han, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), "."));
+                    //메뉴 선택 다이얼로그 생성
+                    Cursor cursor = db.rawQuery(DicQuery.getNoteKindContextMenu(false), null);
+                    final String[] kindCodes = new String[cursor.getCount()];
+                    final String[] kindCodeNames = new String[cursor.getCount()];
 
-                    // 기록..
-                    DicUtils.writeInfoToFile(getApplicationContext(), "MYSAMPLE_INSERT" + ":" + notHan + ":" + han + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), "."));
+                    int idx = 0;
+                    while (cursor.moveToNext()) {
+                        kindCodes[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND"));
+                        kindCodeNames[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND_NAME"));
+                        idx++;
+                    }
+                    cursor.close();
+
+                    final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(SentenceViewActivity.this);
+                    dlg.setTitle("메뉴 선택");
+                    dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            mSelect = arg1;
+                        }
+                    });
+                    dlg.setNegativeButton("취소", null);
+                    dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            DicDb.insConversationToNote(db, kindCodes[mSelect], sampleSeq);
+                            DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_note_ins + ":" + kindCodes[mSelect] + ":" + sampleSeq);
+                        }
+                    });
+                    dlg.show();
 
                     isChange = true;
                 }
@@ -345,10 +371,10 @@ class SentenceViewCursorAdapter extends CursorAdapter {
                     // 기록..
                     DicUtils.writeInfoToFile(context, "MYWORD_DELETE_ALL" + ":" + viewHolder.entryId);
                 } else {
-                    DicDb.insDicVoc(mDb, viewHolder.entryId, "MY0000");
+                    DicDb.insDicVoc(mDb, viewHolder.entryId, CommConstants.voc_code);
 
                     // 기록..
-                    DicUtils.writeInfoToFile(context, "MYWORD_INSERT" + ":" + "MY0000" + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".") + ":" + viewHolder.entryId);
+                    DicUtils.writeInfoToFile(context, "MYWORD_INSERT" + ":" + CommConstants.voc_code + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".") + ":" + viewHolder.entryId);
                 }
 
                 dataChange();

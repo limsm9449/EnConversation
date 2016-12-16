@@ -255,10 +255,10 @@ public class WordViewActivity extends AppCompatActivity implements View.OnClickL
                     ib_myvoc.setImageResource(android.R.drawable.star_on);
                     myVoc = true;
 
-                    DicDb.insDicVoc(db, entryId, "MY0000");
+                    DicDb.insDicVoc(db, entryId, CommConstants.voc_code);
 
                     // 기록..
-                    DicUtils. writeInfoToFile(getApplicationContext(), "MYWORD_INSERT" + ":" + "MY0000" + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".") + ":" + entryId);
+                    DicUtils. writeInfoToFile(getApplicationContext(), "MYWORD_INSERT" + ":" + CommConstants.voc_code + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".") + ":" + entryId);
                 }
 
                 break;

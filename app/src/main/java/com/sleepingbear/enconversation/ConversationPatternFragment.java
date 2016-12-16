@@ -63,7 +63,7 @@ public class ConversationPatternFragment extends Fragment {
 
     public void changeListView(boolean isKeyin) {
         if ( isKeyin ) {
-            cursor = db.rawQuery(DicQuery.getConversationPattern(), null);
+            cursor = db.rawQuery(DicQuery.getPatternList(), null);
 
             if ( cursor.getCount() == 0 ) {
                 Toast.makeText(getContext(), "검색된 데이타가 없습니다.", Toast.LENGTH_SHORT).show();

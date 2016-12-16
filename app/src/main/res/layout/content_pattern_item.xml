@@ -8,20 +8,9 @@
     android:descendantFocusability="blocksDescendants">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Word"
-        android:id="@+id/my_tv_foreign"
-        android:layout_alignParentTop="false"
-        android:layout_alignParentLeft="true"
-        android:textColor="@color/my_text_word"
-        android:textSize="15dp"
-        android:textStyle="normal|bold" />
-
-    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Mean"
+        android:text="Han"
         android:id="@+id/my_tv_han"
         android:layout_alignParentBottom="false"
         android:layout_alignParentRight="false"
@@ -31,9 +20,18 @@
         android:layout_alignParentLeft="false"
         android:layout_alignWithParentIfMissing="false"
         android:layout_alignParentTop="false"
-        android:gravity="center_vertical|left"
-        android:layout_toLeftOf="@+id/my_cb_check"
-        android:layout_below="@+id/my_tv_foreign"
-        android:layout_marginTop="5dp" />
+        android:gravity="center_vertical|left" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Foreign"
+        android:id="@+id/my_tv_foreign"
+        android:layout_alignParentLeft="true"
+        android:textColor="@color/my_text_word"
+        android:textSize="15dp"
+        android:textStyle="normal|bold"
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/my_tv_han" />
 
 </RelativeLayout>

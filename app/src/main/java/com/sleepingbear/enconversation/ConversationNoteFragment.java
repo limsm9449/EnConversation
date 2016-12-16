@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -28,11 +29,20 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class ConversationNoteFragment extends Fragment implements View.OnClickListener {
     private DbHelper dbHelper;
     private SQLiteDatabase db;
     private View mainView;
     private ConversationNoteCursorAdapter adapter;
+    private LayoutInflater mInflater;
 
     public Spinner s_group;
     public String groupCode;
@@ -43,12 +53,14 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        mInflater = inflater;
+
         mainView = inflater.inflate(R.layout.fragment_conversation_note, container, false);
 
         dbHelper = new DbHelper(getContext());
         db = dbHelper.getWritableDatabase();
 
-        Cursor cursor = db.rawQuery(DicQuery.getConversationGroup(), null);
+        Cursor cursor = db.rawQuery(DicQuery.getNoteGroupKind(), null);
         String[] from = new String[]{"KIND_NAME"};
         int[] to = new int[]{android.R.id.text1};
         SimpleCursorAdapter mAdapter = new SimpleCursorAdapter(getContext(), android.R.layout.simple_spinner_item, cursor, from, to);
@@ -59,6 +71,8 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 groupCode = ((Cursor) s_group.getSelectedItem()).getString(1);
+
+                ((MainActivity)getActivity()).setChangeViewPaper(CommConstants.f_ConversationNote);
 
                 changeListView();
             }
@@ -81,7 +95,7 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
 
     public void changeListView() {
         if ( db != null ) {
-            Cursor listCursor = db.rawQuery(DicQuery.getConversationKind(groupCode), null);
+            Cursor listCursor = db.rawQuery(DicQuery.getNoteList(groupCode), null);
             ListView listView = (ListView) mainView.findViewById(R.id.my_f_conversation_note_lv);
             adapter = new ConversationNoteCursorAdapter(getContext(), listCursor, 0);
             listView.setAdapter(adapter);
@@ -110,15 +124,167 @@ public class ConversationNoteFragment extends Fragment implements View.OnClickLi
     AdapterView.OnItemLongClickListener itemLongClickListener = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            Cursor cur = (Cursor) adapter.getItem(position);
+            if ( ((MainActivity)getActivity()).checkPermission() == false ) {
+                Toast.makeText(getContext(), "파일 권한이 없어서 실행하실 수 없습니다.", Toast.LENGTH_SHORT).show();
+                return true;
+            }
 
-            Bundle bundle = new Bundle();
-            bundle.putString("code", cur.getString(cur.getColumnIndexOrThrow("KIND")));
-            bundle.putString("title", cur.getString(cur.getColumnIndexOrThrow("KIND_NAME")));
+            final Cursor cur = (Cursor) adapter.getItem(position);
 
-            Intent intent = new Intent(getContext(), ConversationStudyActivity.class);
-            intent.putExtras(bundle);
-            startActivity(intent);
+            //layout 구성
+            final View dialog_layout = mInflater.inflate(R.layout.dialog_note_iud, null);
+
+            //dialog 생성..
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity());
+            builder.setView(dialog_layout);
+            final android.app.AlertDialog alertDialog = builder.create();
+
+            final EditText et_upd = ((EditText) dialog_layout.findViewById(R.id.my_et_upd_name));
+            et_upd.setText(cur.getString(cur.getColumnIndexOrThrow("KIND_NAME")));
+
+            ((Button) dialog_layout.findViewById(R.id.my_b_upd)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
+            ((Button) dialog_layout.findViewById(R.id.my_b_upd)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if ("".equals(et_upd.getText().toString())) {
+                        Toast.makeText(getContext(), "회화노트 이름을 입력하세요.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        alertDialog.dismiss();
+
+                        db.execSQL(DicQuery.getUpdCode((String) v.getTag(), et_upd.getText().toString()));
+
+                        //기록...
+                        DicUtils.writeInfoToFile(getContext(), CommConstants.tag_code_upd + ":" + (String) v.getTag() + ":" + et_upd.getText().toString());
+
+                        changeListView();
+
+                        Toast.makeText(getContext(), "회화노트 이름을 수정하였습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+            ((Button) dialog_layout.findViewById(R.id.my_b_del)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
+            ((Button) dialog_layout.findViewById(R.id.my_b_del)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final String code = (String) v.getTag();
+
+                    if ("C010001".equals(code)) {
+                        Toast.makeText(getContext(), "기본 회화노트는 삭제할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                        alertDialog.dismiss();
+                    } else {
+                        new android.app.AlertDialog.Builder(getActivity())
+                                .setTitle("알림")
+                                .setMessage("삭제된 데이타는 복구할 수 없습니다. 삭제하시겠습니까?")
+                                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        alertDialog.dismiss();
+
+                                        db.execSQL(DicQuery.getDelCode(code));
+                                        db.execSQL(DicQuery.getDelNote(code));
+
+                                        //기록...
+                                        //DicUtils.writeInfoToFile(getContext(), "CATEGORY_DELETE" + ":" + code);
+                                        DicUtils.writeNewInfoToFile(getContext(), db);
+                                        changeListView();
+
+                                        Toast.makeText(getContext(), "회화노트를 삭제하였습니다.", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                                .show();
+                    }
+                }
+            });
+
+            final EditText et_saveName = ((EditText) dialog_layout.findViewById(R.id.my_et_file_name));
+            et_saveName.setText(cur.getString(cur.getColumnIndexOrThrow("KIND_NAME")));
+            ((Button) dialog_layout.findViewById(R.id.my_b_save)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
+            ((Button) dialog_layout.findViewById(R.id.my_b_save)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final String code = (String) v.getTag();
+
+                    String saveFileName = et_saveName.getText().toString();
+                    if ("".equals(saveFileName)) {
+                        Toast.makeText(getContext(), "저장할 파일명을 입력하세요.", Toast.LENGTH_SHORT).show();
+                    } else if (saveFileName.indexOf(".") > -1 && !"txt".equals(saveFileName.substring(saveFileName.length() - 3, saveFileName.length()).toLowerCase())) {
+                        Toast.makeText(getContext(), "확장자는 txt 입니다.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        String fileName = "";
+
+                        File appDir = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + CommConstants.folderName);
+                        if (!appDir.exists()) {
+                            appDir.mkdirs();
+
+                            if (saveFileName.indexOf(".") > -1) {
+                                fileName = Environment.getExternalStorageDirectory().getAbsoluteFile() + CommConstants.folderName + "/" + saveFileName;
+                            } else {
+                                fileName = Environment.getExternalStorageDirectory().getAbsoluteFile() + CommConstants.folderName + "/" + saveFileName + ".txt";
+                            }
+                        } else {
+                            if (saveFileName.indexOf(".") > -1) {
+                                fileName = Environment.getExternalStorageDirectory().getAbsoluteFile() + CommConstants.folderName + "/" + saveFileName;
+                            } else {
+                                fileName = Environment.getExternalStorageDirectory().getAbsoluteFile() + CommConstants.folderName + "/" + saveFileName + ".txt";
+                            }
+                        }
+
+                        File saveFile = new File(fileName);
+                        if (saveFile.exists()) {
+                            Toast.makeText(getContext(), "파일명이 존재합니다.", Toast.LENGTH_SHORT).show();
+                            ;
+                        } else {
+                            try {
+                                saveFile.createNewFile();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } finally {
+                            }
+
+                            BufferedWriter bw = null;
+                            try {
+                                bw = new BufferedWriter(new FileWriter(saveFile, true));
+
+                                Cursor cursor = db.rawQuery(DicQuery.getSaveVocabulary(code), null);
+                                while (cursor.moveToNext()) {
+                                    bw.write(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1")) + ": " + cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1")));
+                                    bw.newLine();
+                                }
+
+                                bw.flush();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } finally {
+                                if (bw != null) try {
+                                    bw.close();
+                                } catch (IOException ioe2) {
+                                }
+                            }
+
+                            Toast.makeText(getContext(), "회화노트를 정상적으로 내보냈습니다.", Toast.LENGTH_SHORT).show();
+
+                            alertDialog.dismiss();
+                        }
+                    }
+                }
+            });
+
+            ((Button) dialog_layout.findViewById(R.id.my_b_close)).setOnClickListener(new View.OnClickListener() {
+                     @Override
+                     public void onClick(View v) {
+                         alertDialog.dismiss();
+                     }
+                 }
+            );
+
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.show();
 
             return true;
         }

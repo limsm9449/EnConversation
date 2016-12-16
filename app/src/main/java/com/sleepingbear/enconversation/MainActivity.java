@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 db.execSQL(DicQuery.getInsNewCategory("MY", insCategoryCode, et_ins.getText().toString()));
 
                                 //기록
-                                DicUtils.writeInfoToFile(getApplicationContext(), "CATEGORY_INSERT" + ":" + insCategoryCode + ":" + et_ins.getText().toString());
+                                DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_code_ins + ":" + insCategoryCode + ":" + et_ins.getText().toString());
 
                                 ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
 
@@ -135,7 +135,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     alertDialog.setCanceledOnTouchOutside(false);
                     alertDialog.show();
                 } else if ( selectedTab == CommConstants.f_ConversationNote ) {
+                    LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+                    final View dialog_layout = inflater.inflate(R.layout.dialog_note_add, null);
 
+                    //dialog 생성..
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setView(dialog_layout);
+                    final AlertDialog alertDialog = builder.create();
+
+                    final EditText et_ins = ((EditText) dialog_layout.findViewById(R.id.my_et_ins_name));
+                    ((Button) dialog_layout.findViewById(R.id.my_b_ins)).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if ("".equals(et_ins.getText().toString())) {
+                                Toast.makeText(getApplicationContext(), "회화 노트 이름을 입력하세요.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                alertDialog.dismiss();
+
+                                String insConversationCode = DicQuery.getInsConversationCode(db);
+                                db.execSQL(DicQuery.getInsNewNote(insConversationCode, et_ins.getText().toString()));
+
+                                //기록
+                                DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_code_ins + ":" + insConversationCode + ":" + et_ins.getText().toString());
+
+                                ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
+
+                                Toast.makeText(getApplicationContext(), "회회 노트를 추가하였습니다.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                    ((Button) dialog_layout.findViewById(R.id.my_b_close)).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alertDialog.dismiss();
+                        }
+                    });
+
+                    alertDialog.setCanceledOnTouchOutside(false);
+                    alertDialog.show();
                 }
             }
         });
@@ -262,11 +299,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             if (position == CommConstants.f_Vocabulary) {
                 fab.setVisibility(View.VISIBLE);
-                /*
-                if ( ((VocabularyFragment) adapter.getItem(position)) != null ) {
-                    ((VocabularyFragment) adapter.getItem(position)).changeListView();
+            } else if (position == CommConstants.f_ConversationNote) {
+                if ( "C01".equals(((ConversationNoteFragment) adapter.getItem(position)).groupCode) ) {
+                    fab.setVisibility(View.VISIBLE);
                 }
-                */
             }
         } catch ( Exception e ) {
             e.printStackTrace();

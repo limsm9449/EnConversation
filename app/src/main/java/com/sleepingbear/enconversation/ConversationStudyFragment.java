@@ -103,7 +103,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
     public void getData() {
         DicUtils.dicLog(this.getClass().toString() + " getData");
         if ( db != null ) {
-            cursor = db.rawQuery(DicQuery.getConversationStudy(difficult), null);
+            cursor = db.rawQuery(DicQuery.getConversationStudyList(difficult), null);
 
             if ( cursor.getCount() == 0 ) {
             }
@@ -126,7 +126,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
             case R.id.my_iv_right:
                 if ( isStart ) {
                     DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
-                    DicUtils. writeInfoToFile(getContext(), CommConstants.f_tag_c_study_ins + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
+                    DicUtils. writeInfoToFile(getContext(), CommConstants.tag_note_ins + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
                 }
                 if ( !cursor.isLast() ) {
                     cursor.moveToNext();
@@ -210,7 +210,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                         public void onClick(View v) {
                             if ( isStart ) {
                                 DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
-                                DicUtils. writeInfoToFile(getContext(), CommConstants.f_tag_c_study_ins + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
+                                DicUtils. writeInfoToFile(getContext(), CommConstants.tag_note_ins + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
                             }
                             if ( !cursor.isLast() ) {
                                 cursor.moveToNext();

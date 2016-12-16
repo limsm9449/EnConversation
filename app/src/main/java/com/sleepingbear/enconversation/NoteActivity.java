@@ -12,14 +12,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -29,7 +28,7 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
-import static java.security.AccessController.getContext;
+import java.util.HashMap;
 
 public class NoteActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -40,7 +39,8 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
 
     private boolean isAllCheck = false;
     private int mSelect;
-    private boolean isEditing;
+    private boolean isEditing = false;
+    private boolean isForeignView = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,20 +59,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         ((ImageView)this.findViewById(R.id.my_iv_delete)).setOnClickListener(this);
         ((ImageView)this.findViewById(R.id.my_iv_copy)).setOnClickListener(this);
         ((ImageView)this.findViewById(R.id.my_iv_move)).setOnClickListener(this);
-        ((ImageView)this.findViewById(R.id.my_iv_edit)).setOnClickListener(this);
-        ((ImageView)this.findViewById(R.id.my_iv_exit)).setOnClickListener(this);
 
-        if ( "C01".equals(kind) ) {
-            ((RelativeLayout)this.findViewById(R.id.my_c_rl_top)).setVisibility(View.VISIBLE);
-
-            ((ImageView)this.findViewById(R.id.my_iv_all)).setVisibility(View.GONE);
-            ((ImageView)this.findViewById(R.id.my_iv_delete)).setVisibility(View.GONE);
-            ((ImageView)this.findViewById(R.id.my_iv_copy)).setVisibility(View.GONE);
-            ((ImageView)this.findViewById(R.id.my_iv_move)).setVisibility(View.GONE);
-            ((ImageView)this.findViewById(R.id.my_iv_exit)).setVisibility(View.GONE);
-        } else {
-            ((RelativeLayout)this.findViewById(R.id.my_c_rl_top)).setVisibility(View.GONE);
-        }
         ActionBar ab = (ActionBar) getSupportActionBar();
         ab.setTitle(b.getString("kindName"));
         ab.setHomeButtonEnabled(true);
@@ -88,7 +75,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         av.loadAd(adRequest);
     }
     public void changeListView() {
-        Cursor cursor = db.rawQuery(DicQuery.getConversation(kind), null);
+        Cursor cursor = db.rawQuery(DicQuery.getNoteList(kind), null);
 
         ListView listView = (ListView) this.findViewById(R.id.my_c_note_lv);
         adapter = new NoteCursorAdapter(getApplicationContext(), cursor, db, 0);
@@ -98,54 +85,111 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Cursor cur = (Cursor) adapter.getItem(i);
-
-                Bundle bundle = new Bundle();
-                bundle.putString("foreign", cur.getString(cur.getColumnIndexOrThrow("SENTENCE1")));
-                bundle.putString("han", cur.getString(cur.getColumnIndexOrThrow("SENTENCE2")));
-                bundle.putString("seq", cur.getString(cur.getColumnIndexOrThrow("SEQ")));
-
-                Intent intent = new Intent(getApplication(), SentenceViewActivity.class);
-                intent.putExtras(bundle);
-                startActivity(intent);
+                adapter.setStatus( cur.getString(cur.getColumnIndexOrThrow("SEQ")) );
+                adapter.notifyDataSetChanged();
             }
         });
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cur = (Cursor) adapter.getItem(position);
-
                 final String sampleSeq = cur.getString(cur.getColumnIndexOrThrow("SEQ"));
+                final String foreign = cur.getString(cur.getColumnIndexOrThrow("SENTENCE1"));
+                final String han = cur.getString(cur.getColumnIndexOrThrow("SENTENCE2"));
 
-                //메뉴 선택 다이얼로그 생성
-                Cursor cursor = db.rawQuery(DicQuery.getMyConversationKindContextMenu(), null);
-                final String[] kindCodes = new String[cursor.getCount()];
-                final String[] kindCodeNames = new String[cursor.getCount()];
+                if ( "C01".equals(kind) || "C02".equals(kind) ) {
+                    //메뉴 선택 다이얼로그 생성
+                    final String[] kindCodes = new String[]{"M1","M2"};
+                    final String[] kindCodeNames = new String[]{"회화 학습","문장 상세"};
 
-                int idx = 0;
-                while (cursor.moveToNext()) {
-                    kindCodes[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND"));
-                    kindCodeNames[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND_NAME"));
-                    idx++;
+                    final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(NoteActivity.this);
+                    dlg.setTitle("메뉴 선택");
+                    dlg.setSingleChoiceItems(kindCodeNames, 0, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            mSelect = arg1;
+                        }
+                    });
+                    dlg.setNegativeButton("취소", null);
+                    dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if ( mSelect == 0 ) {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("code", "");
+                                bundle.putString("sampleSeq", sampleSeq);
+
+                                Intent intent = new Intent(getApplication(), ConversationStudyActivity.class);
+                                intent.putExtras(bundle);
+
+                                startActivity(intent);
+                            } else {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("foreign", foreign);
+                                bundle.putString("han", han);
+                                bundle.putString("sampleSeq", sampleSeq);
+
+                                Intent intent = new Intent(getApplication(), SentenceViewActivity.class);
+                                intent.putExtras(bundle);
+
+                                startActivity(intent);
+                            }
+                        }
+                    });
+                    dlg.show();
+                } else {
+                    //메뉴 선택 다이얼로그 생성
+                    Cursor cursor = db.rawQuery(DicQuery.getNoteKindContextMenu(true), null);
+                    final String[] kindCodes = new String[cursor.getCount()];
+                    final String[] kindCodeNames = new String[cursor.getCount()];
+
+                    int idx = 0;
+                    while (cursor.moveToNext()) {
+                        kindCodes[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND"));
+                        kindCodeNames[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND_NAME"));
+                        idx++;
+                    }
+                    cursor.close();
+
+                    final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(NoteActivity.this);
+                    dlg.setTitle("메뉴 선택");
+                    dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            mSelect = arg1;
+                        }
+                    });
+                    dlg.setNegativeButton("취소", null);
+                    dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if ( mSelect == 0 ) {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("code", "");
+                                bundle.putString("sampleSeq", sampleSeq);
+
+                                Intent intent = new Intent(getApplication(), ConversationStudyActivity.class);
+                                intent.putExtras(bundle);
+
+                                startActivity(intent);
+                            } else if ( mSelect == 1 ) {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("foreign", foreign);
+                                bundle.putString("han", han);
+                                bundle.putString("sampleSeq", sampleSeq);
+
+                                Intent intent = new Intent(getApplication(), SentenceViewActivity.class);
+                                intent.putExtras(bundle);
+
+                                startActivity(intent);
+                            } else {
+                                DicDb.insConversationToNote(db, kindCodes[mSelect], sampleSeq);
+                                DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_note_ins + ":" + kindCodes[mSelect] + ":" + sampleSeq);
+                            }
+                        }
+                    });
+                    dlg.show();
                 }
-                cursor.close();
-
-                final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(NoteActivity.this);
-                dlg.setTitle("메뉴 선택");
-                dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface arg0, int arg1) {
-                        mSelect = arg1;
-                    }
-                });
-                dlg.setNegativeButton("취소", null);
-                dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        DicDb.insConversationNote(db, kindCodes[mSelect], sampleSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), "."));
-                        DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.f_tag_c_note_ins + ":" + kindCodes[mSelect] + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".") + ":" + sampleSeq);
-                    }
-                });
-                dlg.show();
 
                 return true;
             };
@@ -154,11 +198,60 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if ( isEditing ) {
+            ((MenuItem) menu.findItem(R.id.action_edit)).setVisible(false);
+            ((MenuItem) menu.findItem(R.id.action_exit)).setVisible(true);
+        } else {
+            ((MenuItem) menu.findItem(R.id.action_edit)).setVisible(true);
+            ((MenuItem) menu.findItem(R.id.action_exit)).setVisible(false);
+        }
+
+        if ( isForeignView ) {
+            ((MenuItem) menu.findItem(R.id.action_view)).setVisible(false);
+            ((MenuItem) menu.findItem(R.id.action_hide)).setVisible(true);
+        } else {
+            ((MenuItem) menu.findItem(R.id.action_view)).setVisible(true);
+            ((MenuItem) menu.findItem(R.id.action_hide)).setVisible(false);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
             onBackPressed();
+        } else if (id == R.id.action_edit) {
+            isEditing = true;
+            invalidateOptionsMenu();
+
+            ((RelativeLayout) this.findViewById(R.id.my_c_rl_tool)).setVisibility(View.VISIBLE);
+
+            adapter.editChange(isEditing);
+            adapter.notifyDataSetChanged();
+        } else if (id == R.id.action_exit) {
+            isEditing = false;
+            invalidateOptionsMenu();
+
+            ((RelativeLayout) this.findViewById(R.id.my_c_rl_tool)).setVisibility(View.GONE);
+
+            adapter.editChange(isEditing);
+            adapter.notifyDataSetChanged();
+        } else if (id == R.id.action_view) {
+            isForeignView = true;
+            invalidateOptionsMenu();
+
+            adapter.setForeignView(isForeignView);
+            adapter.notifyDataSetChanged();
+        } else if (id == R.id.action_hide) {
+            isForeignView = false;
+            invalidateOptionsMenu();
+
+            adapter.setForeignView(isForeignView);
+            adapter.notifyDataSetChanged();
         } else if (id == R.id.action_help) {
             Bundle bundle = new Bundle();
             bundle.putString("SCREEN", "DIC_CATEGORY");
@@ -174,26 +267,6 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.my_iv_edit:
-                ((ImageView) this.findViewById(R.id.my_iv_all)).setVisibility(View.VISIBLE);
-                ((ImageView) this.findViewById(R.id.my_iv_delete)).setVisibility(View.VISIBLE);
-                ((ImageView) this.findViewById(R.id.my_iv_copy)).setVisibility(View.VISIBLE);
-                ((ImageView) this.findViewById(R.id.my_iv_move)).setVisibility(View.VISIBLE);
-                ((ImageView) this.findViewById(R.id.my_iv_exit)).setVisibility(View.VISIBLE);
-
-                ((ImageView) this.findViewById(R.id.my_iv_edit)).setVisibility(View.GONE);
-
-                break;
-            case R.id.my_iv_exit:
-                ((ImageView) this.findViewById(R.id.my_iv_all)).setVisibility(View.GONE);
-                ((ImageView) this.findViewById(R.id.my_iv_delete)).setVisibility(View.GONE);
-                ((ImageView) this.findViewById(R.id.my_iv_copy)).setVisibility(View.GONE);
-                ((ImageView) this.findViewById(R.id.my_iv_move)).setVisibility(View.GONE);
-                ((ImageView) this.findViewById(R.id.my_iv_exit)).setVisibility(View.GONE);
-
-                ((ImageView) this.findViewById(R.id.my_iv_edit)).setVisibility(View.VISIBLE);
-
-                break;
             case R.id.my_iv_all :
                 if ( isAllCheck ) {
                     isAllCheck = false;
@@ -212,7 +285,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                             .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    adapter.delete();
+                                    adapter.delete(kind);
                                     changeListView();
 
                                     DicUtils.writeNewInfoToFile(getApplicationContext(), db);
@@ -231,36 +304,40 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                 if ( !adapter.isCheck() ) {
                     Toast.makeText(this, "선택된 데이타가 없습니다.", Toast.LENGTH_SHORT).show();
                 } else {
-
                     //메뉴 선택 다이얼로그 생성
-                    Cursor cursor = db.rawQuery(DicQuery.getMyConversationKindContextMenu(kind), null);
-                    final String[] kindCodes = new String[cursor.getCount()];
-                    final String[] kindCodeNames = new String[cursor.getCount()];
+                    Cursor cursor = db.rawQuery(DicQuery.getNoteKindMeExceptContextMenu(kind), null);
 
-                    int idx = 0;
-                    while (cursor.moveToNext()) {
-                        kindCodes[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND"));
-                        kindCodeNames[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND_NAME"));
-                        idx++;
+                    if ( cursor.getCount() == 0 ) {
+                        Toast.makeText(this, "등록된 회화 노트가 없습니다.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        final String[] kindCodes = new String[cursor.getCount()];
+                        final String[] kindCodeNames = new String[cursor.getCount()];
+
+                        int idx = 0;
+                        while (cursor.moveToNext()) {
+                            kindCodes[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND"));
+                            kindCodeNames[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND_NAME"));
+                            idx++;
+                        }
+                        cursor.close();
+
+                        final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(NoteActivity.this);
+                        dlg.setTitle("회화 노트 선택");
+                        dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface arg0, int arg1) {
+                                mSelect = arg1;
+                            }
+                        });
+                        dlg.setNegativeButton("취소", null);
+                        dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                adapter.copy(kindCodes[mSelect]);
+                            }
+                        });
+                        dlg.show();
                     }
-                    cursor.close();
-
-                    final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(NoteActivity.this);
-                    dlg.setTitle("회화 노트 선택");
-                    dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface arg0, int arg1) {
-                            mSelect = arg1;
-                        }
-                    });
-                    dlg.setNegativeButton("취소", null);
-                    dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    });
-                    dlg.show();
                 }
 
                 break;
@@ -269,41 +346,39 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this, "선택된 데이타가 없습니다.", Toast.LENGTH_SHORT).show();
                 } else {
                     //메뉴 선택 다이얼로그 생성
-                    Cursor cursor = db.rawQuery(DicQuery.getSentenceViewContextMenu(), null);
-                    final String[] kindCodes = new String[cursor.getCount()];
-                    final String[] kindCodeNames = new String[cursor.getCount()];
+                    Cursor cursor = db.rawQuery(DicQuery.getNoteKindMeExceptContextMenu(kind), null);
 
-                    int idx = 0;
-                    while (cursor.moveToNext()) {
-                        kindCodes[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND"));
-                        kindCodeNames[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND_NAME"));
-                        idx++;
+                    if ( cursor.getCount() == 0 ) {
+                        Toast.makeText(this, "등록된 회화 노트가 없습니다.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        final String[] kindCodes = new String[cursor.getCount()];
+                        final String[] kindCodeNames = new String[cursor.getCount()];
+
+                        int idx = 0;
+                        while (cursor.moveToNext()) {
+                            kindCodes[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND"));
+                            kindCodeNames[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND_NAME"));
+                            idx++;
+                        }
+                        cursor.close();
+
+                        final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(NoteActivity.this);
+                        dlg.setTitle("회화 노트 선택");
+                        dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface arg0, int arg1) {
+                                mSelect = arg1;
+                            }
+                        });
+                        dlg.setNegativeButton("취소", null);
+                        dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                adapter.move(kind, kindCodes[mSelect]);
+                            }
+                        });
+                        dlg.show();
                     }
-                    cursor.close();
-
-                    /*
-                    final AlertDialog.Builder dlg = new AlertDialog.Builder(getContext());
-                    dlg.setTitle("메뉴 선택");
-                    dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface arg0, int arg1) {
-                            mSelect = arg1;
-                        }
-                    });
-                    dlg.setNegativeButton("취소", null);
-                    dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            adapter.save(kindCodes[mSelect]);
-                            changeListView();
-
-                            DicUtils.writeNewInfoToFile(this, db);
-
-                            Toast.makeText(this, "단어장에 추가하였습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    dlg.show();
-                    */
                 }
                 break;
         }
@@ -316,6 +391,8 @@ class NoteCursorAdapter extends CursorAdapter {
     public boolean[] isCheck;
     public int[] seq;
     private boolean isEditing = false;
+    public HashMap statusData = new HashMap();
+    public boolean isForeignView = false;
 
     public NoteCursorAdapter(Context context, Cursor cursor, SQLiteDatabase db, int flags) {
         super(context, cursor, 0);
@@ -366,9 +443,12 @@ class NoteCursorAdapter extends CursorAdapter {
         viewHolder.position = cursor.getPosition();
         viewHolder.cb.setTag(viewHolder);
 
-
-        ((TextView) view.findViewById(R.id.my_tv_foreign)).setText(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1")));
-        ((TextView) view.findViewById(R.id.my_tv_han)).setText(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE2")));
+        ((TextView) view.findViewById(R.id.my_tv_han)).setText(String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE2"))));
+        if ( isForeignView || statusData.containsKey(cursor.getString(cursor.getColumnIndexOrThrow("SEQ")))  ) {
+            ((TextView) view.findViewById(R.id.my_tv_foreign)).setText(String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1"))));
+        } else {
+            ((TextView) view.findViewById(R.id.my_tv_foreign)).setText("Click..");
+        }
 
         if ( isCheck[cursor.getPosition()] ) {
             ((CheckBox)view.findViewById(R.id.my_cb_check)).setButtonDrawable(android.R.drawable.checkbox_on_background);
@@ -391,19 +471,26 @@ class NoteCursorAdapter extends CursorAdapter {
         notifyDataSetChanged();
     }
 
-    public void delete() {
+    public void delete(String kind) {
         for ( int i = 0; i < isCheck.length; i++ ) {
             if ( isCheck[i] ) {
-                DicDb.delConversationNote(mDb, seq[i]);
+                DicDb.delConversationFromNote(mDb, kind, seq[i]);
             }
         }
     }
 
-    public void save(String kind) {
+    public void copy(String copyKind) {
         for ( int i = 0; i < isCheck.length; i++ ) {
             if ( isCheck[i] ) {
-                //DicDb.insDicVoc(mDb, entryId[i], kind);
-                DicDb.delDicClickWord(mDb, seq[i]);
+                DicDb.copyConversationToNote(mDb, copyKind, seq[i]);
+            }
+        }
+    }
+
+    public void move(String kind, String copyKind) {
+        for ( int i = 0; i < isCheck.length; i++ ) {
+            if ( isCheck[i] ) {
+                DicDb.moveConversationToNote(mDb, kind, copyKind, seq[i]);
             }
         }
     }
@@ -425,4 +512,11 @@ class NoteCursorAdapter extends CursorAdapter {
         notifyDataSetChanged();
     }
 
+    public void setForeignView(boolean foreignView) {
+        isForeignView = foreignView;
+    }
+
+    public void setStatus(String sampleSeq) {
+        statusData.put(sampleSeq, "Y");
+    }
 }
