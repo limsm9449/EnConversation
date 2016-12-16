@@ -42,7 +42,7 @@ public class DicDb {
         db.execSQL(sql.toString());
     }
 
-    public static void insDicVoc(SQLiteDatabase db, String entryId, String kind, String insDate) {
+    public static void insDicVoc(SQLiteDatabase db, String kind, String entryId, String insDate) {
         StringBuffer sql = new StringBuffer();
         sql.append("DELETE FROM DIC_VOC " + CommConstants.sqlCR);
         sql.append(" WHERE KIND = '" + kind + "'" + CommConstants.sqlCR);
@@ -59,7 +59,7 @@ public class DicDb {
         db.execSQL(sql.toString());
     }
 
-    public static void delDicVoc(SQLiteDatabase db, String entryId, String kind) {
+    public static void delDicVoc(SQLiteDatabase db, String kind, String entryId) {
         StringBuffer sql = new StringBuffer();
         sql.append("DELETE FROM DIC_VOC " + CommConstants.sqlCR);
         sql.append(" WHERE KIND = '" + kind + "'" + CommConstants.sqlCR);
@@ -127,7 +127,7 @@ public class DicDb {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT COUNT(*) CNT  " + CommConstants.sqlCR);
         sql.append("  FROM DIC_NOTE " + CommConstants.sqlCR);
-        sql.append(" WHERE CODE IN (SELECT CODE FROM DIC_CODE WHERE GROUP_CD = 'C01')" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE IN (SELECT CODE FROM DIC_CODE WHERE CODE_GROUP = 'C01')" + CommConstants.sqlCR);
         sql.append("   AND SAMPLE_SEQ = " + sampleSeq +  CommConstants.sqlCR);
         DicUtils.dicSqlLog(sql.toString());
 
@@ -144,7 +144,7 @@ public class DicDb {
 
     public static void initNote(SQLiteDatabase db, String groupCode) {
         StringBuffer sql = new StringBuffer();
-        sql.append("DELETE FROM DIC_NOTE WHERE CODE IN (SELECT CODE FROM DIC_CODE WHERE GROUP_CD IN ('" + groupCode + "')) " + CommConstants.sqlCR);
+        sql.append("DELETE FROM DIC_NOTE WHERE CODE IN (SELECT CODE FROM DIC_CODE WHERE CODE_GROUP IN ('" + groupCode + "')) " + CommConstants.sqlCR);
         DicUtils.dicSqlLog(sql.toString());
         db.execSQL(sql.toString());
     }
@@ -267,7 +267,7 @@ public class DicDb {
         StringBuffer sql = new StringBuffer();
         sql.append("DELETE FROM DIC_NOTE " + CommConstants.sqlCR);
         sql.append(" WHERE CODE = '" + code + "'" + CommConstants.sqlCR);
-        sql.append("   AND SEQ = " + seq + "" + CommConstants.sqlCR);
+        sql.append("   AND SEQ = " + seq + CommConstants.sqlCR);
         DicUtils.dicSqlLog(sql.toString());
         db.execSQL(sql.toString());
     }
@@ -276,12 +276,12 @@ public class DicDb {
         StringBuffer sql = new StringBuffer();
         sql.append("DELETE  FROM DIC_NOTE " + CommConstants.sqlCR);
         sql.append("WHERE   CODE = '" + copyKind + "'" + CommConstants.sqlCR);
-        sql.append("AND     SAMPLE_SEQ = '" + sampleSeq + "'" + CommConstants.sqlCR);
+        sql.append("AND     SAMPLE_SEQ = " + sampleSeq + CommConstants.sqlCR);
         db.execSQL(sql.toString());
 
         sql.setLength(0);
         sql.append("INSERT INTO DIC_NOTE (CODE, SAMPLE_SEQ) " + CommConstants.sqlCR);
-        sql.append("VALUES('" + copyKind + "', " + sampleSeq + "') " + CommConstants.sqlCR);
+        sql.append("VALUES('" + copyKind + "', " + sampleSeq + ") " + CommConstants.sqlCR);
         DicUtils.dicSqlLog(sql.toString());
         db.execSQL(sql.toString());
     }
@@ -295,14 +295,14 @@ public class DicDb {
 
         sql.setLength(0);
         sql.append("INSERT INTO DIC_NOTE (CODE, SAMPLE_SEQ) " + CommConstants.sqlCR);
-        sql.append("VALUES('" + copyKind + "', " + sampleSeq + "') " + CommConstants.sqlCR);
+        sql.append("VALUES('" + copyKind + "', " + sampleSeq + ") " + CommConstants.sqlCR);
         DicUtils.dicSqlLog(sql.toString());
         db.execSQL(sql.toString());
 
         sql.setLength(0);
         sql.append("DELETE  FROM DIC_NOTE " + CommConstants.sqlCR);
         sql.append("WHERE   CODE = '" + currKind + "'" + CommConstants.sqlCR);
-        sql.append("AND     SAMPLE_SEQ = '" + sampleSeq + "'" + CommConstants.sqlCR);
+        sql.append("AND     SAMPLE_SEQ = " + sampleSeq + CommConstants.sqlCR);
         db.execSQL(sql.toString());
     }
 
@@ -310,6 +310,16 @@ public class DicDb {
         StringBuffer sql = new StringBuffer();
         sql.append("INSERT INTO DIC_NOTE (CODE_GROUP, CODE, CODE_NAME) " + CommConstants.sqlCR);
         sql.append("VALUES('" + groupCode + "', " + code + "', " + codeName + "') " + CommConstants.sqlCR);
+        DicUtils.dicSqlLog(sql.toString());
+        db.execSQL(sql.toString());
+    }
+
+    public static void updCode(SQLiteDatabase db, String groupCode, String code, String codeName) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("UPDATE DIC_NOTE (CODE_GROUP, CODE, CODE_NAME) " + CommConstants.sqlCR);
+        sql.append("SET    CODE_NAME = '" + codeName + "' " + CommConstants.sqlCR);
+        sql.append("WHERE  CODE_GROUP = '" + groupCode + "' " + CommConstants.sqlCR);
+        sql.append("AND    CODE_GROUP = '" + code + "' " + CommConstants.sqlCR);
         DicUtils.dicSqlLog(sql.toString());
         db.execSQL(sql.toString());
     }

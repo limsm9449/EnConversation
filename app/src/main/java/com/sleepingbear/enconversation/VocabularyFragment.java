@@ -1,29 +1,22 @@
 package com.sleepingbear.enconversation;
 
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -73,7 +66,7 @@ public class VocabularyFragment extends Fragment implements View.OnClickListener
     public void changeListView() {
         DicUtils.dicLog(this.getClass().toString() + " changeListView");
 
-        Cursor cursor = mDb.rawQuery(DicQuery.getVocabularyCategoryCount(), null);
+        Cursor cursor = mDb.rawQuery(DicQuery.getVocabularyKind(), null);
 
         ListView listView = (ListView) mainView.findViewById(R.id.my_a_cat_lv_category);
         adapter = new VocabularyFlagmentCursorAdapter(getContext(), cursor, 0, this, mDb, getFragmentManager(), mScreenKind);
@@ -90,20 +83,18 @@ public class VocabularyFragment extends Fragment implements View.OnClickListener
 				final Cursor cur = (Cursor) adapter.getItem(position);
 
                 //layout 구성
-                final View dialog_layout = mInflater.inflate(R.layout.dialog_category_iud, null);
+                final View dialog_layout = mInflater.inflate(R.layout.dialog_voc_iud, null);
 
                 //dialog 생성..
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setView(dialog_layout);
                 final AlertDialog alertDialog = builder.create();
 
-                ((TextView) dialog_layout.findViewById(R.id.my_d_category_tv_category)).setText("단어장 관리");
-
-                final EditText et_upd = ((EditText) dialog_layout.findViewById(R.id.my_d_category_et_upd));
+                final EditText et_upd = ((EditText) dialog_layout.findViewById(R.id.my_et_upd_name));
                 et_upd.setText(cur.getString(cur.getColumnIndexOrThrow("KIND_NAME")));
 
-                ((Button) dialog_layout.findViewById(R.id.my_d_category_b_upd)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
-                ((Button) dialog_layout.findViewById(R.id.my_d_category_b_upd)).setOnClickListener(new View.OnClickListener() {
+                ((Button) dialog_layout.findViewById(R.id.my_b_upd)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
+                ((Button) dialog_layout.findViewById(R.id.my_b_upd)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if ("".equals(et_upd.getText().toString())) {
@@ -111,10 +102,10 @@ public class VocabularyFragment extends Fragment implements View.OnClickListener
                         } else {
                             alertDialog.dismiss();
 
-                            mDb.execSQL(DicQuery.getUpdCategory("MY", (String) v.getTag(), et_upd.getText().toString()));
+                            mDb.execSQL(DicQuery.getUpdCode("VOC", (String) v.getTag(), et_upd.getText().toString()));
 
                             //기록...
-                            DicUtils.writeInfoToFile(getContext(), "CATEGORY_UPDATE" + ":" + (String) v.getTag() + ":" + et_upd.getText().toString());
+                            DicUtils.writeInfoToFile(getContext(), CommConstants.tag_code_upd+ ":VOC:" + (String) v.getTag() + ":" + et_upd.getText().toString());
 
                             changeListView();
 
@@ -123,13 +114,13 @@ public class VocabularyFragment extends Fragment implements View.OnClickListener
                     }
                 });
 
-                ((Button) dialog_layout.findViewById(R.id.my_d_category_b_del)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
-                ((Button) dialog_layout.findViewById(R.id.my_d_category_b_del)).setOnClickListener(new View.OnClickListener() {
+                ((Button) dialog_layout.findViewById(R.id.my_b_del)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
+                ((Button) dialog_layout.findViewById(R.id.my_b_del)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         final String code = (String) v.getTag();
 
-                        if (CommConstants.voc_code.equals(code)) {
+                        if (CommConstants.voc_default_code.equals(code)) {
                             Toast.makeText(getContext(), "기본 단어장은 삭제할 수 없습니다.", Toast.LENGTH_SHORT).show();
                             alertDialog.dismiss();
                         } else {
@@ -141,11 +132,10 @@ public class VocabularyFragment extends Fragment implements View.OnClickListener
                                         public void onClick(DialogInterface dialog, int which) {
                                             alertDialog.dismiss();
 
-                                            mDb.execSQL(DicQuery.getDelCategory("MY", code));
+                                            mDb.execSQL(DicQuery.getDelCode("VOC", code));
                                             mDb.execSQL(DicQuery.getDelDicVoc(code));
 
                                             //기록...
-                                            //DicUtils.writeInfoToFile(getContext(), "CATEGORY_DELETE" + ":" + code);
                                             DicUtils.writeNewInfoToFile(getContext(), mDb);
                                             changeListView();
 
@@ -162,10 +152,10 @@ public class VocabularyFragment extends Fragment implements View.OnClickListener
                     }
                 });
 
-                final EditText et_saveName = ((EditText) dialog_layout.findViewById(R.id.my_dc_et_voc_name));
+                final EditText et_saveName = ((EditText) dialog_layout.findViewById(R.id.my_et_file_name));
                 et_saveName.setText(cur.getString(cur.getColumnIndexOrThrow("KIND_NAME")));
-                ((Button) dialog_layout.findViewById(R.id.my_dc__b_save)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
-                ((Button) dialog_layout.findViewById(R.id.my_dc__b_save)).setOnClickListener(new View.OnClickListener() {
+                ((Button) dialog_layout.findViewById(R.id.my_b_save)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
+                ((Button) dialog_layout.findViewById(R.id.my_b_save)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         final String code = (String) v.getTag();
@@ -235,8 +225,8 @@ public class VocabularyFragment extends Fragment implements View.OnClickListener
                     }
                 });
 
-                ((Button) dialog_layout.findViewById(R.id.my_d_category_b_upload)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
-                ((Button) dialog_layout.findViewById(R.id.my_d_category_b_upload)).setOnClickListener(new View.OnClickListener() {
+                ((Button) dialog_layout.findViewById(R.id.my_b_upload)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
+                ((Button) dialog_layout.findViewById(R.id.my_b_upload)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         final String code = (String) v.getTag();
@@ -280,12 +270,12 @@ public class VocabularyFragment extends Fragment implements View.OnClickListener
                     }
                 });
 
-                ((Button) dialog_layout.findViewById(R.id.my_d_category_b_close)).setOnClickListener(new View.OnClickListener() {
-                                                                                                         @Override
-                                                                                                         public void onClick(View v) {
-                                                                                                             alertDialog.dismiss();
-                                                                                                         }
-                                                                                                     }
+                ((Button) dialog_layout.findViewById(R.id.my_b_close)).setOnClickListener(new View.OnClickListener() {
+                         @Override
+                         public void onClick(View v) {
+                             alertDialog.dismiss();
+                         }
+                     }
                 );
 
                 alertDialog.setCanceledOnTouchOutside(false);

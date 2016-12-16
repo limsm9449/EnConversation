@@ -1,6 +1,5 @@
 package com.sleepingbear.enconversation;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -208,7 +207,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
                         bundle.putString("code", "");
                         bundle.putString("sampleSeq", sampleSeq);
 
-                        Intent intent = new Intent(getActivity().getApplication(), ConversationStudyActivity.class);
+                        Intent intent = new Intent(getActivity().getApplication(), NoteStudyActivity.class);
                         intent.putExtras(bundle);
 
                         startActivity(intent);

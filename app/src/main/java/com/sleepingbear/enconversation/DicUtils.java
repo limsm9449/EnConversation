@@ -224,45 +224,23 @@ public class DicUtils {
                 if ( row[0] ==  CommConstants.tag_code_ins) {
                     DicDb.insCode(db, row[1], row[2], row[3]);
                 } else if ( row[0] ==  CommConstants.tag_code_upd) {
-                } else if ( row[0] ==  CommConstants.tag_code_del) {
+                    DicDb.updCode(db, row[1], row[2], row[3]);
                 } else if ( row[0] ==  CommConstants.tag_note_ins) {
+                    DicDb.insConversationToNote(db, row[1], row[2]);
                 } else if ( row[0] ==  CommConstants.tag_note_del) {
+                    DicDb.delConversationFromNote(db, row[1], Integer.parseInt(row[2]));
                 } else if ( row[0] ==  CommConstants.tag_note_del_all) {
+                    DicDb.delAllConversationFromNote(db, Integer.parseInt(row[1]));
                 } else if ( row[0] ==  CommConstants.tag_voc_ins) {
-                    DicDb.insDicVoc(db, row[3], row[1], row[2]);
+                    DicDb.insDicVoc(db, row[1], row[2], row[3]);
                 } else if ( row[0] ==  CommConstants.tag_voc_del) {
-                    DicDb.delDicVoc(db, row[2], row[1]);
+                    DicDb.delDicVoc(db, row[1], row[2]);
                 } else if ( row[0] ==  CommConstants.tag_voc_del_all) {
                     DicDb.delDicVocAll(db, row[1]);
                 } else if ( row[0] ==  CommConstants.tag_voc_memory) {
+                    DicDb.updMemory(db, row[1], row[2]);
                 }
 
-
-                switch (row[0]) {
-                    case "MYWORD_DELETE_ALL":
-                        //단어장 전체 삭제
-                        //DicUtils. writeInfoToFile(getApplicationContext(), "MYWORD_DELETE_ALL" + ":" + entryId);
-
-                        break;
-                    case "CATEGORY_INSERT":
-                        //DicUtils. writeInfoToFile(getContext(), "CATEGORY_INSERT" + ":" + insCategoryCode + ":" + et_ins.getText().toString());
-                        db.execSQL(DicQuery.getInsNewCategory("MY", row[1], row[2]));
-                        break;
-                    case "CATEGORY_UPDATE":
-                        //DicUtils. writeInfoToFile(getContext(), "CATEGORY_UPDATE" + ":" + (String) v.getTag() + ":" + et_ins.getText().toString());
-                        db.execSQL(DicQuery.getUpdCategory("MY", row[1], row[2]));
-                        break;
-                    case "CATEGORY_DELETE":
-                        //DicUtils. writeInfoToFile(getContext(), "CATEGORY_DELETE" + ":" + code);
-                        db.execSQL(DicQuery.getDelCategory("MY", row[1]));
-                        db.execSQL(DicQuery.getDelDicVoc(row[1]));
-                        break;
-                    case "MEMORY":
-                        //DicUtils.writeInfoToFile(context, "MEMORY" + ":" + entryId + ":" + (((CheckBox) v.findViewById(R.id.my_c_vi_cb_memorization)).isChecked() ? "Y" : "N"));
-                        DicDb.updMemory(db, row[1], row[2]);
-                        break;
-
-                }
                 readString = buffreader.readLine();
             }
 

@@ -5,48 +5,38 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
-import java.util.HashMap;
 
-
-public class ConversationPatternFragment extends Fragment {
+public class PatternFragment extends Fragment {
     private DbHelper dbHelper;
     private SQLiteDatabase db;
     private View mainView;
-    private ConversationPatternCursorAdapter adapter;
+    private PatternFragCursorAdapter adapter;
 
     private Cursor cursor;
 
     private Activity mActivity;
 
-    public ConversationPatternFragment() {
+    public PatternFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mainView = inflater.inflate(R.layout.fragment_conversation_pattern, container, false);
+        mainView = inflater.inflate(R.layout.fragment_pattern, container, false);
 
 
         dbHelper = new DbHelper(getContext());
@@ -70,7 +60,7 @@ public class ConversationPatternFragment extends Fragment {
             }
 
             ListView dictionaryListView = (ListView) mainView.findViewById(R.id.my_f_convation_lv);
-            adapter = new ConversationPatternCursorAdapter(getContext(), cursor, 0);
+            adapter = new PatternFragCursorAdapter(getContext(), cursor, 0);
             dictionaryListView.setAdapter(adapter);
 
             dictionaryListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -97,15 +87,15 @@ public class ConversationPatternFragment extends Fragment {
     };
 }
 
-class ConversationPatternCursorAdapter extends CursorAdapter {
+class PatternFragCursorAdapter extends CursorAdapter {
 
-    public ConversationPatternCursorAdapter(Context context, Cursor cursor, int flags) {
+    public PatternFragCursorAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, 0);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.fragment_conversation_pattern_item, parent, false);
+        return LayoutInflater.from(context).inflate(R.layout.fragment_pattern_item, parent, false);
     }
 
     @Override

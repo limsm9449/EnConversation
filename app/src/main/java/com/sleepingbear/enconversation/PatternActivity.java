@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -117,7 +116,7 @@ public class PatternActivity extends AppCompatActivity {
                             bundle.putString("code", "");
                             bundle.putString("sampleSeq", sampleSeq);
 
-                            Intent intent = new Intent(getApplication(), ConversationStudyActivity.class);
+                            Intent intent = new Intent(getApplication(), NoteStudyActivity.class);
                             intent.putExtras(bundle);
 
                             startActivity(intent);
@@ -143,6 +142,14 @@ public class PatternActivity extends AppCompatActivity {
             };
         });
         listView.setSelection(0);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // 상단 메뉴 구성
+        getMenuInflater().inflate(R.menu.menu_pattern, menu);
+
+        return true;
     }
 
     @Override

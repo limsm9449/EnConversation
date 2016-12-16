@@ -249,16 +249,16 @@ public class WordViewActivity extends AppCompatActivity implements View.OnClickL
                     DicDb.delDicVocAll(db, entryId);
 
                     // 기록..
-                    DicUtils. writeInfoToFile(getApplicationContext(), "MYWORD_DELETE_ALL" + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".") + ":" + entryId);
+                    DicUtils. writeInfoToFile(getApplicationContext(), CommConstants.tag_voc_del + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".") + ":" + entryId);
                 } else {
                     ImageButton ib_myvoc = (ImageButton)this.findViewById(R.id.my_c_wv_ib_myvoc);
                     ib_myvoc.setImageResource(android.R.drawable.star_on);
                     myVoc = true;
 
-                    DicDb.insDicVoc(db, entryId, CommConstants.voc_code);
+                    DicDb.insDicVoc(db, entryId, CommConstants.voc_default_code);
 
                     // 기록..
-                    DicUtils. writeInfoToFile(getApplicationContext(), "MYWORD_INSERT" + ":" + CommConstants.voc_code + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".") + ":" + entryId);
+                    DicUtils. writeInfoToFile(getApplicationContext(), CommConstants.tag_voc_ins + ":" + CommConstants.voc_default_code + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".") + ":" + entryId);
                 }
 
                 break;

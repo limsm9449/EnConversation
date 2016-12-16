@@ -26,16 +26,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -96,16 +93,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onClick(View view) {
                 if ( selectedTab == CommConstants.f_Vocabulary ) {
                     LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-                    final View dialog_layout = inflater.inflate(R.layout.dialog_category_add, (ViewGroup) findViewById(R.id.my_d_category_root));
+                    final View dialog_layout = inflater.inflate(R.layout.dialog_voc_add, null);
 
                     //dialog 생성..
                     AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
                     builder.setView(dialog_layout);
                     final AlertDialog alertDialog = builder.create();
 
-                    ((TextView) dialog_layout.findViewById(R.id.my_d_category_add_tv_title)).setText("단어장 추가");
-                    final EditText et_ins = ((EditText) dialog_layout.findViewById(R.id.my_d_category_add_et_ins));
-                    ((Button) dialog_layout.findViewById(R.id.my_d_category_add_b_ins)).setOnClickListener(new View.OnClickListener() {
+                    final EditText et_ins = ((EditText) dialog_layout.findViewById(R.id.my_et_ins_name));
+                    ((Button) dialog_layout.findViewById(R.id.my_b_ins)).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             if ("".equals(et_ins.getText().toString())) {
@@ -113,11 +109,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             } else {
                                 alertDialog.dismiss();
 
-                                String insCategoryCode = DicQuery.getInsCategoryCode(db);
-                                db.execSQL(DicQuery.getInsNewCategory("MY", insCategoryCode, et_ins.getText().toString()));
+                                String insMaxCode = DicQuery.getMaxVocCode(db);
+                                db.execSQL(DicQuery.getInsCode("VOC", insMaxCode, et_ins.getText().toString()));
 
                                 //기록
-                                DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_code_ins + ":" + insCategoryCode + ":" + et_ins.getText().toString());
+                                DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_code_ins + ":VOC:" + insMaxCode + ":" + et_ins.getText().toString());
 
                                 ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
 
@@ -125,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                         }
                     });
-                    ((Button) dialog_layout.findViewById(R.id.my_d_category_add_b_close)).setOnClickListener(new View.OnClickListener() {
+                    ((Button) dialog_layout.findViewById(R.id.my_b_close)).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             alertDialog.dismiss();
@@ -134,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     alertDialog.setCanceledOnTouchOutside(false);
                     alertDialog.show();
-                } else if ( selectedTab == CommConstants.f_ConversationNote ) {
+                } else if ( selectedTab == CommConstants.f_Note ) {
                     LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
                     final View dialog_layout = inflater.inflate(R.layout.dialog_note_add, null);
 
@@ -152,13 +148,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             } else {
                                 alertDialog.dismiss();
 
-                                String insConversationCode = DicQuery.getInsConversationCode(db);
-                                db.execSQL(DicQuery.getInsNewNote(insConversationCode, et_ins.getText().toString()));
+                                String insMaxCode = DicQuery.getMaxNoteCode(db);
+                                db.execSQL(DicQuery.getInsCode("C01", insMaxCode, et_ins.getText().toString()));
 
                                 //기록
-                                DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_code_ins + ":" + insConversationCode + ":" + et_ins.getText().toString());
+                                DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_code_ins + ":C01:" + insMaxCode + ":" + et_ins.getText().toString());
 
-                                ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
+                                ((NoteFragment) adapter.getItem(selectedTab)).changeListView();
 
                                 Toast.makeText(getApplicationContext(), "회회 노트를 추가하였습니다.", Toast.LENGTH_SHORT).show();
                             }
@@ -223,8 +219,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //상단 편집 버튼 갱신
                 invalidateOptionsMenu();
 
-                if ( selectedTab == CommConstants.f_ConversationNote ) {
-                    ((ConversationNoteFragment) adapter.getItem(selectedTab)).changeListView();
+                if ( selectedTab == CommConstants.f_Note ) {
+                    ((NoteFragment) adapter.getItem(selectedTab)).changeListView();
                 } else if ( selectedTab == CommConstants.f_Vocabulary ) {
                     ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
                 }
@@ -290,6 +286,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //뷰의 내용이 변경되었을때...
     public void setChangeViewPaper(int position) {
+        DicUtils.dicLog("setChangeViewPaper : " + position);
         try {
             fab.setVisibility(View.GONE);
 
@@ -299,8 +296,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             if (position == CommConstants.f_Vocabulary) {
                 fab.setVisibility(View.VISIBLE);
-            } else if (position == CommConstants.f_ConversationNote) {
-                if ( "C01".equals(((ConversationNoteFragment) adapter.getItem(position)).groupCode) ) {
+            } else if (position == CommConstants.f_Note) {
+                DicUtils.dicLog("groupCode222 : " + ((NoteFragment) adapter.getItem(position)).groupCode);
+                if ( "C01".equals(((NoteFragment) adapter.getItem(position)).groupCode) ) {
                     fab.setVisibility(View.VISIBLE);
                 }
             }
@@ -368,9 +366,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Bundle bundle = new Bundle();
             if ( selectedTab == CommConstants.f_ConversationStudy ) {
                 bundle.putString("SCREEN", "NEWS");
-            } else if ( selectedTab == CommConstants.f_ConversationPattern ) {
+            } else if ( selectedTab == CommConstants.f_Pattern ) {
                 bundle.putString("SCREEN", "CLICKWORD");
-            } else if ( selectedTab == CommConstants.f_ConversationNote ) {
+            } else if ( selectedTab == CommConstants.f_Note ) {
                 bundle.putString("SCREEN", "BOOKMARK");
             } else if ( selectedTab == CommConstants.f_Conversation ) {
                 bundle.putString("SCREEN", "VOCABULARY");
@@ -523,8 +521,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void changeListView() {
-        if ( selectedTab == CommConstants.f_ConversationNote ) {
-            ((ConversationNoteFragment) adapter.getItem(selectedTab)).changeListView();
+        if ( selectedTab == CommConstants.f_Note ) {
+            ((NoteFragment) adapter.getItem(selectedTab)).changeListView();
         } else if ( selectedTab == CommConstants.f_Vocabulary ) {
             ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
         }
@@ -548,13 +546,13 @@ class MainPagerAdapter extends FragmentPagerAdapter {
         mFragmentList.add(new ConversationStudyFragment());
         mFragmentTitleList.add("회화 학습");
 
-        mFragmentList.add(new ConversationPatternFragment());
+        mFragmentList.add(new PatternFragment());
         mFragmentTitleList.add("회화 패턴");
 
         mFragmentList.add(new ConversationFragment());
         mFragmentTitleList.add("회화 검색");
 
-        mFragmentList.add(new ConversationNoteFragment());
+        mFragmentList.add(new NoteFragment());
         mFragmentTitleList.add("회화 노트");
 
         mFragmentList.add(new VocabularyFragment());

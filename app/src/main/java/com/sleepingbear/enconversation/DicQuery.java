@@ -62,14 +62,14 @@ public class DicQuery {
         return sql.toString();
     }
 
-    public static String getVocabularyCategoryCount() {
+    public static String getVocabularyKind() {
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT 1 _id, CODE KIND, CODE_NAME KIND_NAME," + CommConstants.sqlCR);
         sql.append("            COALESCE((SELECT COUNT(*)" + CommConstants.sqlCR);
         sql.append("                        FROM DIC_VOC" + CommConstants.sqlCR);
         sql.append("                       WHERE KIND = A.CODE),0) CNT" + CommConstants.sqlCR);
         sql.append("  FROM DIC_CODE A" + CommConstants.sqlCR);
-        sql.append(" WHERE CODE_GROUP = 'MY'" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP = 'VOC'" + CommConstants.sqlCR);
         sql.append(" ORDER BY 1,3" + CommConstants.sqlCR);
 
         DicUtils.dicSqlLog(sql.toString());
@@ -103,24 +103,29 @@ public class DicQuery {
         return sql.toString();
     }
 
-    public static String getInsCategoryCode(SQLiteDatabase mDb) {
+    /**
+     * 추가할 단어장 Max 코드
+     * @param mDb
+     * @return
+     */
+    public static String getMaxVocCode(SQLiteDatabase mDb) {
         StringBuffer sql = new StringBuffer();
 
         sql.append("SELECT MAX(CODE) CODE" + CommConstants.sqlCR);
         sql.append("  FROM DIC_CODE" + CommConstants.sqlCR);
-        sql.append(" WHERE CODE_GROUP = 'MY'" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP = 'VOC'" + CommConstants.sqlCR);
         DicUtils.dicSqlLog(sql.toString());
 
-        String insCategoryCode = "";
+        String maxVocCode = "";
         Cursor maxCategoryCursor = mDb.rawQuery(sql.toString(), null);
         if ( maxCategoryCursor.moveToNext() ) {
             String max = maxCategoryCursor.getString(maxCategoryCursor.getColumnIndexOrThrow("CODE"));
-            int maxCategory = Integer.parseInt(max.substring(2,max.length()));
-            insCategoryCode = "MY" + DicUtils.lpadding(Integer.toString(maxCategory + 1), 4, "0");
-            DicUtils.dicSqlLog("insCategoryCode : " + insCategoryCode);
+            int maxCategory = Integer.parseInt(max.substring(3,max.length()));
+            maxVocCode = "VOC" + DicUtils.lpadding(Integer.toString(maxCategory + 1), 4, "0");
+            DicUtils.dicSqlLog("MaxVocCode : " + maxVocCode);
         }
 
-        return insCategoryCode;
+        return maxVocCode;
     }
 
     public static String getInsNewCategory(String codeGroup, String code, String codeName) {
@@ -326,10 +331,10 @@ public class DicQuery {
     public static String getWriteData() {
         StringBuffer sql = new StringBuffer();
 
-        sql.append("SELECT '" + CommConstants.tag_code_ins + "'||':'||A.CODE||':'||A.CODE_NAME WRITE_DATA" + CommConstants.sqlCR);
+        sql.append("SELECT '" + CommConstants.tag_code_ins + "'||':'||A.CODE_GROUP||':'||A.CODE||':'||A.CODE_NAME WRITE_DATA" + CommConstants.sqlCR);
         sql.append("  FROM DIC_CODE A" + CommConstants.sqlCR);
-        sql.append(" WHERE CODE_GROUP IN ('MY','C01','C02')" + CommConstants.sqlCR);
-        sql.append("   AND CODE NOT IN ('MY0001','C010001')" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP IN ('VOC','C01','C02')" + CommConstants.sqlCR);
+        sql.append("   AND CODE NOT IN ('VOC0001','C010001')" + CommConstants.sqlCR);
 
         sql.append("UNION" + CommConstants.sqlCR);
         sql.append("SELECT '" + CommConstants.tag_note_ins + "'||':'||CODE||':'||SAMPLE_SEQ WRITE_DATA " + CommConstants.sqlCR);
@@ -407,11 +412,16 @@ public class DicQuery {
             sql.append("UNION ALL" + CommConstants.sqlCR);
             sql.append("SELECT 2 ORD, 'M2' KIND, '문장 상세' KIND_NAME" + CommConstants.sqlCR);
             sql.append("UNION ALL" + CommConstants.sqlCR);
+            sql.append("SELECT 3 ORD, CODE KIND, CODE_NAME||' 회화에 추가' KIND_NAME" + CommConstants.sqlCR);
+            sql.append("  FROM DIC_CODE" + CommConstants.sqlCR);
+            sql.append(" WHERE CODE_GROUP = 'C01'" + CommConstants.sqlCR);
+            sql.append(" ORDER BY ORD, KIND_NAME" + CommConstants.sqlCR);
+        } else {
+            sql.append("SELECT 3 ORD, CODE KIND, CODE_NAME KIND_NAME" + CommConstants.sqlCR);
+            sql.append("  FROM DIC_CODE" + CommConstants.sqlCR);
+            sql.append(" WHERE CODE_GROUP = 'C01'" + CommConstants.sqlCR);
+            sql.append(" ORDER BY ORD, KIND_NAME" + CommConstants.sqlCR);
         }
-        sql.append("SELECT 3 ORD, CODE KIND, CODE_NAME KIND_NAME" + CommConstants.sqlCR);
-        sql.append("  FROM DIC_CODE" + CommConstants.sqlCR);
-        sql.append(" WHERE CODE_GROUP = 'C01'" + CommConstants.sqlCR);
-        sql.append(" ORDER BY ORD, CODE_NAME" + CommConstants.sqlCR);
 
         DicUtils.dicSqlLog(sql.toString());
 
@@ -514,18 +524,17 @@ public class DicQuery {
         sql.append("SELECT MAX(CODE) CODE" + CommConstants.sqlCR);
         sql.append("  FROM DIC_CODE" + CommConstants.sqlCR);
         sql.append(" WHERE CODE_GROUP = 'C01'" + CommConstants.sqlCR);
-        DicUtils.dicSqlLog(sql.toString());
 
-        String insCategoryCode = "";
+        String maxNoteCode = "";
         Cursor maxCategoryCursor = mDb.rawQuery(sql.toString(), null);
         if ( maxCategoryCursor.moveToNext() ) {
             String max = maxCategoryCursor.getString(maxCategoryCursor.getColumnIndexOrThrow("CODE"));
             int maxCategory = Integer.parseInt(max.substring(3,max.length()));
-            insCategoryCode = "C01" + DicUtils.lpadding(Integer.toString(maxCategory + 1), 4, "0");
-            DicUtils.dicSqlLog("insConversationCode : " + insCategoryCode);
+            maxNoteCode = "C01" + DicUtils.lpadding(Integer.toString(maxCategory + 1), 4, "0");
+            DicUtils.dicSqlLog("maxNoteCode : " + maxNoteCode);
         }
 
-        return insCategoryCode;
+        return maxNoteCode;
     }
 
     /**
@@ -534,11 +543,11 @@ public class DicQuery {
      * @param codeName
      * @return
      */
-    public static String getInsNewNoteCode(String code, String codeName) {
+    public static String getInsCode(String groupCode, String code, String codeName) {
         StringBuffer sql = new StringBuffer();
 
         sql.append("INSERT INTO DIC_CODE(CODE_GROUP, CODE, CODE_NAME)" + CommConstants.sqlCR);
-        sql.append("VALUES('C01', '" + code + "', '" + codeName + "')" + CommConstants.sqlCR);
+        sql.append("VALUES('" + groupCode + "', '" + code + "', '" + codeName + "')" + CommConstants.sqlCR);
 
         DicUtils.dicSqlLog(sql.toString());
 
@@ -551,12 +560,12 @@ public class DicQuery {
      * @param codeName
      * @return
      */
-    public static String getUpdCode(String code, String codeName) {
+    public static String getUpdCode(String groupCode, String code, String codeName) {
         StringBuffer sql = new StringBuffer();
 
         sql.append("UPDATE DIC_CODE" + CommConstants.sqlCR);
         sql.append("   SET CODE_NAME = '" + codeName + "'" + CommConstants.sqlCR);
-        sql.append(" WHERE CODE_GROUP = 'C01'" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP = '" + groupCode + "'" + CommConstants.sqlCR);
         sql.append("   AND CODE = '" + code + "'" + CommConstants.sqlCR);
 
         DicUtils.dicSqlLog(sql.toString());
@@ -565,15 +574,15 @@ public class DicQuery {
     }
 
     /**
-     * 노트 코드 삭제
+     * 코드 삭제
      * @param code
      * @return
      */
-    public static String getDelCode(String code) {
+    public static String getDelCode(String groupCode, String code) {
         StringBuffer sql = new StringBuffer();
 
         sql.append("DELETE FROM DIC_CODE" + CommConstants.sqlCR);
-        sql.append(" WHERE CODE_GROUP = 'C01'" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP = '" + groupCode + "'" + CommConstants.sqlCR);
         sql.append("   AND CODE = '" + code + "'" + CommConstants.sqlCR);
 
         DicUtils.dicSqlLog(sql.toString());
@@ -597,4 +606,15 @@ public class DicQuery {
         return sql.toString();
     }
 
+    public static String getSample(String sampleSeq) {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("SELECT  SEQ _id, SEQ, SENTENCE1, SENTENCE2" + CommConstants.sqlCR);
+        sql.append("FROM    DIC_SAMPLE" + CommConstants.sqlCR);
+        sql.append("WHERE   SEQ = " + sampleSeq + CommConstants.sqlCR);
+
+        DicUtils.dicSqlLog(sql.toString());
+
+        return sql.toString();
+    }
 }

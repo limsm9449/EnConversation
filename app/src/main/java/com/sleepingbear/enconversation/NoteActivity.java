@@ -60,6 +60,8 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         ((ImageView)this.findViewById(R.id.my_iv_copy)).setOnClickListener(this);
         ((ImageView)this.findViewById(R.id.my_iv_move)).setOnClickListener(this);
 
+        ((RelativeLayout) this.findViewById(R.id.my_c_rl_tool)).setVisibility(View.GONE);
+
         ActionBar ab = (ActionBar) getSupportActionBar();
         ab.setTitle(b.getString("kindName"));
         ab.setHomeButtonEnabled(true);
@@ -97,7 +99,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                 final String foreign = cur.getString(cur.getColumnIndexOrThrow("SENTENCE1"));
                 final String han = cur.getString(cur.getColumnIndexOrThrow("SENTENCE2"));
 
-                if ( "C01".equals(kind) || "C02".equals(kind) ) {
+                if ( "C01".equals(kind.substring(0, 3)) || "C02".equals(kind.substring(0, 3)) ) {
                     //메뉴 선택 다이얼로그 생성
                     final String[] kindCodes = new String[]{"M1","M2"};
                     final String[] kindCodeNames = new String[]{"회화 학습","문장 상세"};
@@ -119,7 +121,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                                 bundle.putString("code", "");
                                 bundle.putString("sampleSeq", sampleSeq);
 
-                                Intent intent = new Intent(getApplication(), ConversationStudyActivity.class);
+                                Intent intent = new Intent(getApplication(), NoteStudyActivity.class);
                                 intent.putExtras(bundle);
 
                                 startActivity(intent);
@@ -168,7 +170,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                                 bundle.putString("code", "");
                                 bundle.putString("sampleSeq", sampleSeq);
 
-                                Intent intent = new Intent(getApplication(), ConversationStudyActivity.class);
+                                Intent intent = new Intent(getApplication(), NoteStudyActivity.class);
                                 intent.putExtras(bundle);
 
                                 startActivity(intent);
@@ -198,12 +200,25 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // 상단 메뉴 구성
+        getMenuInflater().inflate(R.menu.menu_note, menu);
+
+        return true;
+    }
+
+    @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if ( isEditing ) {
-            ((MenuItem) menu.findItem(R.id.action_edit)).setVisible(false);
-            ((MenuItem) menu.findItem(R.id.action_exit)).setVisible(true);
+        if ( "C01".equals(kind.substring(0, 3)) || "C02".equals(kind.substring(0, 3)) ) {
+            if (isEditing) {
+                ((MenuItem) menu.findItem(R.id.action_edit)).setVisible(false);
+                ((MenuItem) menu.findItem(R.id.action_exit)).setVisible(true);
+            } else {
+                ((MenuItem) menu.findItem(R.id.action_edit)).setVisible(true);
+                ((MenuItem) menu.findItem(R.id.action_exit)).setVisible(false);
+            }
         } else {
-            ((MenuItem) menu.findItem(R.id.action_edit)).setVisible(true);
+            ((MenuItem) menu.findItem(R.id.action_edit)).setVisible(false);
             ((MenuItem) menu.findItem(R.id.action_exit)).setVisible(false);
         }
 
@@ -491,6 +506,9 @@ class NoteCursorAdapter extends CursorAdapter {
         for ( int i = 0; i < isCheck.length; i++ ) {
             if ( isCheck[i] ) {
                 DicDb.moveConversationToNote(mDb, kind, copyKind, seq[i]);
+                DicDb.delConversationFromNote(mDb, kind, seq[i]);
+
+                notifyDataSetChanged();
             }
         }
     }

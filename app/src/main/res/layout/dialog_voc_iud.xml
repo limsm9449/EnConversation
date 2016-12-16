@@ -6,8 +6,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/my_d_category_tv_category"
+        android:text="단어장"
         android:layout_gravity="center"
         android:layout_alignParentTop="true"
         android:layout_marginTop="10dp"
@@ -42,18 +41,18 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/my_d_category_et_upd"
+            android:id="@+id/my_et_upd_name"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
             android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/my_d_category_b_upd"
+            android:layout_toLeftOf="@+id/my_b_upd"
             android:layout_marginLeft="10dp" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:text="수정"
-            android:id="@+id/my_d_category_b_upd"
+            android:id="@+id/my_b_upd"
             android:layout_gravity="center_horizontal"
             android:layout_alignParentRight="true"
             android:background="@drawable/my_button"
@@ -82,7 +81,7 @@
             android:id="@+id/textView5"
             android:layout_centerInParent="true"
             android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/my_d_category_b_del"
+            android:layout_toLeftOf="@+id/my_b_del"
             android:layout_marginLeft="10dp"
             android:textSize="12dp" />
 
@@ -90,7 +89,7 @@
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:text="삭제"
-            android:id="@+id/my_d_category_b_del"
+            android:id="@+id/my_b_del"
             android:layout_gravity="center_horizontal"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
@@ -125,12 +124,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/my_dc__b_save">
+            android:layout_toLeftOf="@+id/my_b_save">
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/my_dc_et_voc_name"
+                android:id="@+id/my_et_file_name"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true"
                 android:layout_alignParentLeft="false"
@@ -147,14 +146,14 @@
                 android:layout_marginLeft="10dp"
                 android:textSize="12dp"
                 android:layout_alignParentBottom="false"
-                android:layout_below="@+id/my_dc_et_voc_name" />
+                android:layout_below="@+id/my_et_file_name" />
         </RelativeLayout>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:text="내보내기"
-            android:id="@+id/my_dc__b_save"
+            android:id="@+id/my_b_save"
             android:layout_gravity="center_horizontal"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
@@ -183,7 +182,7 @@
             android:id="@+id/textView8"
             android:layout_centerInParent="true"
             android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/my_d_category_b_upload"
+            android:layout_toLeftOf="@+id/my_b_upload"
             android:layout_marginLeft="10dp"
             android:textSize="12dp" />
 
@@ -191,7 +190,7 @@
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:text="가져오기"
-            android:id="@+id/my_d_category_b_upload"
+            android:id="@+id/my_b_upload"
             android:layout_gravity="center_horizontal"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
@@ -217,7 +216,7 @@
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:text="닫기"
-        android:id="@+id/my_d_category_b_close"
+        android:id="@+id/my_b_close"
         android:layout_gravity="right"
         android:layout_alignParentRight="true"
         android:layout_centerInParent="true"

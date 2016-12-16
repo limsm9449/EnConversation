@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.sleepingbear.enconversation.ConversationStudyActivity"
-    tools:showIn="@layout/activity_conversation_study">
+    tools:context="com.sleepingbear.enconversation.NoteStudyActivity"
+    tools:showIn="@layout/activity_note_study">
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"

@@ -53,7 +53,8 @@
                 app:srcCompat="@mipmap/ic_content_cut_black_24dp"
                 android:id="@+id/my_iv_move"
                 android:layout_marginLeft="10dp"
-                android:layout_alignParentRight="true" />
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp" />
 
         </RelativeLayout>
     </RelativeLayout>
