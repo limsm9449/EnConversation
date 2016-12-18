@@ -60,16 +60,26 @@
                     android:layout_alignParentEnd="false"
                     android:background="@android:color/transparent"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_toLeftOf="@+id/my_cb_foreign_view" />
-                <CheckBox
+                    android:layout_marginRight="50dp"
+                    android:layout_toLeftOf="@+id/my_cb_foreign_view"
+                    android:layout_alignParentRight="true" />
+
+                <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="영문보기"
-                    android:id="@+id/my_cb_foreign_view"
-                    android:checked="false"
-                    android:layout_alignParentEnd="true"
+                    app:srcCompat="@mipmap/ic_visibility_black_24dp"
+                    android:id="@+id/my_iv_view"
+                    android:layout_alignParentRight="true"
                     android:layout_marginRight="10dp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@mipmap/ic_visibility_off_black_24dp"
+                    android:id="@+id/my_iv_hide"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="10dp" />
+
             </RelativeLayout>
 
             <LinearLayout

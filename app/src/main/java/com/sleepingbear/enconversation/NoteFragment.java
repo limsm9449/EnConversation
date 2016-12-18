@@ -60,6 +60,7 @@ public class NoteFragment extends Fragment implements View.OnClickListener {
         mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         s_group = (Spinner) mainView.findViewById(R.id.my_s_conversation_note);
         s_group.setAdapter(mAdapter);
+        s_group.setSelection(1); //학습회화로 초기값 지정
         s_group.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -112,6 +113,7 @@ public class NoteFragment extends Fragment implements View.OnClickListener {
             Intent intent = new Intent(getContext(), NoteActivity.class);
             intent.putExtras(bundle);
             startActivity(intent);
+            getActivity().startActivityForResult(intent, CommConstants.s_note);
         }
     };
 
@@ -179,30 +181,34 @@ public class NoteFragment extends Fragment implements View.OnClickListener {
         final android.app.AlertDialog alertDialog = builder.create();
 
         if ( "C01".equals(groupCode) || "C02".equals(groupCode) ) {
-            final EditText et_upd = ((EditText) dialog_layout.findViewById(R.id.my_et_upd_name));
-            et_upd.setText(cur.getString(cur.getColumnIndexOrThrow("KIND_NAME")));
+            if ( "C01".equals(groupCode) ) {
+                final EditText et_upd = ((EditText) dialog_layout.findViewById(R.id.my_et_upd_name));
+                et_upd.setText(cur.getString(cur.getColumnIndexOrThrow("KIND_NAME")));
 
-            ((Button) dialog_layout.findViewById(R.id.my_b_upd)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
-            ((Button) dialog_layout.findViewById(R.id.my_b_upd)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if ("".equals(et_upd.getText().toString())) {
-                        Toast.makeText(getContext(), "회화노트 이름을 입력하세요.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        alertDialog.dismiss();
+                ((Button) dialog_layout.findViewById(R.id.my_b_upd)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
+                ((Button) dialog_layout.findViewById(R.id.my_b_upd)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if ("".equals(et_upd.getText().toString())) {
+                            Toast.makeText(getContext(), "회화노트 이름을 입력하세요.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            alertDialog.dismiss();
 
-                        db.execSQL(DicQuery.getUpdCode(groupCode, (String) v.getTag(), et_upd.getText().toString()));
+                            db.execSQL(DicQuery.getUpdCode(groupCode, (String) v.getTag(), et_upd.getText().toString()));
 
-                        //기록...
-                        DicUtils.writeInfoToFile(getContext(), CommConstants.tag_code_upd + ":" + (String) v.getTag() + ":" + et_upd.getText().toString());
+                            //기록...
+                            DicUtils.writeInfoToFile(getContext(), db, groupCode);
 
-                        changeListView();
+                            changeListView();
 
-                        Toast.makeText(getContext(), "회화노트 이름을 수정하였습니다.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "회화노트 이름을 수정하였습니다.", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }
-            });
-
+                });
+            } else {
+                ((EditText) dialog_layout.findViewById(R.id.my_et_upd_name)).setEnabled(false);
+                ((Button) dialog_layout.findViewById(R.id.my_b_upd)).setEnabled(false);
+            }
             ((Button) dialog_layout.findViewById(R.id.my_b_del)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
             ((Button) dialog_layout.findViewById(R.id.my_b_del)).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -225,8 +231,7 @@ public class NoteFragment extends Fragment implements View.OnClickListener {
                                         db.execSQL(DicQuery.getDelNote(code));
 
                                         //기록...
-                                        //DicUtils.writeInfoToFile(getContext(), "CATEGORY_DELETE" + ":" + code);
-                                        DicUtils.writeNewInfoToFile(getContext(), db);
+                                        DicUtils.writeInfoToFile(getContext(), db, groupCode);
                                         changeListView();
 
                                         Toast.makeText(getContext(), "회화노트를 삭제하였습니다.", Toast.LENGTH_SHORT).show();
@@ -248,10 +253,12 @@ public class NoteFragment extends Fragment implements View.OnClickListener {
         }
 
         final EditText et_saveName = ((EditText) dialog_layout.findViewById(R.id.my_et_file_name));
-        if ( "C01".equals(groupCode) || "C02".equals(groupCode) ) {
+        if ( "C01".equals(groupCode) ) {
             et_saveName.setText(cur.getString(cur.getColumnIndexOrThrow("KIND_NAME")));
+        } else if ( "C02".equals(groupCode) ) {
+            et_saveName.setText(cur.getString(cur.getColumnIndexOrThrow("KIND")).replaceAll("[.]","") + "_회화학습");
         } else {
-            et_saveName.setText("회화_" + DicUtils.getCurrentDate());
+            et_saveName.setText(((Cursor) s_group.getSelectedItem()).getString(2) + "_" + DicUtils.getCurrentDate());
         }
         ((Button) dialog_layout.findViewById(R.id.my_b_save)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
         ((Button) dialog_layout.findViewById(R.id.my_b_save)).setOnClickListener(new View.OnClickListener() {
@@ -300,9 +307,9 @@ public class NoteFragment extends Fragment implements View.OnClickListener {
                         try {
                             bw = new BufferedWriter(new FileWriter(saveFile, true));
 
-                            Cursor cursor = db.rawQuery(DicQuery.getSaveVocabulary(code), null);
+                            Cursor cursor = db.rawQuery(DicQuery.getNoteList(code), null);
                             while (cursor.moveToNext()) {
-                                bw.write(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1")) + ": " + cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1")));
+                                bw.write(cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1")) + ": " + cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE2")));
                                 bw.newLine();
                             }
 

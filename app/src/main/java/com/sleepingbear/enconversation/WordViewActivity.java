@@ -119,7 +119,7 @@ public class WordViewActivity extends AppCompatActivity implements View.OnClickL
                 dlg.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        DicDb.insDicVoc(db, entryId, vocKind);
+                        DicDb.insDicVoc(db, vocKind, entryId, "N");
                         ImageButton ib_myvoc = (ImageButton)findViewById(R.id.my_c_wv_ib_myvoc);
                         ib_myvoc.setImageResource(android.R.drawable.star_on);
                         myVoc = true;            }
@@ -249,16 +249,16 @@ public class WordViewActivity extends AppCompatActivity implements View.OnClickL
                     DicDb.delDicVocAll(db, entryId);
 
                     // 기록..
-                    DicUtils. writeInfoToFile(getApplicationContext(), CommConstants.tag_voc_del + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".") + ":" + entryId);
+                    DicUtils. writeInfoToFile(getApplicationContext(), db, "VOC");
                 } else {
                     ImageButton ib_myvoc = (ImageButton)this.findViewById(R.id.my_c_wv_ib_myvoc);
                     ib_myvoc.setImageResource(android.R.drawable.star_on);
                     myVoc = true;
 
-                    DicDb.insDicVoc(db, entryId, CommConstants.voc_default_code);
+                    DicDb.insDicVoc(db, CommConstants.voc_default_code, entryId, "N");
 
                     // 기록..
-                    DicUtils. writeInfoToFile(getApplicationContext(), CommConstants.tag_voc_ins + ":" + CommConstants.voc_default_code + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".") + ":" + entryId);
+                    DicUtils. writeInfoToFile(getApplicationContext(), db, "VOC");
                 }
 
                 break;

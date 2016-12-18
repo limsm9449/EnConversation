@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    tools:context="com.sleepingbear.enconversation.ConversationNoteFragment">
+    tools:context="com.sleepingbear.enconversation.NoteFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -23,7 +23,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_toLeftOf="@+id/my_iv_all"
                 android:layout_alignParentStart="true"
-                android:layout_height="25dp"
+                android:layout_height="20dp"
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginRight="10dp" />

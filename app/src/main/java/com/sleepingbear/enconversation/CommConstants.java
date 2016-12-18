@@ -19,11 +19,13 @@ public class CommConstants {
 
     public static String tag = "enConversation";
 
-    public static String infoFileName = "enConversation.txt";
+    public static String infoFileNameC01 = "C01.txt";
+    public static String infoFileNameC02 = "C02.txt";
+    public static String infoFileNameVoc = "VOC.txt";
     public static String folderName = "/enconversation";
 
-    public final static int a_news = 1;
-    public final static int a_vocabulary = 2;
+    public final static int s_note = 1;
+    public final static int s_vocabulary = 2;
 
     public static int f_ConversationStudy = 0;
     public static int f_Pattern = 1;
@@ -43,7 +45,6 @@ public class CommConstants {
     public static String tag_voc_ins = "C_VOC_INS" ;
     public static String tag_voc_del = "C_VOC_DEL" ;
     public static String tag_voc_del_all = "C_VOC_DEL_ALL" ;
-    public static String tag_voc_memory = "C_VOC_MEMORY" ;
 
     public static String voc_group_code = "VOC" ;
     public static String voc_default_code = "VOC0001" ;

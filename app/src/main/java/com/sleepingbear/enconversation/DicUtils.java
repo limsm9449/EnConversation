@@ -181,6 +181,7 @@ public class DicUtils {
         return rtn;
     }
 
+    /*
     public static void writeInfoToFile(Context ctx, String saveData) {
         try {
             FileOutputStream fos = ctx.openFileOutput(CommConstants.infoFileName, ctx.MODE_APPEND);
@@ -191,24 +192,38 @@ public class DicUtils {
             DicUtils.dicLog("File 에러=" + e.toString());
         }
     }
+    */
 
-    public static void readInfoFromFile(Context ctx, SQLiteDatabase db) {
-        readInfoFromFile(ctx, db, "");
+    public static void readInfoFromFile(Context ctx, SQLiteDatabase db, String kind) {
+        readInfoFromFile(ctx, db, kind, "");
     }
-    public static void readInfoFromFile(Context ctx, SQLiteDatabase db, String fileName) {
+    public static void readInfoFromFile(Context ctx, SQLiteDatabase db, String kind, String fileName) {
         dicLog(DicUtils.class.toString() + " : " + "readInfoFromFile start");
 
         //데이타 복구
         FileInputStream fis = null;
         try {
-            //데이타 초기화
-            DicDb.initVocabulary(db);
-            DicDb.initNote(db, "C01");
-            DicDb.initNote(db, "C02");
+            if ( "C01".equals(kind) ) {
+                fis = ctx.openFileInput(CommConstants.infoFileNameC01);
 
-            if ( fileName == null || fileName.length() == 0 ) {
-                fis = ctx.openFileInput(CommConstants.infoFileName);
+                //데이타 초기화
+                DicDb.initNote(db, "C01");
+            } else if ( "C02".equals(kind) ) {
+                fis = ctx.openFileInput(CommConstants.infoFileNameC02);
+
+                //데이타 초기화
+                DicDb.initNote(db, "C02");
+            } else if ( "VOC".equals(kind) ) {
+                fis = ctx.openFileInput(CommConstants.infoFileNameVoc);
+
+                //데이타 초기화
+                DicDb.initVocabulary(db);
             } else {
+                //데이타 초기화
+                DicDb.initNote(db, "C01");
+                DicDb.initNote(db, "C02");
+                DicDb.initVocabulary(db);
+
                 fis = new FileInputStream(new File(fileName));
             }
 
@@ -221,24 +236,12 @@ public class DicUtils {
                 dicLog(readString);
 
                 String[] row = readString.split(":");
-                if ( row[0] ==  CommConstants.tag_code_ins) {
+                if ( row[0].equals(CommConstants.tag_code_ins) ) {
                     DicDb.insCode(db, row[1], row[2], row[3]);
-                } else if ( row[0] ==  CommConstants.tag_code_upd) {
-                    DicDb.updCode(db, row[1], row[2], row[3]);
-                } else if ( row[0] ==  CommConstants.tag_note_ins) {
+                } else if ( row[0].equals(CommConstants.tag_note_ins) ) {
                     DicDb.insConversationToNote(db, row[1], row[2]);
-                } else if ( row[0] ==  CommConstants.tag_note_del) {
-                    DicDb.delConversationFromNote(db, row[1], Integer.parseInt(row[2]));
-                } else if ( row[0] ==  CommConstants.tag_note_del_all) {
-                    DicDb.delAllConversationFromNote(db, Integer.parseInt(row[1]));
-                } else if ( row[0] ==  CommConstants.tag_voc_ins) {
-                    DicDb.insDicVoc(db, row[1], row[2], row[3]);
-                } else if ( row[0] ==  CommConstants.tag_voc_del) {
-                    DicDb.delDicVoc(db, row[1], row[2]);
-                } else if ( row[0] ==  CommConstants.tag_voc_del_all) {
-                    DicDb.delDicVocAll(db, row[1]);
-                } else if ( row[0] ==  CommConstants.tag_voc_memory) {
-                    DicDb.updMemory(db, row[1], row[2]);
+                } else if ( row[0].equals(CommConstants.tag_voc_ins) ) {
+                    DicDb.insDicVoc(db, row[1], row[2], row[3], row[4]);
                 }
 
                 readString = buffreader.readLine();
@@ -253,7 +256,9 @@ public class DicUtils {
         dicLog(DicUtils.class.toString() + " : " + "readInfoFromFile end");
 
         //데이타 기록
-        writeNewInfoToFile(ctx, db);
+        writeInfoToFile(ctx, db, "C01");
+        writeInfoToFile(ctx, db, "C02");
+        writeInfoToFile(ctx, db, "VOC");
     }
 
     /**
@@ -261,19 +266,23 @@ public class DicUtils {
      * @param ctx
      * @param db
      */
-    public static void writeNewInfoToFile(Context ctx, SQLiteDatabase db) {
+    public static void writeInfoToFile(Context ctx, SQLiteDatabase db, String kind) {
         System.out.println("writeNewInfoToFile start");
 
-        writeNewInfoToFile(ctx, db, "");
+        writeInfoToFile(ctx, db, kind, "");
 
         System.out.println("writeNewInfoToFile end");
     }
-    public static void writeNewInfoToFile(Context ctx, SQLiteDatabase db, String fileName) {
+    public static void writeInfoToFile(Context ctx, SQLiteDatabase db, String kind, String fileName) {
         try {
             FileOutputStream fos = null;
 
-            if ( fileName == null || fileName.length() == 0 ) {
-                fos = ctx.openFileOutput(CommConstants.infoFileName, ctx.MODE_PRIVATE);
+            if ( "C01".equals(kind) ) {
+                fos = ctx.openFileOutput(CommConstants.infoFileNameC01, ctx.MODE_PRIVATE);
+            } else if ( "C02".equals(kind) ) {
+                fos = ctx.openFileOutput(CommConstants.infoFileNameC02, ctx.MODE_PRIVATE);
+            } else if ( "VOC".equals(kind) ) {
+                fos = ctx.openFileOutput(CommConstants.infoFileNameVoc, ctx.MODE_PRIVATE);
             } else {
                 File saveFile = new File(fileName);
                 try {
@@ -285,7 +294,7 @@ public class DicUtils {
                 fos = new FileOutputStream(saveFile);
             }
 
-            Cursor cursor = db.rawQuery(DicQuery.getWriteData(), null);
+            Cursor cursor = db.rawQuery(DicQuery.getWriteData(kind), null);
             while (cursor.moveToNext()) {
                 DicUtils.dicLog(cursor.getString(cursor.getColumnIndexOrThrow("WRITE_DATA")));
                 fos.write((cursor.getString(cursor.getColumnIndexOrThrow("WRITE_DATA")).getBytes()));

@@ -9,7 +9,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -18,7 +17,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,9 +28,6 @@ import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
 import java.util.HashMap;
 import java.util.Random;
-
-import static android.content.Context.LAYOUT_INFLATER_SERVICE;
-import static java.security.AccessController.getContext;
 
 public class NoteStudyActivity extends AppCompatActivity implements View.OnClickListener {
     private DbHelper dbHelper;
@@ -74,8 +69,8 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
         ((ImageView) this.findViewById(R.id.my_iv_left)).setOnClickListener(this);
         ((ImageView) this.findViewById(R.id.my_iv_right)).setOnClickListener(this);
 
-        ((ImageView) this.findViewById(R.id.my_iv_foreign_view)).setOnClickListener(this);
-        ((ImageView) this.findViewById(R.id.my_iv_refresh)).setOnClickListener(this);
+        ((ImageView) this.findViewById(R.id.my_iv_view)).setOnClickListener(this);
+        ((ImageView) this.findViewById(R.id.my_iv_hide)).setOnClickListener(this);
 
         if ( !"".equals(sampleSeq) ) {
             ((ImageView) this.findViewById(R.id.my_iv_left)).setVisibility(View.GONE);
@@ -130,7 +125,7 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
             case R.id.my_iv_right:
                 if ( isStart ) {
                     DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
-                    DicUtils. writeInfoToFile(this, CommConstants.tag_note_ins + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
+                    //DicUtils. writeInfoToFile(this, CommConstants.tag_note_ins + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
                 }
                 if ( !cursor.isLast() ) {
                     cursor.moveToNext();
@@ -139,10 +134,10 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                     changeListView(true);
                 }
                 break;
-            case R.id.my_iv_foreign_view:
+            case R.id.my_iv_view:
                 my_tv_foreign.setText(foreign);
                 break;
-            case R.id.my_iv_refresh:
+            case R.id.my_iv_hide:
                 conversationShow();
                 break;
             default:
@@ -202,7 +197,7 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                         public void onClick(View v) {
                             if ( isStart ) {
                                 DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
-                                DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_note_ins + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
+                                //DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_note_ins + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
                             }
                             if ( !cursor.isLast() ) {
                                 cursor.moveToNext();

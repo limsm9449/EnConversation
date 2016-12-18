@@ -41,6 +41,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
     private int mSelect;
     private boolean isEditing = false;
     private boolean isForeignView = false;
+    private boolean isChange = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,7 +187,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                                 startActivity(intent);
                             } else {
                                 DicDb.insConversationToNote(db, kindCodes[mSelect], sampleSeq);
-                                DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_note_ins + ":" + kindCodes[mSelect] + ":" + sampleSeq);
+                                isChange = true;
                             }
                         }
                     });
@@ -301,9 +302,8 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     adapter.delete(kind);
-                                    changeListView();
 
-                                    DicUtils.writeNewInfoToFile(getApplicationContext(), db);
+                                    isChange = true;
                                 }
                             })
                             .setNegativeButton("취소", new DialogInterface.OnClickListener() {
@@ -399,6 +399,14 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this.getApplication(), VocabularyActivity.class);
+        intent.putExtra("isChange", (isChange ? "Y" : "N"));
+        setResult(RESULT_OK, intent);
+
+        finish();
+    }
 }
 
 class NoteCursorAdapter extends CursorAdapter {
@@ -427,10 +435,21 @@ class NoteCursorAdapter extends CursorAdapter {
         protected CheckBox cb;
     }
 
+    public void dataChange() {
+        mCursor.requery();
+        mCursor.move(mCursor.getPosition());
+
+        for ( int i = 0; i < isCheck.length; i++ ) {
+            isCheck[i] = false;
+        }
+
+        //변경사항을 반영한다.
+        notifyDataSetChanged();
+    }
+
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.content_note_item, parent, false);
-
 
         ViewHolder viewHolder = new ViewHolder();
         viewHolder.cb = (CheckBox) view.findViewById(R.id.my_cb_check);
@@ -492,25 +511,28 @@ class NoteCursorAdapter extends CursorAdapter {
                 DicDb.delConversationFromNote(mDb, kind, seq[i]);
             }
         }
+
+        dataChange();
     }
 
     public void copy(String copyKind) {
         for ( int i = 0; i < isCheck.length; i++ ) {
             if ( isCheck[i] ) {
-                DicDb.copyConversationToNote(mDb, copyKind, seq[i]);
+                DicDb.insConversationToNote(mDb, copyKind, Integer.toString(seq[i]));
             }
         }
+
+        dataChange();
     }
 
     public void move(String kind, String copyKind) {
         for ( int i = 0; i < isCheck.length; i++ ) {
             if ( isCheck[i] ) {
                 DicDb.moveConversationToNote(mDb, kind, copyKind, seq[i]);
-                DicDb.delConversationFromNote(mDb, kind, seq[i]);
-
-                notifyDataSetChanged();
             }
         }
+
+        dataChange();
     }
 
     public boolean isCheck() {

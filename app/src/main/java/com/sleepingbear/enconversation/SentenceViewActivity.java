@@ -170,7 +170,7 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
                 cursor.close();
 
                 final AlertDialog.Builder dlg = new AlertDialog.Builder(SentenceViewActivity.this);
-                dlg.setTitle("메뉴 선택");
+                dlg.setTitle("단어장 선택");
                 dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
@@ -181,9 +181,9 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
                 dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        DicDb.insDicVoc(db, entryId, kindCodes[mSelect]);
+                        DicDb.insDicVoc(db, kindCodes[mSelect], entryId, "N");
                         sentenceViewAdapter.dataChange();
-                        DicUtils. writeInfoToFile(getApplicationContext(), "MYWORD_INSERT" + ":" + kindCodes[mSelect] + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + entryId);
+                        DicUtils. writeInfoToFile(getApplicationContext(), db, "VOC");
                     }
                 });
                 dlg.show();
@@ -212,7 +212,7 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.my_c_sv_ib_mysample :
-                ImageButton mySample = (ImageButton) findViewById(R.id.my_c_sv_ib_mysample);
+                final ImageButton mySample = (ImageButton) findViewById(R.id.my_c_sv_ib_mysample);
                 if ( isMySample ) {
                     isMySample = false;
                     mySample.setImageResource(android.R.drawable.star_off);
@@ -220,13 +220,10 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
                     DicDb.delAllConversationFromNote(db, Integer.parseInt(sampleSeq));
 
                     // 기록..
-                    DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_note_ins + ":" + sampleSeq);
+                    DicUtils.writeInfoToFile(getApplicationContext(), db, "C01");
 
                     isChange = true;
                 } else {
-                    isMySample = true;
-                    mySample.setImageResource(android.R.drawable.star_on);
-
                     //메뉴 선택 다이얼로그 생성
                     Cursor cursor = db.rawQuery(DicQuery.getNoteKindContextMenu(false), null);
                     final String[] kindCodes = new String[cursor.getCount()];
@@ -241,7 +238,7 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
                     cursor.close();
 
                     final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(SentenceViewActivity.this);
-                    dlg.setTitle("메뉴 선택");
+                    dlg.setTitle("회화 노트 선택");
                     dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface arg0, int arg1) {
@@ -253,7 +250,10 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             DicDb.insConversationToNote(db, kindCodes[mSelect], sampleSeq);
-                            DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_note_ins + ":" + kindCodes[mSelect] + ":" + sampleSeq);
+                            DicUtils.writeInfoToFile(getApplicationContext(), db, "C02");
+
+                            isMySample = true;
+                            mySample.setImageResource(android.R.drawable.star_on);
                         }
                     });
                     dlg.show();
@@ -369,12 +369,12 @@ class SentenceViewCursorAdapter extends CursorAdapter {
                     DicDb.delDicVocAll(mDb, viewHolder.entryId);
 
                     // 기록..
-                    DicUtils.writeInfoToFile(context, CommConstants.tag_voc_del + ":" + viewHolder.entryId);
+                    DicUtils.writeInfoToFile(context, mDb, "VOC");
                 } else {
-                    DicDb.insDicVoc(mDb, viewHolder.entryId, CommConstants.voc_default_code);
+                    DicDb.insDicVoc(mDb, CommConstants.voc_default_code, viewHolder.entryId, "N");
 
                     // 기록..
-                    DicUtils.writeInfoToFile(context, CommConstants.tag_voc_ins + ":" + CommConstants.voc_default_code + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".") + ":" + viewHolder.entryId);
+                    DicUtils.writeInfoToFile(context, mDb, "VOC");
                 }
 
                 dataChange();

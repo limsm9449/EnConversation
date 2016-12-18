@@ -132,7 +132,7 @@ public class PatternActivity extends AppCompatActivity {
                             startActivity(intent);
                         } else {
                             DicDb.insConversationToNote(db, kindCodes[mSelect], sampleSeq);
-                            DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_note_ins + ":" + kindCodes[mSelect] + ":" + sampleSeq);
+                            DicUtils.writeInfoToFile(getApplicationContext(), db, "C01");
                         }
                     }
                 });

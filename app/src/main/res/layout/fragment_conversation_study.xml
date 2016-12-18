@@ -29,14 +29,13 @@
                     android:layout_height="match_parent">
 
                     <RadioGroup
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:checkedButton="@+id/my_rb_easy"
                         android:id="@+id/my_rg_difficulty"
-                        android:layout_marginRight="10dp"
+                        android:layout_marginRight="50dp"
                         android:orientation="horizontal"
                         android:background="@drawable/my_toggle_outline"
-                        android:layout_toLeftOf="@+id/my_iv_refresh"
                         android:layout_alignParentStart="true">
 
                         <RadioButton
@@ -88,20 +87,20 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:srcCompat="@mipmap/ic_refresh_black_24dp"
-                        android:id="@+id/my_iv_refresh"
+                        app:srcCompat="@mipmap/ic_visibility_off_black_24dp"
+                        android:id="@+id/my_iv_hide"
                         android:layout_weight="1"
                         android:layout_marginRight="10dp"
-                        android:layout_toLeftOf="@+id/my_iv_foreign_view"
-                        android:layout_marginTop="3dp" />
+                        android:layout_marginTop="3dp"
+                        android:layout_alignParentRight="true" />
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:srcCompat="@mipmap/ic_visibility_black_24dp"
-                        android:id="@+id/my_iv_foreign_view"
+                        android:id="@+id/my_iv_view"
                         android:layout_weight="1"
-                        android:layout_marginRight="5dp"
+                        android:layout_marginRight="10dp"
                         android:layout_alignParentRight="true"
                         android:layout_marginTop="3dp" />
 

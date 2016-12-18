@@ -1,31 +1,22 @@
 package com.sleepingbear.enconversation;
 
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,7 +30,6 @@ import java.util.HashMap;
 import java.util.Random;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
-import static com.sleepingbear.enconversation.R.style.myButton;
 
 
 public class ConversationStudyFragment extends Fragment implements View.OnClickListener {
@@ -70,11 +60,15 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
         my_tv_han = (TextView) mainView.findViewById(R.id.my_tv_han);
         my_tv_foreign = (TextView) mainView.findViewById(R.id.my_tv_foreign);
 
+
         ((ImageView) mainView.findViewById(R.id.my_iv_left)).setOnClickListener(this);
         ((ImageView) mainView.findViewById(R.id.my_iv_right)).setOnClickListener(this);
 
-        ((ImageView) mainView.findViewById(R.id.my_iv_foreign_view)).setOnClickListener(this);
-        ((ImageView) mainView.findViewById(R.id.my_iv_refresh)).setOnClickListener(this);
+        ((ImageView) mainView.findViewById(R.id.my_iv_view)).setOnClickListener(this);
+        ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setOnClickListener(this);
+
+        ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.VISIBLE);
+        ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
 
         ((RadioButton) mainView.findViewById(R.id.my_rb_easy)).setOnClickListener(this);
         ((RadioButton) mainView.findViewById(R.id.my_rb_normal)).setOnClickListener(this);
@@ -126,7 +120,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
             case R.id.my_iv_right:
                 if ( isStart ) {
                     DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
-                    DicUtils. writeInfoToFile(getContext(), CommConstants.tag_note_ins + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
+                    DicUtils. writeInfoToFile(getContext(), db, "C02");
                 }
                 if ( !cursor.isLast() ) {
                     cursor.moveToNext();
@@ -135,10 +129,16 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                     changeListView(true);
                 }
                 break;
-            case R.id.my_iv_foreign_view:
+            case R.id.my_iv_view:
                 my_tv_foreign.setText(foreign);
+                ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.GONE);
+                ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.VISIBLE);
+
                 break;
-            case R.id.my_iv_refresh:
+            case R.id.my_iv_hide:
+                ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.VISIBLE);
+                ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
+
                 conversationShow();
                 break;
             case R.id.my_rb_easy:
@@ -210,7 +210,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                         public void onClick(View v) {
                             if ( isStart ) {
                                 DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
-                                DicUtils. writeInfoToFile(getContext(), CommConstants.tag_note_ins + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
+                                DicUtils. writeInfoToFile(getContext(), db, "C02");
                             }
                             if ( !cursor.isLast() ) {
                                 cursor.moveToNext();

@@ -78,7 +78,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if ( "Y".equals(prefs.getString("db_new", "N")) ) {
             DicUtils.dicLog("backup data import");
 
-            DicUtils.readInfoFromFile(this, db);
+            DicUtils.readInfoFromFile(this, db, "C01");
+            DicUtils.readInfoFromFile(this, db, "C02");
+            DicUtils.readInfoFromFile(this, db, "VOC");
 
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString("db_new", "N");
@@ -113,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 db.execSQL(DicQuery.getInsCode("VOC", insMaxCode, et_ins.getText().toString()));
 
                                 //기록
-                                DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_code_ins + ":VOC:" + insMaxCode + ":" + et_ins.getText().toString());
+                                DicUtils.writeInfoToFile(getApplicationContext(), db, "VOC");
 
                                 ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
 
@@ -152,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 db.execSQL(DicQuery.getInsCode("C01", insMaxCode, et_ins.getText().toString()));
 
                                 //기록
-                                DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_code_ins + ":C01:" + insMaxCode + ":" + et_ins.getText().toString());
+                                DicUtils.writeInfoToFile(getApplicationContext(), db, "C01");
 
                                 ((NoteFragment) adapter.getItem(selectedTab)).changeListView();
 
@@ -237,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onTabReselected(TabLayout.Tab tab) {
             }
         });
+
 
 		/*
         String flag_other = "other_20161009";
@@ -437,7 +440,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (saveFile.exists()) {
                             Toast.makeText(getApplicationContext(), "파일명이 존재합니다.", Toast.LENGTH_LONG).show();
                         } else {
-                            DicUtils.writeNewInfoToFile(getApplicationContext(), (new DbHelper(getApplicationContext())).getWritableDatabase(), fileName);
+                            DicUtils.writeInfoToFile(getApplicationContext(), db, "", fileName);
 
                             Toast.makeText(getApplicationContext(), "백업 데이타를 정상적으로 내보냈습니다.", Toast.LENGTH_LONG).show();
 
@@ -454,10 +457,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     filechooser.setFileListener(new FileChooser.FileSelectedListener() {
                         @Override
                         public void fileSelected(final File file) {
-                            DicUtils.readInfoFromFile(getApplicationContext(), (new DbHelper(getApplicationContext())).getWritableDatabase(), file.getAbsolutePath());
-
-                            // 시스템 기록파일 생성
-                            DicUtils.writeNewInfoToFile(getApplicationContext(), (new DbHelper(getApplicationContext())).getWritableDatabase());
+                            DicUtils.readInfoFromFile(getApplicationContext(), (new DbHelper(getApplicationContext())).getWritableDatabase(), "", file.getAbsolutePath());
 
                             Toast.makeText(getApplicationContext(), "백업 데이타를 정상적으로 가져왔습니다.", Toast.LENGTH_LONG).show();
 
@@ -485,15 +485,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Fragment 에서 호출한 Activity 가 종료된 후 처리
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         DicUtils.dicLog("onActivityResult : " + requestCode + " : " + resultCode);
-        /*
+
         switch ( requestCode ) {
-            case CommConstants.a_news :
-                ((ClickwordFragment) adapter.getItem(1)).changeListView();
+            case CommConstants.s_note :
+                ((NoteFragment) adapter.getItem(CommConstants.f_Note)).changeListView();
+
+                if ( "C01".equals(((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode) ) {
+                    DicUtils.writeInfoToFile(getApplicationContext(), db, "C01");
+                } else if ( "C02".equals(((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode) ) {
+                    DicUtils.writeInfoToFile(getApplicationContext(), db, "C02");
+                }
+
+                break;
+            case CommConstants.s_vocabulary :
+                ((VocabularyFragment) adapter.getItem(CommConstants.f_Vocabulary)).changeListView();
+                DicUtils.writeInfoToFile(getApplicationContext(), db, "VOC");
                 break;
         }
-        */
+
     }
 
     public void confirmAllDelete() {
@@ -506,7 +523,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                           if (selectedTab == CommConstants.f_Vocabulary) {
                               DicDb.initVocabulary(db);
 
-                              DicUtils.writeNewInfoToFile(getApplicationContext(), db);
+                              DicUtils.writeInfoToFile(getApplicationContext(), db, "VOC");
 
                               ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
                           }

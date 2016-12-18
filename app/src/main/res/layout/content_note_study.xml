@@ -31,17 +31,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:srcCompat="@mipmap/ic_refresh_black_24dp"
-                    android:id="@+id/my_iv_refresh"
+                    android:id="@+id/my_iv_hide"
                     android:layout_weight="1"
                     android:layout_marginRight="10dp"
-                    android:layout_toLeftOf="@+id/my_iv_foreign_view"
+                    android:layout_toLeftOf="@+id/my_iv_view"
                     android:layout_marginTop="3dp" />
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:srcCompat="@mipmap/ic_visibility_black_24dp"
-                    android:id="@+id/my_iv_foreign_view"
+                    android:id="@+id/my_iv_view"
                     android:layout_weight="1"
                     android:layout_marginRight="5dp"
                     android:layout_alignParentRight="true"

@@ -13,14 +13,18 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,13 +39,15 @@ public class VocabularyActivity extends AppCompatActivity implements View.OnClic
     private SQLiteDatabase db;
     private VocabularyCursorAdapter adapter;
     public int mSelect = 0;
+    private boolean isEditing = false;
 
     private String kind = "";
     private String mMemorization = "ALL";
     private int mOrder = -1;
     private String mOrderName = "";
 
-    public String isChange = "N";
+    private boolean isChange = false;
+    private boolean isAllCheck = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,14 +70,16 @@ public class VocabularyActivity extends AppCompatActivity implements View.OnClic
         dbHelper = new DbHelper(this);
         db = dbHelper.getWritableDatabase();
 
-        RadioButton rb_all = (RadioButton) this.findViewById(R.id.my_a_voc_rb_all);
-        rb_all.setOnClickListener(this);
+        ((RelativeLayout) this.findViewById(R.id.my_c_rl_tool)).setVisibility(View.GONE);
 
-        RadioButton rb_m = (RadioButton) this.findViewById(R.id.my_a_voc_rb_m);
-        rb_m.setOnClickListener(this);
+        ((RadioButton)this.findViewById(R.id.my_a_voc_rb_all)).setOnClickListener(this);
+        ((RadioButton)this.findViewById(R.id.my_a_voc_rb_m)).setOnClickListener(this);
+        ((RadioButton)this.findViewById(R.id.my_a_voc_rb_m_not)).setOnClickListener(this);
 
-        RadioButton rb_m_not = (RadioButton) this.findViewById(R.id.my_a_voc_rb_m_not);
-        rb_m_not.setOnClickListener(this);
+        ((ImageView)this.findViewById(R.id.my_iv_all)).setOnClickListener(this);
+        ((ImageView)this.findViewById(R.id.my_iv_delete)).setOnClickListener(this);
+        ((ImageView)this.findViewById(R.id.my_iv_copy)).setOnClickListener(this);
+        ((ImageView)this.findViewById(R.id.my_iv_move)).setOnClickListener(this);
 
         Spinner spinner = (Spinner) this.findViewById(R.id.my_a_voc_s_ord);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.dicOrderValue, android.R.layout.simple_spinner_item);
@@ -141,6 +149,7 @@ public class VocabularyActivity extends AppCompatActivity implements View.OnClic
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         listView.setOnItemClickListener(itemClickListener);
 
+        /*
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -173,6 +182,7 @@ public class VocabularyActivity extends AppCompatActivity implements View.OnClic
                 return true;
             };
         });
+        */
 
         listView.setSelection(0);
     }
@@ -180,20 +190,22 @@ public class VocabularyActivity extends AppCompatActivity implements View.OnClic
     AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Cursor cur = (Cursor) adapter.getItem(position);
-            cur.moveToPosition(position);
+            if ( isEditing == false ) {
+                Cursor cur = (Cursor) adapter.getItem(position);
+                cur.moveToPosition(position);
 
-            final String entryId = cur.getString(cur.getColumnIndexOrThrow("ENTRY_ID"));
-            final String word = cur.getString(cur.getColumnIndexOrThrow("WORD"));
-            final String seq = cur.getString(cur.getColumnIndexOrThrow("_id"));
+                final String entryId = cur.getString(cur.getColumnIndexOrThrow("ENTRY_ID"));
+                final String word = cur.getString(cur.getColumnIndexOrThrow("WORD"));
+                final String seq = cur.getString(cur.getColumnIndexOrThrow("_id"));
 
-            Intent intent = new Intent(getApplication(), WordViewActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putString("entryId", entryId);
-            bundle.putString("seq", seq);
-            intent.putExtras(bundle);
+                Intent intent = new Intent(getApplication(), WordViewActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("entryId", entryId);
+                bundle.putString("seq", seq);
+                intent.putExtras(bundle);
 
-            startActivity(intent);
+                startActivity(intent);
+            }
         }
     };
 
@@ -208,7 +220,134 @@ public class VocabularyActivity extends AppCompatActivity implements View.OnClic
         } else if (v.getId() == R.id.my_a_voc_rb_m_not) {
             mMemorization = "N";
             getListView();
+        } else if (v.getId() == R.id.my_iv_all ) {
+            if ( isAllCheck ) {
+                isAllCheck = false;
+            } else {
+                isAllCheck = true;
+            }
+            adapter.allCheck(isAllCheck);
+        } else if (v.getId() == R.id.my_iv_delete ) {
+            if ( !adapter.isCheck() ) {
+                Toast.makeText(this, "선택된 데이타가 없습니다.", Toast.LENGTH_SHORT).show();
+            } else {
+                new android.app.AlertDialog.Builder(this)
+                        .setTitle("알림")
+                        .setMessage("삭제하시겠습니까?")
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                adapter.delete(kind);
+
+                                isChange = true;
+                            }
+                        })
+                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .show();
+            }
+        } else if (v.getId() == R.id.my_iv_copy) {
+            if ( !adapter.isCheck() ) {
+                Toast.makeText(this, "선택된 데이타가 없습니다.", Toast.LENGTH_SHORT).show();
+            } else {
+                //메뉴 선택 다이얼로그 생성
+                Cursor cursor = db.rawQuery(DicQuery.getVocabularyKindMeExceptContextMenu(kind), null);
+
+                if ( cursor.getCount() == 0 ) {
+                    Toast.makeText(this, "등록된 단어장이 없습니다.", Toast.LENGTH_SHORT).show();
+                } else {
+                    final String[] kindCodes = new String[cursor.getCount()];
+                    final String[] kindCodeNames = new String[cursor.getCount()];
+
+                    int idx = 0;
+                    while (cursor.moveToNext()) {
+                        kindCodes[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND"));
+                        kindCodeNames[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND_NAME"));
+                        idx++;
+                    }
+                    cursor.close();
+
+                    final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(VocabularyActivity.this);
+                    dlg.setTitle("단어장 선택");
+                    dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            mSelect = arg1;
+                        }
+                    });
+                    dlg.setNegativeButton("취소", null);
+                    dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            adapter.copy(kindCodes[mSelect]);
+
+                            isChange = true;
+                        }
+                    });
+                    dlg.show();
+                }
+            }
+        } else if (v.getId() == R.id.my_iv_move ) {
+            if (!adapter.isCheck()) {
+                Toast.makeText(this, "선택된 데이타가 없습니다.", Toast.LENGTH_SHORT).show();
+            } else {
+                //메뉴 선택 다이얼로그 생성
+                Cursor cursor = db.rawQuery(DicQuery.getVocabularyKindMeExceptContextMenu(kind), null);
+
+                if (cursor.getCount() == 0) {
+                    Toast.makeText(this, "등록된 단어장이 없습니다.", Toast.LENGTH_SHORT).show();
+                } else {
+                    final String[] kindCodes = new String[cursor.getCount()];
+                    final String[] kindCodeNames = new String[cursor.getCount()];
+
+                    int idx = 0;
+                    while (cursor.moveToNext()) {
+                        kindCodes[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND"));
+                        kindCodeNames[idx] = cursor.getString(cursor.getColumnIndexOrThrow("KIND_NAME"));
+                        idx++;
+                    }
+                    cursor.close();
+
+                    final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(VocabularyActivity.this);
+                    dlg.setTitle("단어장 선택");
+                    dlg.setSingleChoiceItems(kindCodeNames, mSelect, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            mSelect = arg1;
+                        }
+                    });
+                    dlg.setNegativeButton("취소", null);
+                    dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            adapter.move(kind, kindCodes[mSelect]);
+
+                            isChange = true;
+                        }
+                    });
+                    dlg.show();
+                }
+            }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // 상단 메뉴 구성
+        getMenuInflater().inflate(R.menu.menu_vocabulary, menu);
+
+        if (isEditing) {
+            ((MenuItem) menu.findItem(R.id.action_edit)).setVisible(false);
+            ((MenuItem) menu.findItem(R.id.action_exit)).setVisible(true);
+        } else {
+            ((MenuItem) menu.findItem(R.id.action_edit)).setVisible(true);
+            ((MenuItem) menu.findItem(R.id.action_exit)).setVisible(false);
+        }
+
+        return true;
     }
 
     @Override
@@ -217,6 +356,24 @@ public class VocabularyActivity extends AppCompatActivity implements View.OnClic
 
         if (id == android.R.id.home) {
             onBackPressed();
+        } else if (id == R.id.action_edit) {
+            isEditing = true;
+            invalidateOptionsMenu();
+
+            ((RelativeLayout) this.findViewById(R.id.my_c_rl_tool)).setVisibility(View.VISIBLE);
+            ((RelativeLayout) this.findViewById(R.id.my_c_rl_condi)).setVisibility(View.GONE);
+
+            adapter.editChange(isEditing);
+            adapter.notifyDataSetChanged();
+        } else if (id == R.id.action_exit) {
+            isEditing = false;
+            invalidateOptionsMenu();
+
+            ((RelativeLayout) this.findViewById(R.id.my_c_rl_tool)).setVisibility(View.GONE);
+            ((RelativeLayout) this.findViewById(R.id.my_c_rl_condi)).setVisibility(View.VISIBLE);
+
+            adapter.editChange(isEditing);
+            adapter.notifyDataSetChanged();
         }
 
         return super.onOptionsItemSelected(item);
@@ -225,7 +382,7 @@ public class VocabularyActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(this.getApplication(), VocabularyActivity.class);
-        intent.putExtra("isChange", isChange);
+        intent.putExtra("isChange", (isChange ? "Y" : "N"));
         setResult(RESULT_OK, intent);
 
         finish();
@@ -233,28 +390,42 @@ public class VocabularyActivity extends AppCompatActivity implements View.OnClic
 }
 
 class VocabularyCursorAdapter extends CursorAdapter {
-    private String entryId = "";
     private String seq = "";
-    private Activity mActivity;
     private SQLiteDatabase mDb;
     private Cursor mCursor;
+    private boolean isEditing = false;
+    private boolean[] isCheck;
+    private String[] entryId;
 
     static class ViewHolder {
         protected CheckBox memorizationCheck;
-        protected String enrtyId;
+        protected String entryId;
         protected String seq;
+        protected int position;
+        protected CheckBox cb;
     }
 
     public VocabularyCursorAdapter(Context context, Cursor cursor, Activity activity, SQLiteDatabase db) {
         super(context, cursor, 0);
         mCursor = cursor;
-        mActivity = activity;
         mDb = db;
+
+        isCheck = new boolean[cursor.getCount()];
+        entryId = new String[cursor.getCount()];
+        while ( cursor.moveToNext() ) {
+            isCheck[cursor.getPosition()] = false;
+            entryId[cursor.getPosition()] = cursor.getString(cursor.getColumnIndexOrThrow("ENTRY_ID"));
+        }
+        cursor.moveToFirst();
     }
 
     public void dataChange() {
         mCursor.requery();
         mCursor.move(mCursor.getPosition());
+
+        for ( int i = 0; i < isCheck.length; i++ ) {
+            isCheck[i] = false;
+        }
 
         //변경사항을 반영한다.
         notifyDataSetChanged();
@@ -266,19 +437,27 @@ class VocabularyCursorAdapter extends CursorAdapter {
 
         ViewHolder viewHolder = new ViewHolder();
         //암기 체크
-        viewHolder.memorizationCheck = (CheckBox) view.findViewById(R.id.my_cb_check);
+        viewHolder.memorizationCheck = (CheckBox) view.findViewById(R.id.my_cb_memory_check);
         viewHolder.memorizationCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HashMap hm = (HashMap) v.getTag();
-                String entryId = (String) hm.get("entryId");
+                ViewHolder viewHolder = (ViewHolder)v.getTag();
 
-                DicDb.updMemory(mDb, entryId, (((CheckBox) v.findViewById(R.id.my_cb_check)).isChecked() ? "Y" : "N"));
-
-                //기록...
-                DicUtils.writeInfoToFile(context, "MEMORY" + ":" + entryId + ":" + (((CheckBox) v.findViewById(R.id.my_cb_check)).isChecked() ? "Y" : "N"));
+                DicDb.updMemory(mDb, viewHolder.entryId, (((CheckBox) v).isChecked() ? "Y" : "N"));
 
                 dataChange();
+            }
+        });
+        viewHolder.cb = (CheckBox) view.findViewById(R.id.my_cb_check);
+        viewHolder.cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                ViewHolder viewHolder = (ViewHolder)buttonView.getTag();
+                isCheck[viewHolder.position] = isChecked;
+                notifyDataSetChanged();
+
+                DicUtils.dicLog("onCheckedChanged : " + viewHolder.position);
             }
         });
 
@@ -289,16 +468,12 @@ class VocabularyCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        HashMap param = new HashMap();
-        param.put("WORD", cursor.getString(cursor.getColumnIndexOrThrow("WORD")));
-        param.put("entryId", cursor.getString(cursor.getColumnIndexOrThrow("ENTRY_ID")));
-        param.put("seq", cursor.getString(cursor.getColumnIndexOrThrow("SEQ")));
-        param.put("position", cursor.getPosition());
-
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        viewHolder.memorizationCheck.setTag(param);
-        viewHolder.enrtyId = cursor.getString(cursor.getColumnIndexOrThrow("ENTRY_ID"));
+        viewHolder.entryId = cursor.getString(cursor.getColumnIndexOrThrow("ENTRY_ID"));
         viewHolder.seq = cursor.getString(cursor.getColumnIndexOrThrow("SEQ"));
+        viewHolder.position = cursor.getPosition();
+        viewHolder.memorizationCheck.setTag(viewHolder);
+        viewHolder.cb.setTag(viewHolder);
 
         ((TextView) view.findViewById(R.id.my_f_bi_tv_bookmark)).setText(DicUtils.getString(cursor.getString(cursor.getColumnIndexOrThrow("WORD"))));
         ((TextView) view.findViewById(R.id.my_c_vi_tv_spelling)).setText(DicUtils.getString(cursor.getString(cursor.getColumnIndexOrThrow("SPELLING"))));
@@ -306,14 +481,76 @@ class VocabularyCursorAdapter extends CursorAdapter {
         ((TextView) view.findViewById(R.id.my_c_vi_tv_mean)).setText(DicUtils.getString(cursor.getString(cursor.getColumnIndexOrThrow("MEAN"))));
 
         //암기 체크박스
-        String memorization = cursor.getString(cursor.getColumnIndexOrThrow("MEMORIZATION"));
-        CheckBox cb_memorization = (CheckBox)view.findViewById(R.id.my_cb_check);
-        cb_memorization.setTag(param);
-        if ( "Y".equals(memorization) ) {
-            cb_memorization.setChecked(true);
+        if ( "Y".equals(cursor.getString(cursor.getColumnIndexOrThrow("MEMORIZATION"))) ) {
+            ((CheckBox)view.findViewById(R.id.my_cb_memory_check)).setChecked(true);
         } else {
-            cb_memorization.setChecked(false);
+            ((CheckBox)view.findViewById(R.id.my_cb_memory_check)).setChecked(false);
         }
 
+        if ( isEditing ) {
+            ((RelativeLayout) view.findViewById(R.id.my_rl_left)).setVisibility(View.VISIBLE);
+        } else {
+            ((RelativeLayout) view.findViewById(R.id.my_rl_left)).setVisibility(View.GONE);
+        }
+
+        if ( isCheck[cursor.getPosition()] ) {
+            ((CheckBox)view.findViewById(R.id.my_cb_check)).setButtonDrawable(android.R.drawable.checkbox_on_background);
+        } else {
+            ((CheckBox)view.findViewById(R.id.my_cb_check)).setButtonDrawable(android.R.drawable.checkbox_off_background);
+        }
+    }
+
+    public void allCheck(boolean chk) {
+        for ( int i = 0; i < isCheck.length; i++ ) {
+            isCheck[i] = chk;
+        }
+
+        notifyDataSetChanged();
+    }
+
+    public void delete(String kind) {
+        for ( int i = 0; i < isCheck.length; i++ ) {
+            if ( isCheck[i] ) {
+                DicDb.delDicVoc(mDb, kind, entryId[i]);
+            }
+        }
+        dataChange();
+    }
+
+    public void copy(String copyKind) {
+        for ( int i = 0; i < isCheck.length; i++ ) {
+            if ( isCheck[i] ) {
+                DicDb.insDicVoc(mDb, copyKind, entryId[i], "N");
+            }
+        }
+
+        dataChange();
+    }
+
+    public void move(String kind, String copyKind) {
+        for ( int i = 0; i < isCheck.length; i++ ) {
+            if ( isCheck[i] ) {
+                DicDb.moveDicVoc(mDb, kind, copyKind, entryId[i]);
+            }
+        }
+
+        dataChange();
+    }
+
+    public boolean isCheck() {
+        boolean rtn = false;
+        for ( int i = 0; i < isCheck.length; i++ ) {
+            if ( isCheck[i] ) {
+                rtn = true;
+                break;
+            }
+        }
+
+        return rtn;
+    }
+
+    public void editChange(boolean isEditing) {
+        this.isEditing = isEditing;
+        notifyDataSetChanged();
     }
 }

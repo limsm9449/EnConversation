@@ -70,17 +70,6 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
             }
         });
 
-        cb_foreignView = (CheckBox) mainView.findViewById(R.id.my_cb_foreign_view);
-        cb_foreignView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if ( adapter != null ) {
-                    adapter.setForeignView(cb_foreignView.isChecked());
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        });
-
         ImageView iv_clear = (ImageView)mainView.findViewById(R.id.my_f_conv_iv_clear);
         iv_clear.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -91,6 +80,11 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         });
 
         ((ImageButton) mainView.findViewById(R.id.my_f_conv_ib_search)).setOnClickListener(this);
+        ((ImageView) mainView.findViewById(R.id.my_iv_view)).setOnClickListener(this);
+        ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setOnClickListener(this);
+
+
+        ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
 
         changeListView(false);
 
@@ -223,7 +217,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
                         startActivity(intent);
                     } else {
                         DicDb.insConversationToNote(db, kindCodes[mSelect], sampleSeq);
-                        DicUtils.writeInfoToFile(getActivity().getApplicationContext(), CommConstants.tag_note_ins + ":" + kindCodes[mSelect] + ":" + sampleSeq);
+                        DicUtils.writeInfoToFile(getActivity().getApplicationContext(), db, "C01");
                     }
                 }
             });
@@ -256,6 +250,18 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     public void onClick(View v) {
         if ( v.getId() == R.id.my_f_conv_ib_search) {
             changeListView(true);
+        } else if ( v.getId() == R.id.my_iv_view ) {
+            adapter.setForeignView(true);
+            adapter.notifyDataSetChanged();
+
+            ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.GONE);
+            ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.VISIBLE);
+        } else if ( v.getId() == R.id.my_iv_hide ) {
+            adapter.setForeignView(false);
+            adapter.notifyDataSetChanged();
+
+            ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.VISIBLE);
+            ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
         }
     }
 
