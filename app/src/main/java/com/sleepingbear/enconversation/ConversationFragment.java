@@ -327,6 +327,7 @@ class ConversationCursorAdapter extends CursorAdapter {
 
     public void setForeignView(boolean foreignView) {
         isForeignView = foreignView;
+        statusData.clear();
     }
 
     public void setStatus(String sampleSeq) {

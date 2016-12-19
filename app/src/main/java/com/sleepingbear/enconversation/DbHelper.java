@@ -15,7 +15,7 @@ import java.io.OutputStream;
 class DbHelper extends SQLiteOpenHelper {
     private static String DB_NAME = "enconversation.db";
     private String DB_PATH = "";
-    private static final int DATABASE_VERSION = 111;
+    private static final int DATABASE_VERSION = 114;
     private final Context mContext;
 
     public DbHelper(Context context) {
