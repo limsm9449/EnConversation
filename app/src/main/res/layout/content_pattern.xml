@@ -6,22 +6,24 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.sleepingbear.enconversation.PatternActivity"
-    tools:showIn="@layout/activity_pattern">
+    tools:showIn="@layout/activity_pattern"
+    android:elevation="0dp">
 
     <TextView
         android:text="TextView"
         android:layout_width="wrap_content"
         android:id="@+id/my_tv_pattern_desc"
-        android:layout_height="30dp"
-        android:gravity="center_vertical"
-        android:layout_marginLeft="10dp" />
+        android:gravity="left|center_vertical"
+        android:layout_marginLeft="10dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp" />
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:background="@color/my_divider"
-        android:layout_marginTop="5dp"
         android:layout_below="@+id/my_tv_pattern_desc"
         android:id="@+id/my_h_split_line"></LinearLayout>
 

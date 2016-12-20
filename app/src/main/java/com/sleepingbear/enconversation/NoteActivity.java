@@ -119,7 +119,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                         public void onClick(DialogInterface dialog, int which) {
                             if ( mSelect == 0 ) {
                                 Bundle bundle = new Bundle();
-                                bundle.putString("code", "");
+                                bundle.putString("kind", "SAMPLE");
                                 bundle.putString("sampleSeq", sampleSeq);
 
                                 Intent intent = new Intent(getApplication(), NoteStudyActivity.class);
@@ -168,7 +168,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                         public void onClick(DialogInterface dialog, int which) {
                             if ( mSelect == 0 ) {
                                 Bundle bundle = new Bundle();
-                                bundle.putString("code", "");
+                                bundle.putString("kind", "SAMPLE");
                                 bundle.putString("sampleSeq", sampleSeq);
 
                                 Intent intent = new Intent(getApplication(), NoteStudyActivity.class);

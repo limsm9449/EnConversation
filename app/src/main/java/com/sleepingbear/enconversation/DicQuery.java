@@ -410,7 +410,7 @@ public class DicQuery {
         sql.append("SELECT  SEQ _id, SEQ, SENTENCE1, SENTENCE2" + CommConstants.sqlCR);
         sql.append("FROM    DIC_SAMPLE" + CommConstants.sqlCR);
         sql.append("WHERE   SENTENCE1 LIKE '" + pattern + "'" + CommConstants.sqlCR);
-        sql.append("ORDER   BY WORD_CNT, ORD" + CommConstants.sqlCR);
+        sql.append("ORDER   BY ORD" + CommConstants.sqlCR);
         DicUtils.dicSqlLog(sql.toString());
 
         return sql.toString();

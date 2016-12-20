@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -120,7 +121,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
             case R.id.my_iv_right:
                 if ( isStart ) {
                     DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
-                    DicUtils. writeInfoToFile(getContext(), db, "C02");
+                    DicUtils.writeInfoToFile(getContext(), db, "C02");
                 }
                 if ( !cursor.isLast() ) {
                     cursor.moveToNext();
@@ -175,7 +176,13 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                     ((Button)v).setBackgroundColor(Color.rgb(189, 195, 195));
                 }
 
+                //정답이면...
                 if ( foreign.equals( currForeign) ) {
+                    if ( isStart ) {
+                        DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
+                        DicUtils. writeInfoToFile(getContext(), db, "C02");
+                    }
+
                     LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(LAYOUT_INFLATER_SERVICE);
                     final View dialog_layout = inflater.inflate(R.layout.dialog_correct_answer, null);
 
@@ -188,19 +195,13 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                     ((TextView) dialog_layout.findViewById(R.id.my_tv_foreign)).setText(my_tv_foreign.getText());
 
                     // 광고 추가
-                    // Create a banner ad. The ad size and ad unit ID must be set before calling loadAd.
-                    PublisherAdView mPublisherAdView = new PublisherAdView(getContext());
-                    mPublisherAdView.setAdSizes(AdSize.SMART_BANNER);
+                    PublisherAdView mPublisherAdView = new PublisherAdView(getActivity());
+                    mPublisherAdView.setAdSizes(new AdSize(300, 250));
                     mPublisherAdView.setAdUnitId(getResources().getString(R.string.banner_ad_unit_id2));
 
                     // Create an ad request.
                     PublisherAdRequest.Builder publisherAdRequestBuilder = new PublisherAdRequest.Builder();
-
-                    // Optionally populate the ad request builder.
-                    //publisherAdRequestBuilder.addTestDevice(PublisherAdRequest.DEVICE_ID_EMULATOR);
-
-                    // Add the PublisherAdView to the view hierarchy.
-                    ((LinearLayout) dialog_layout.findViewById(R.id.my_ll_admob)).addView(mPublisherAdView);
+                    ((RelativeLayout) dialog_layout.findViewById(R.id.my_rl_admob)).addView(mPublisherAdView);
 
                     // Start loading the ad.
                     mPublisherAdView.loadAd(publisherAdRequestBuilder.build());
@@ -208,10 +209,6 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                     ((Button) dialog_layout.findViewById(R.id.my_b_next)).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if ( isStart ) {
-                                DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
-                                DicUtils. writeInfoToFile(getContext(), db, "C02");
-                            }
                             if ( !cursor.isLast() ) {
                                 cursor.moveToNext();
                                 conversationShow();

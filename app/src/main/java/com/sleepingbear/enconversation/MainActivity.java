@@ -480,6 +480,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             alertDialog.setCanceledOnTouchOutside(false);
             alertDialog.show();
+        } else if (id == R.id.action_share) {
+            Intent msg = new Intent(Intent.ACTION_SEND);
+            msg.addCategory(Intent.CATEGORY_DEFAULT);
+            msg.putExtra(Intent.EXTRA_SUBJECT, "최고의 영어회화 어플 공유..");
+            msg.putExtra(Intent.EXTRA_TEXT, "영어회화 어플을 사용해보세요.");
+            msg.putExtra(Intent.EXTRA_TITLE, "제목");
+            msg.setType("text/plain");
+            startActivity(Intent.createChooser(msg, "공유"));
         }
 
         return super.onOptionsItemSelected(item);

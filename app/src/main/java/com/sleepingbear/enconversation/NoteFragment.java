@@ -112,7 +112,6 @@ public class NoteFragment extends Fragment implements View.OnClickListener {
 
             Intent intent = new Intent(getContext(), NoteActivity.class);
             intent.putExtras(bundle);
-            startActivity(intent);
             getActivity().startActivityForResult(intent, CommConstants.s_note);
         }
     };

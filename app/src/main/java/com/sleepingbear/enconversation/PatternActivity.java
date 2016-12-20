@@ -49,9 +49,10 @@ public class PatternActivity extends AppCompatActivity {
 
         ActionBar ab = (ActionBar) getSupportActionBar();
         ab.setTitle(b.getString("PATTERN"));
-        ((TextView)this.findViewById(R.id.my_tv_pattern_desc)).setText("뜻 : " + b.getString("DESC"));
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
+
+        ((TextView)this.findViewById(R.id.my_tv_pattern_desc)).setText("뜻 : " + b.getString("DESC"));
 
         dbHelper = new DbHelper(this);
         db = dbHelper.getWritableDatabase();
@@ -113,7 +114,7 @@ public class PatternActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         if ( mSelect == 0 ) {
                             Bundle bundle = new Bundle();
-                            bundle.putString("code", "");
+                            bundle.putString("kind", "SAMPLE");
                             bundle.putString("sampleSeq", sampleSeq);
 
                             Intent intent = new Intent(getApplication(), NoteStudyActivity.class);
@@ -138,7 +139,7 @@ public class PatternActivity extends AppCompatActivity {
                 });
                 dlg.show();
 
-                return true;
+                return false;
             };
         });
         listView.setSelection(0);

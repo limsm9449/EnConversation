@@ -9,14 +9,17 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,17 +35,15 @@ import java.util.Random;
 public class NoteStudyActivity extends AppCompatActivity implements View.OnClickListener {
     private DbHelper dbHelper;
     private SQLiteDatabase db;
-    private View mainView;
     private Cursor cursor;
     private TextView my_tv_han;
     private TextView my_tv_foreign;
     private String currForeign;
     private String currSeq;
-    private int difficult = 1;
-    private boolean isStart = false;
 
     private String kind;
     private String sampleSeq;
+    private String sqlWhere;
 
     NoteStudySearchTask task;
 
@@ -59,6 +60,12 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
         Bundle b = this.getIntent().getExtras();
         kind = b.getString("kind");
         sampleSeq = b.getString("sampleSeq");
+        sqlWhere = b.getString("sqlWhere");
+
+        ActionBar ab = (ActionBar) getSupportActionBar();
+        ab.setTitle("회화 학습");
+        ab.setHomeButtonEnabled(true);
+        ab.setDisplayHomeAsUpEnabled(true);
 
         dbHelper = new DbHelper(this);
         db = dbHelper.getWritableDatabase();
@@ -71,40 +78,38 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
 
         ((ImageView) this.findViewById(R.id.my_iv_view)).setOnClickListener(this);
         ((ImageView) this.findViewById(R.id.my_iv_hide)).setOnClickListener(this);
-
-        if ( !"".equals(sampleSeq) ) {
-            ((ImageView) this.findViewById(R.id.my_iv_left)).setVisibility(View.GONE);
-            ((ImageView) this.findViewById(R.id.my_iv_right)).setVisibility(View.GONE);
-        }
+        ((ImageView) this.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
 
         //리스트 내용 변경
-        changeListView(true);
+        changeListView();
 
-        AdView av = (AdView)mainView.findViewById(R.id.adView);
-        AdRequest adRequest = new  AdRequest.Builder().build();
+        AdView av = (AdView)this.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
         av.loadAd(adRequest);
     }
 
-    public void changeListView(boolean isKeyin) {
-        if ( isKeyin ) {
-            if (task != null) {
-                return;
-            }
-            task = new NoteStudySearchTask();
-            task.execute();
+    public void changeListView() {
+        if (task != null) {
+            return;
         }
+        task = new NoteStudySearchTask();
+        task.execute();
     }
 
     public void getData() {
         DicUtils.dicLog(this.getClass().toString() + " getData");
         if ( db != null ) {
-            if ( !"".equals(kind) ) {
-                cursor = db.rawQuery(DicQuery.getNoteList(kind), null);
-            } else {
+            if ( "PATTERN".equals(kind) ) {
+                cursor = db.rawQuery(DicQuery.getPatternSampleList(sqlWhere), null);
+            } else if ( "SAMPLE".equals(kind) ) {
                 cursor = db.rawQuery(DicQuery.getSample(sampleSeq), null);
+            }else {
+                cursor = db.rawQuery(DicQuery.getNoteList(kind), null);
             }
 
-            if ( cursor.getCount() == 0 ) {
+            if ( cursor.getCount() == 1 ) {
+                ((ImageView) this.findViewById(R.id.my_iv_left)).setVisibility(View.GONE);
+                ((ImageView) this.findViewById(R.id.my_iv_right)).setVisibility(View.GONE);
             }
         }
     }
@@ -119,19 +124,13 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                     conversationShow();
                 }
 
-                isStart = false;
-
                 break;
             case R.id.my_iv_right:
-                if ( isStart ) {
-                    DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
-                    //DicUtils. writeInfoToFile(this, CommConstants.tag_note_ins + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
-                }
                 if ( !cursor.isLast() ) {
                     cursor.moveToNext();
                     conversationShow();
                 } else {
-                    changeListView(true);
+                    changeListView();
                 }
                 break;
             case R.id.my_iv_view:
@@ -141,8 +140,6 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                 conversationShow();
                 break;
             default:
-                isStart = true;
-
                 String foreign = (String)my_tv_foreign.getText();
 
                 //영문보기를 클릭하고 단어 클릭시 오류가 발생해서 체크를 해줌.
@@ -175,19 +172,13 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                     ((TextView) dialog_layout.findViewById(R.id.my_tv_foreign)).setText(my_tv_foreign.getText());
 
                     // 광고 추가
-                    // Create a banner ad. The ad size and ad unit ID must be set before calling loadAd.
                     PublisherAdView mPublisherAdView = new PublisherAdView(this);
-                    mPublisherAdView.setAdSizes(AdSize.SMART_BANNER);
+                    mPublisherAdView.setAdSizes(new AdSize(300, 250));
                     mPublisherAdView.setAdUnitId(getResources().getString(R.string.banner_ad_unit_id2));
 
                     // Create an ad request.
                     PublisherAdRequest.Builder publisherAdRequestBuilder = new PublisherAdRequest.Builder();
-
-                    // Optionally populate the ad request builder.
-                    //publisherAdRequestBuilder.addTestDevice(PublisherAdRequest.DEVICE_ID_EMULATOR);
-
-                    // Add the PublisherAdView to the view hierarchy.
-                    ((LinearLayout) dialog_layout.findViewById(R.id.my_ll_admob)).addView(mPublisherAdView);
+                    ((RelativeLayout) dialog_layout.findViewById(R.id.my_rl_admob)).addView(mPublisherAdView);
 
                     // Start loading the ad.
                     mPublisherAdView.loadAd(publisherAdRequestBuilder.build());
@@ -195,15 +186,11 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                     ((Button) dialog_layout.findViewById(R.id.my_b_next)).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if ( isStart ) {
-                                DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
-                                //DicUtils.writeInfoToFile(getApplicationContext(), CommConstants.tag_note_ins + ":" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),".") + ":" + currSeq);
-                            }
                             if ( !cursor.isLast() ) {
                                 cursor.moveToNext();
                                 conversationShow();
                             } else {
-                                changeListView(true);
+                                changeListView();
                             }
 
                             alertDialog.dismiss();
@@ -221,9 +208,9 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                             Bundle bundle = new Bundle();
                             bundle.putString("foreign", (String)my_tv_foreign.getText());
                             bundle.putString("han", (String)my_tv_han.getText());
-                            bundle.putString("seq", currSeq);
+                            bundle.putString("sampleSeq", currSeq);
 
-                            Intent intent = new Intent(getApplication(), NoteStudyActivity.class);
+                            Intent intent = new Intent(getApplication(), SentenceViewActivity.class);
                             intent.putExtras(bundle);
                             startActivity(intent);
 
@@ -234,12 +221,31 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                     alertDialog.setCanceledOnTouchOutside(false);
                     alertDialog.show();
 
-                    FlowLayout wordArea = (FlowLayout) mainView.findViewById(R.id.my_ll_conversation_word);
+                    FlowLayout wordArea = (FlowLayout) this.findViewById(R.id.my_ll_conversation_word);
                     wordArea.removeAllViews();
                 }
 
                 break;
         }
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            onBackPressed();
+        } else if (id == R.id.action_help) {
+            Bundle bundle = new Bundle();
+            bundle.putString("SCREEN", "NOTE_STUDY");
+
+            Intent intent = new Intent(getApplication(), HelpActivity.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private String foreign = "";
@@ -253,7 +259,7 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
 
             foreign = cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1"));
 
-            FlowLayout wordArea = (FlowLayout) mainView.findViewById(R.id.my_ll_conversation_word);
+            FlowLayout wordArea = (FlowLayout) this.findViewById(R.id.my_ll_conversation_word);
             wordArea.removeAllViews();
 
             foreignArr = getRandForeign(foreign.split(" "));
@@ -274,8 +280,6 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                 System.out.println(foreignArr[i]);
                 wordArea.addView(btn);
             }
-
-            isStart = false;
         } else {
             my_tv_han.setText("");
             my_tv_foreign.setText("");

@@ -2,6 +2,7 @@ package com.sleepingbear.enconversation;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -59,13 +60,14 @@ public class PatternFragment extends Fragment {
                 Toast.makeText(getContext(), "검색된 데이타가 없습니다.", Toast.LENGTH_SHORT).show();
             }
 
-            ListView dictionaryListView = (ListView) mainView.findViewById(R.id.my_f_convation_lv);
+            ListView listView = (ListView) mainView.findViewById(R.id.my_f_convation_lv);
             adapter = new PatternFragCursorAdapter(getContext(), cursor, 0);
-            dictionaryListView.setAdapter(adapter);
+            listView.setAdapter(adapter);
 
-            dictionaryListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-            dictionaryListView.setOnItemClickListener(itemClickListener);
-            dictionaryListView.setSelection(0);
+            listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+            listView.setOnItemClickListener(itemClickListener);
+            listView.setOnItemLongClickListener(itemLongClickListener);
+            listView.setSelection(0);
         }
     }
 
@@ -83,6 +85,24 @@ public class PatternFragment extends Fragment {
             intent.putExtras(bundle);
 
             startActivity(intent);
+        }
+    };
+
+    AdapterView.OnItemLongClickListener itemLongClickListener = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            Cursor cur = (Cursor) adapter.getItem(position);
+
+            Bundle bundle = new Bundle();
+            bundle.putString("kind", "PATTERN");
+            bundle.putString("sqlWhere", cur.getString(cur.getColumnIndexOrThrow("SQL_WHERE")));
+
+            Intent intent = new Intent(getActivity().getApplicationContext(), NoteStudyActivity.class);
+            intent.putExtras(bundle);
+
+            startActivity(intent);
+
+            return true;
         }
     };
 }

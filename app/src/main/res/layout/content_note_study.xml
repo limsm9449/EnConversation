@@ -30,12 +30,12 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@mipmap/ic_refresh_black_24dp"
+                    app:srcCompat="@mipmap/ic_visibility_off_black_24dp"
                     android:id="@+id/my_iv_hide"
                     android:layout_weight="1"
                     android:layout_marginRight="10dp"
-                    android:layout_toLeftOf="@+id/my_iv_view"
-                    android:layout_marginTop="3dp" />
+                    android:layout_marginTop="3dp"
+                    android:layout_alignParentRight="true" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -130,7 +130,9 @@
                     android:layout_centerVertical="true"
                     android:layout_toLeftOf="@+id/my_iv_right"
                     android:id="@+id/my_ll_conversation_word"
-                    android:layout_toRightOf="@+id/my_iv_left"></com.sleepingbear.enconversation.FlowLayout>
+                    android:layout_toRightOf="@+id/my_iv_left"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"></com.sleepingbear.enconversation.FlowLayout>
 
                 <ImageView
                     android:layout_width="wrap_content"

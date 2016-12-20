@@ -21,8 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/my_divider"
-        android:layout_alignParentTop="true"
-        android:id="@+id/linearLayout4" />
+        android:layout_alignParentTop="true" />
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -36,7 +35,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center_vertical|center_horizontal">
 
             <TextView
                 android:layout_width="match_parent"
@@ -65,21 +65,17 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:orientation="horizontal"
+    <RelativeLayout
+        android:layout_height="250dp"
+        android:id="@+id/my_rl_admob"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/my_ll_admob"></LinearLayout>
+        android:elevation="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:gravity="center_vertical|center_horizontal">
 
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        ads:adSize="BANNER"
-        ads:adUnitId="@string/banner_ad_unit_id2"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp" />
+    </RelativeLayout>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -87,8 +83,7 @@
         android:layout_height="1dp"
         android:background="@color/my_divider"
         android:layout_alignParentTop="true"
-        android:id="@+id/linearLayout5" />
-
+        android:layout_marginTop="1dp" />
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"

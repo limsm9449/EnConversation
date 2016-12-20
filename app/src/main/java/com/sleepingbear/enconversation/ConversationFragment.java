@@ -198,7 +198,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
                 public void onClick(DialogInterface dialog, int which) {
                     if ( mSelect == 0 ) {
                         Bundle bundle = new Bundle();
-                        bundle.putString("code", "");
+                        bundle.putString("kind", "SAMPLE");
                         bundle.putString("sampleSeq", sampleSeq);
 
                         Intent intent = new Intent(getActivity().getApplication(), NoteStudyActivity.class);
@@ -251,14 +251,18 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         if ( v.getId() == R.id.my_f_conv_ib_search) {
             changeListView(true);
         } else if ( v.getId() == R.id.my_iv_view ) {
-            adapter.setForeignView(true);
-            adapter.notifyDataSetChanged();
+            if ( adapter != null ) {
+                adapter.setForeignView(true);
+                adapter.notifyDataSetChanged();
+            }
 
             ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.GONE);
             ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.VISIBLE);
         } else if ( v.getId() == R.id.my_iv_hide ) {
-            adapter.setForeignView(false);
-            adapter.notifyDataSetChanged();
+            if ( adapter != null ) {
+                adapter.setForeignView(false);
+                adapter.notifyDataSetChanged();
+            }
 
             ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.VISIBLE);
             ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
