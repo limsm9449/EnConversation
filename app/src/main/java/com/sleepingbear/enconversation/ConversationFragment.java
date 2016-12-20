@@ -39,7 +39,6 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     private SQLiteDatabase db;
     private View mainView;
     private EditText et_search;
-    private CheckBox cb_foreignView;
     private ConversationCursorAdapter adapter;
 
     private Cursor dictionaryCursor;
@@ -109,6 +108,9 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
 
     public void getData() {
         DicUtils.dicLog(this.getClass().toString() + " changeListView");
+
+        ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
+        ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.VISIBLE);
 
         StringBuffer sql = new StringBuffer();
 

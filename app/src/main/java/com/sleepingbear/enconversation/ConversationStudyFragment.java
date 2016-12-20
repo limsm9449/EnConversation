@@ -110,6 +110,9 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
         DicUtils.dicLog("onClick");
         switch (v.getId()) {
             case R.id.my_iv_left:
+                ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
+                ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.VISIBLE);
+
                 if ( !cursor.isFirst() ) {
                     cursor.moveToPrevious();
                     conversationShow();
@@ -119,6 +122,9 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
 
                 break;
             case R.id.my_iv_right:
+                ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
+                ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.VISIBLE);
+
                 if ( isStart ) {
                     DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
                     DicUtils.writeInfoToFile(getContext(), db, "C02");

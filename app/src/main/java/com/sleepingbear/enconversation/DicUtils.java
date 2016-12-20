@@ -198,7 +198,7 @@ public class DicUtils {
         readInfoFromFile(ctx, db, kind, "");
     }
     public static void readInfoFromFile(Context ctx, SQLiteDatabase db, String kind, String fileName) {
-        dicLog(DicUtils.class.toString() + " : " + "readInfoFromFile start");
+        dicLog(DicUtils.class.toString() + " : " + "readInfoFromFile start, " + kind + ", " + fileName);
 
         //데이타 복구
         FileInputStream fis = null;
@@ -254,11 +254,6 @@ public class DicUtils {
         }
 
         dicLog(DicUtils.class.toString() + " : " + "readInfoFromFile end");
-
-        //데이타 기록
-        writeInfoToFile(ctx, db, "C01");
-        writeInfoToFile(ctx, db, "C02");
-        writeInfoToFile(ctx, db, "VOC");
     }
 
     /**

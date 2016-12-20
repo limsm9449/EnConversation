@@ -119,6 +119,9 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
         DicUtils.dicLog("onClick");
         switch (v.getId()) {
             case R.id.my_iv_left:
+                ((ImageView) this.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
+                ((ImageView) this.findViewById(R.id.my_iv_view)).setVisibility(View.VISIBLE);
+
                 if ( !cursor.isFirst() ) {
                     cursor.moveToPrevious();
                     conversationShow();
@@ -126,6 +129,9 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
 
                 break;
             case R.id.my_iv_right:
+                ((ImageView) this.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
+                ((ImageView) this.findViewById(R.id.my_iv_view)).setVisibility(View.VISIBLE);
+
                 if ( !cursor.isLast() ) {
                     cursor.moveToNext();
                     conversationShow();
@@ -217,6 +223,11 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                             alertDialog.dismiss();
                         }
                     });
+
+                    //개별 조회면은 다음 버튼을 안보이게 해준다.
+                    if ( cursor.getCount() == 1 ) {
+                        ((Button) dialog_layout.findViewById(R.id.my_b_next)).setVisibility(View.GONE);
+                    }
 
                     alertDialog.setCanceledOnTouchOutside(false);
                     alertDialog.show();
