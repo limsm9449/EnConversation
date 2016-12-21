@@ -444,4 +444,21 @@ public class DicUtils {
         }
     }
 
+    public static String getBtnString(String word){
+        String rtn = "";
+
+        if ( word.length() == 1 ) {
+            rtn = "  " + word + "  ";
+        } else if ( word.length() == 2 ) {
+            rtn = "  " + word + " ";
+        } else if ( word.length() == 3 ) {
+            rtn = " " + word + " ";
+        } else if ( word.length() == 4 ) {
+            rtn = " " + word;
+        } else {
+            rtn = " " + word + " ";
+        }
+
+        return rtn;
+    }
 }

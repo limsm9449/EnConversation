@@ -55,7 +55,9 @@ public class FlowLayout extends ViewGroup {
             if (child.getVisibility() != GONE) {
                 final LayoutParams lp = (LayoutParams) child.getLayoutParams();
                 child.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST), childHeightMeasureSpec);
-                final int childw = child.getMeasuredWidth();
+                //final int childw = child.getMeasuredWidth();
+                //final int childw = (((String)child.getTag()).length() <= 3 ? 100 : ((String)child.getTag()).length() * 35);
+                final int childw = getWordWidth((String)child.getTag());
                 //line_height = Math.max(line_height, child.getMeasuredHeight() + lp.vertical_spacing);
                 line_height = Math.max(line_height, 140 + lp.vertical_spacing);
                 //System.out.println(child.getMeasuredHeight());
@@ -104,7 +106,8 @@ public class FlowLayout extends ViewGroup {
             final View child = getChildAt(i);
             if (child.getVisibility() != GONE) {
                 //final int childw = child.getMeasuredWidth();
-                final int childw = (((String)child.getTag()).length() <= 3 ? 100 : ((String)child.getTag()).length() * 35);
+                //final int childw = (((String)child.getTag()).length() <= 3 ? 100 : ((String)child.getTag()).length() * 35);
+                final int childw = getWordWidth((String)child.getTag());
                 //final int childh = child.getMeasuredHeight();
                 final int childh = 140;
                 //System.out.println(childh);
@@ -118,5 +121,30 @@ public class FlowLayout extends ViewGroup {
                 xpos += childw + lp.horizontal_spacing;
             }
         }
+    }
+
+    public int getWordWidth(String word) {
+        int width = 0;
+        String compWord1 = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
+        String compWord2 = "I";
+        String compWord3 = "abcdeghkmnopqsuvwxyz";
+        String compWord4 = "fijltr";
+
+
+        for ( int i = 0; i < word.length() ; i++ ) {
+            if ( compWord1.indexOf(word.substring(i, i +1)) > -1 ) {
+                width += 33;
+            } else if ( compWord2.indexOf(word.substring(i, i +1)) > -1 ) {
+                width += 25;
+            } else if ( compWord3.indexOf(word.substring(i, i +1)) > -1 ) {
+                width += 30;
+            } else if ( compWord4.indexOf(word.substring(i, i +1)) > -1 ) {
+                width += 18;
+            } else {
+                width += 30;
+            }
+        }
+        //DicUtils.dicLog(word + " : " + word.length() + " : " + width);
+        return width;
     }
 }

@@ -142,9 +142,15 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                 }
                 break;
             case R.id.my_iv_view:
+                ((ImageView) this.findViewById(R.id.my_iv_view)).setVisibility(View.GONE);
+                ((ImageView) this.findViewById(R.id.my_iv_hide)).setVisibility(View.VISIBLE);
+
                 my_tv_foreign.setText(foreign);
                 break;
             case R.id.my_iv_hide:
+                ((ImageView) this.findViewById(R.id.my_iv_view)).setVisibility(View.VISIBLE);
+                ((ImageView) this.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
+
                 conversationShow();
                 break;
             default:
@@ -157,9 +163,9 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                 }
 
                 if ( "".equals(foreign) ) {
-                    foreign = (String)v.getTag();
+                    foreign = ((String)v.getTag()).trim();
                 } else {
-                    foreign += " " + (String)v.getTag();
+                    foreign += " " + ((String)v.getTag()).trim();
                 }
 
                 if ( foreign.equals( currForeign.substring( 0, foreign.length() ) ) ) {
@@ -211,6 +217,10 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                         @Override
                         public void onClick(View v) {
                             alertDialog.dismiss();
+
+                            if ( cursor.getCount() == 1 ) {
+                                finishActivity();
+                            }
                         }
                     });
                     ((Button) dialog_layout.findViewById(R.id.my_b_detail)).setOnClickListener(new View.OnClickListener() {
@@ -283,17 +293,16 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                 Button btn = new Button(this);
                 btn.setBackgroundColor(Color.rgb(249, 151, 53));
                 btn.setTextColor(Color.rgb(255, 255, 255));
-                btn.setText(" " + foreignArr[i] + " ");
+                btn.setText( DicUtils.getBtnString( foreignArr[i] ) );
                 btn.setAllCaps(false);
                 btn.setTextSize(12);
 
                 btn.setLayoutParams((new FlowLayout.LayoutParams(3, 3)));
 
                 btn.setId(i);
-                btn.setTag(foreignArr[i]);
+                btn.setTag( DicUtils.getBtnString( foreignArr[i] ) );
                 btn.setGravity(Gravity.LEFT);
                 btn.setOnClickListener(this);
-                System.out.println(foreignArr[i]);
                 wordArea.addView(btn);
             }
         } else {
@@ -330,6 +339,10 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
         DicUtils.dicLog(str1 + " : " + str2);
 
         return rtnArr;
+    }
+
+    private void finishActivity() {
+        this.finish();;
     }
 
     private class NoteStudySearchTask extends AsyncTask<Void, Void, Void> {

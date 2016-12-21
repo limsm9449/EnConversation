@@ -43,7 +43,7 @@
                     app:srcCompat="@mipmap/ic_visibility_black_24dp"
                     android:id="@+id/my_iv_view"
                     android:layout_weight="1"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginRight="10dp"
                     android:layout_alignParentRight="true"
                     android:layout_marginTop="3dp" />
 
