@@ -7,11 +7,13 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,14 +27,16 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import java.util.HashMap;
+import java.util.Locale;
 
-public class PatternActivity extends AppCompatActivity {
+public class PatternActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
     private DbHelper dbHelper;
     private SQLiteDatabase db;
     private PatternCursorAdapter adapter;
     public String sqlWhere;
     public int mSelect = 0;
     private boolean isForeignView = false;
+    private TextToSpeech myTTS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,8 @@ public class PatternActivity extends AppCompatActivity {
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setVisibility(View.GONE);
+
+        myTTS = new TextToSpeech(this, this);
 
         Bundle b = this.getIntent().getExtras();
         sqlWhere = b.getString("SQL_WHERE");
@@ -108,6 +114,12 @@ public class PatternActivity extends AppCompatActivity {
                         mSelect = arg1;
                     }
                 });
+                dlg.setNeutralButton("TTS", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        myTTS.speak(foreign, TextToSpeech.QUEUE_FLUSH, null);
+                    }
+                });
                 dlg.setNegativeButton("취소", null);
                 dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
@@ -133,7 +145,7 @@ public class PatternActivity extends AppCompatActivity {
                             startActivity(intent);
                         } else {
                             DicDb.insConversationToNote(db, kindCodes[mSelect], sampleSeq);
-                            DicUtils.writeInfoToFile(getApplicationContext(), db, "C01");
+                            //DicUtils.writeInfoToFile(getApplicationContext(), db, "C01");
                         }
                     }
                 });
@@ -194,6 +206,25 @@ public class PatternActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onInit(int status) {
+        Locale loc = new Locale("en");
+
+        if (status == TextToSpeech.SUCCESS) {
+            int result = myTTS.setLanguage(Locale.ENGLISH);
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "This Language is not supported");
+            }
+        } else {
+            Log.e("TTS", "Initilization Failed!");
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myTTS.shutdown();
     }
 }
 

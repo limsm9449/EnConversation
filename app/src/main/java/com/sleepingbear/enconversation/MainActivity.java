@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FloatingActionButton fab;
 
     private Activity mActivity;
-    public boolean mIsCategory = true;
 
     private static final int MY_PERMISSIONS_REQUEST = 0;
 
@@ -115,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 db.execSQL(DicQuery.getInsCode("VOC", insMaxCode, et_ins.getText().toString()));
 
                                 //기록
-                                DicUtils.writeInfoToFile(getApplicationContext(), db, "VOC");
+                                //DicUtils.writeInfoToFile(getApplicationContext(), db, "VOC");
 
                                 ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
 
@@ -154,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 db.execSQL(DicQuery.getInsCode("C01", insMaxCode, et_ins.getText().toString()));
 
                                 //기록
-                                DicUtils.writeInfoToFile(getApplicationContext(), db, "C01");
+                                //DicUtils.writeInfoToFile(getApplicationContext(), db, "C01");
 
                                 ((NoteFragment) adapter.getItem(selectedTab)).changeListView();
 
@@ -300,7 +299,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (position == CommConstants.f_Vocabulary) {
                 fab.setVisibility(View.VISIBLE);
             } else if (position == CommConstants.f_Note) {
-                DicUtils.dicLog("groupCode222 : " + ((NoteFragment) adapter.getItem(position)).groupCode);
                 if ( "C01".equals(((NoteFragment) adapter.getItem(position)).groupCode) ) {
                     fab.setVisibility(View.VISIBLE);
                 }
@@ -337,7 +335,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onPrepareOptionsMenu(Menu menu) {
         ((MenuItem)menu.findItem(R.id.action_delete)).setVisible(false);
 
-        if ( selectedTab == CommConstants.f_Vocabulary ) {
+        if ( selectedTab == CommConstants.f_Vocabulary ||
+                ( selectedTab == CommConstants.f_Note &&
+                        ( "C01".equals(((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode) ||
+                          "C02".equals(((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode) ) ) ) {
             ((MenuItem)menu.findItem(R.id.action_delete)).setVisible(true);
         }
 
@@ -348,10 +349,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
 
         if (id == R.id.action_delete) {
-            if (selectedTab == CommConstants.f_Vocabulary) {
+            if (selectedTab == CommConstants.f_Vocabulary ||
+                    ( selectedTab == CommConstants.f_Note &&
+                            ( "C01".equals(((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode) ||
+                                    "C02".equals(((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode) ) ) ) {
+                String title = "";
+                if ( selectedTab == CommConstants.f_Vocabulary ) {
+                    title = "단어장을 초기화 하시겠습니까?";
+                } else if ( selectedTab == CommConstants.f_Note && "C01".equals(((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode) ) {
+                    title = "MY 회화를 초기화 하시겠습니까?";
+                } else if ( selectedTab == CommConstants.f_Note && "C02".equals(((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode) ) {
+                    title = "학습 호화를 초기화 하시겠습니까?";
+                }
+                DicUtils.dicLog("groupCode : " + ((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode);
                 new AlertDialog.Builder(this)
                         .setTitle("알림")
-                        .setMessage("단어장을 초기화 하시겠습니까?")
+                        .setMessage(title)
                         .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -505,16 +518,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case CommConstants.s_note :
                 ((NoteFragment) adapter.getItem(CommConstants.f_Note)).changeListView();
 
+                /*
                 if ( "C01".equals(((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode) ) {
                     DicUtils.writeInfoToFile(getApplicationContext(), db, "C01");
                 } else if ( "C02".equals(((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode) ) {
                     DicUtils.writeInfoToFile(getApplicationContext(), db, "C02");
                 }
+                */
 
                 break;
             case CommConstants.s_vocabulary :
                 ((VocabularyFragment) adapter.getItem(CommConstants.f_Vocabulary)).changeListView();
-                DicUtils.writeInfoToFile(getApplicationContext(), db, "VOC");
+                //DicUtils.writeInfoToFile(getApplicationContext(), db, "VOC");
                 break;
         }
 
@@ -527,12 +542,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                   .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                       @Override
                       public void onClick(DialogInterface dialog, int which) {
-                          if (selectedTab == CommConstants.f_Vocabulary) {
+                          if ( selectedTab == CommConstants.f_Vocabulary ) {
                               DicDb.initVocabulary(db);
 
-                              DicUtils.writeInfoToFile(getApplicationContext(), db, "VOC");
-
                               ((VocabularyFragment) adapter.getItem(selectedTab)).changeListView();
+                          } else if ( selectedTab == CommConstants.f_Note ) {
+                              DicDb.initNote(db, ((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode);
+
+                              ((NoteFragment) adapter.getItem(selectedTab)).changeListView();
                           }
                       }
                   })
@@ -558,6 +575,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MultiDex.install(this);
     }
 
+    private long backKeyPressedTime = 0;
+    @Override
+    public void onBackPressed() {
+        if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
+            backKeyPressedTime = System.currentTimeMillis();
+            Toast.makeText(getApplicationContext(), "'뒤로'버튼을 한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show();
+
+            return;
+        }
+        if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
+            //종료 시점에 변경 사항을 기록한다.
+            DicUtils.writeInfoToFile(this, db, "C01");
+            DicUtils.writeInfoToFile(this, db, "C02");
+            DicUtils.writeInfoToFile(this, db, "VOC");
+
+            finish();
+        }
+    }
 }
 
 class MainPagerAdapter extends FragmentPagerAdapter {

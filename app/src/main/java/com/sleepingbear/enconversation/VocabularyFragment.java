@@ -105,7 +105,7 @@ public class VocabularyFragment extends Fragment implements View.OnClickListener
                                 mDb.execSQL(DicQuery.getUpdCode("VOC", (String) v.getTag(), et_upd.getText().toString()));
 
                                 //기록...
-                                DicUtils.writeInfoToFile(getContext(), mDb, "VOC");
+                                //DicUtils.writeInfoToFile(getContext(), mDb, "VOC");
 
                                 changeListView();
 
@@ -136,7 +136,7 @@ public class VocabularyFragment extends Fragment implements View.OnClickListener
                                                 mDb.execSQL(DicQuery.getDelDicVoc(code));
 
                                                 //기록...
-                                                DicUtils.writeInfoToFile(getContext(), mDb, "VOC");
+                                                //DicUtils.writeInfoToFile(getContext(), mDb, "VOC");
                                                 changeListView();
 
                                                 Toast.makeText(getContext(), "단어장을 삭제하였습니다.", Toast.LENGTH_SHORT).show();
@@ -251,7 +251,7 @@ public class VocabularyFragment extends Fragment implements View.OnClickListener
                                         }
                                         isr.close();
 
-                                        DicUtils.writeInfoToFile(getContext(), mDb, "VOC");
+                                        //DicUtils.writeInfoToFile(getContext(), mDb, "VOC");
 
                                         changeListView();
 

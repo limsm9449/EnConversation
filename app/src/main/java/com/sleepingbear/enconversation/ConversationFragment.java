@@ -9,10 +9,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,9 +34,10 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 
-public class ConversationFragment extends Fragment implements View.OnClickListener {
+public class ConversationFragment extends Fragment implements View.OnClickListener, TextToSpeech.OnInitListener {
     private DbHelper dbHelper;
     private SQLiteDatabase db;
     private View mainView;
@@ -43,7 +46,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
 
     private Cursor dictionaryCursor;
     private int mSelect = 0;
-
+    private TextToSpeech myTTS;
     DicSearchTask task;
 
     @Override
@@ -52,6 +55,8 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         // Inflate the layout for this fragment
         mainView = inflater.inflate(R.layout.fragment_conversation, container, false);
 
+
+        myTTS = new TextToSpeech(getContext(), this);
 
         dbHelper = new DbHelper(getContext());
         db = dbHelper.getWritableDatabase();
@@ -109,23 +114,18 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     public void getData() {
         DicUtils.dicLog(this.getClass().toString() + " changeListView");
 
-        ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
-        ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.VISIBLE);
-
         StringBuffer sql = new StringBuffer();
 
         sql.append("SELECT SEQ _id, SEQ, SENTENCE1, SENTENCE2" + CommConstants.sqlCR);
         sql.append("  FROM DIC_SAMPLE" + CommConstants.sqlCR);
         if ( !"".equals(et_search.getText().toString()) ) {
-            String[] search = et_search.getText().toString().split(" ");
-            String condi1 = "";
-            String condi2 = "";
+            String[] search = et_search.getText().toString().split(",");
+            String condi = "";
             for ( int i = 0; i < search.length; i++ ) {
-                condi1 += ("".equals(condi1) ? "" : " AND ") + " SENTENCE1 LIKE '%" + search[i] + "%'";
-                condi2 += ("".equals(condi2) ? "" : " AND ") + " SENTENCE2 LIKE '%" + search[i] + "%'";
+                condi += ("".equals(condi) ? "" : " OR ") + " SENTENCE1 LIKE '%" + search[i].replaceAll(" ","%") + "%'";
+                condi += ("".equals(condi) ? "" : " OR ") + " SENTENCE2 LIKE '%" + search[i].replaceAll(" ","%") + "%'";
             }
-            sql.append(" WHERE ( " + condi1 + " ) OR" + CommConstants.sqlCR);
-            sql.append("         ( " + condi2 + " )" + CommConstants.sqlCR);
+            sql.append(" WHERE " + condi + CommConstants.sqlCR);
         }
         sql.append(" ORDER BY ORD" + CommConstants.sqlCR);
         DicUtils.dicSqlLog(sql.toString());
@@ -194,6 +194,12 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
                     mSelect = arg1;
                 }
             });
+            dlg.setNeutralButton("TTS", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    myTTS.speak(foreign, TextToSpeech.QUEUE_FLUSH, null);
+                }
+            });
             dlg.setNegativeButton("취소", null);
             dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                 @Override
@@ -219,7 +225,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
                         startActivity(intent);
                     } else {
                         DicDb.insConversationToNote(db, kindCodes[mSelect], sampleSeq);
-                        DicUtils.writeInfoToFile(getActivity().getApplicationContext(), db, "C01");
+                        //DicUtils.writeInfoToFile(getActivity().getApplicationContext(), db, "C01");
                     }
                 }
             });
@@ -271,6 +277,25 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         }
     }
 
+    public void onInit(int status) {
+        Locale loc = new Locale("en");
+
+        if (status == TextToSpeech.SUCCESS) {
+            int result = myTTS.setLanguage(Locale.ENGLISH);
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "This Language is not supported");
+            }
+        } else {
+            Log.e("TTS", "Initilization Failed!");
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        myTTS.shutdown();
+    }
+
     private class DicSearchTask extends AsyncTask<Void, Void, Void> {
 
         private ProgressDialog pd;
@@ -299,6 +324,9 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         @Override
         protected void onPostExecute(Void result) {
             setListView();
+
+            ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
+            ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.VISIBLE);
 
             pd.dismiss();
             task = null;

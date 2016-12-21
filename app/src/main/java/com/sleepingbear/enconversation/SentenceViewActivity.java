@@ -183,7 +183,7 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
                     public void onClick(DialogInterface dialog, int which) {
                         DicDb.insDicVoc(db, kindCodes[mSelect], entryId, "N");
                         sentenceViewAdapter.dataChange();
-                        DicUtils. writeInfoToFile(getApplicationContext(), db, "VOC");
+                        //DicUtils. writeInfoToFile(getApplicationContext(), db, "VOC");
                     }
                 });
                 dlg.show();
@@ -220,7 +220,7 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
                     DicDb.delAllConversationFromNote(db, Integer.parseInt(sampleSeq));
 
                     // 기록..
-                    DicUtils.writeInfoToFile(getApplicationContext(), db, "C01");
+                    //DicUtils.writeInfoToFile(getApplicationContext(), db, "C01");
 
                     isChange = true;
                 } else {
@@ -250,7 +250,7 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             DicDb.insConversationToNote(db, kindCodes[mSelect], sampleSeq);
-                            DicUtils.writeInfoToFile(getApplicationContext(), db, "C02");
+                            //DicUtils.writeInfoToFile(getApplicationContext(), db, "C02");
 
                             isMySample = true;
                             mySample.setImageResource(android.R.drawable.star_on);
@@ -369,12 +369,12 @@ class SentenceViewCursorAdapter extends CursorAdapter {
                     DicDb.delDicVocAll(mDb, viewHolder.entryId);
 
                     // 기록..
-                    DicUtils.writeInfoToFile(context, mDb, "VOC");
+                    //DicUtils.writeInfoToFile(context, mDb, "VOC");
                 } else {
                     DicDb.insDicVoc(mDb, CommConstants.voc_default_code, viewHolder.entryId, "N");
 
                     // 기록..
-                    DicUtils.writeInfoToFile(context, mDb, "VOC");
+                    //DicUtils.writeInfoToFile(context, mDb, "VOC");
                 }
 
                 dataChange();

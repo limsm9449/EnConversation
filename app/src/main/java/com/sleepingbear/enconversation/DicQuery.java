@@ -349,7 +349,7 @@ public class DicQuery {
             sql.append("   AND CODE NOT IN ('VOC0001')" + CommConstants.sqlCR);
 
             sql.append("UNION" + CommConstants.sqlCR);
-            sql.append("SELECT '" + CommConstants.tag_voc_ins + "'||':'||A.KIND||':'||A.INS_DATE||':'||A.ENTRY_ID||':'||A.MEMORIZATION WRITE_DATA " + CommConstants.sqlCR);
+            sql.append("SELECT '" + CommConstants.tag_voc_ins + "'||':'||A.KIND||':'||A.ENTRY_ID||':'||A.INS_DATE||':'||A.MEMORIZATION WRITE_DATA " + CommConstants.sqlCR);
             sql.append(" FROM DIC_VOC A, DIC B" + CommConstants.sqlCR);
             sql.append(" WHERE A.ENTRY_ID = B.ENTRY_ID" + CommConstants.sqlCR);
         } else {
@@ -364,7 +364,7 @@ public class DicQuery {
             sql.append(" WHERE CODE IN (SELECT CODE FROM DIC_CODE WHERE CODE_GROUP IN ('C01','C02') )" + CommConstants.sqlCR);
 
             sql.append("UNION" + CommConstants.sqlCR);
-            sql.append("SELECT '" + CommConstants.tag_voc_ins + "'||':'||A.KIND||':'||A.INS_DATE||':'||A.ENTRY_ID||':'||A.MEMORIZATION WRITE_DATA " + CommConstants.sqlCR);
+            sql.append("SELECT '" + CommConstants.tag_voc_ins + "'||':'||A.KIND||':'||A.ENTRY_ID||':'||A.INS_DATE||':'||A.MEMORIZATION WRITE_DATA " + CommConstants.sqlCR);
             sql.append(" FROM DIC_VOC A, DIC B" + CommConstants.sqlCR);
             sql.append(" WHERE A.ENTRY_ID = B.ENTRY_ID" + CommConstants.sqlCR);
         }

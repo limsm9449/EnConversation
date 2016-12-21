@@ -196,7 +196,7 @@ public class NoteFragment extends Fragment implements View.OnClickListener {
                             db.execSQL(DicQuery.getUpdCode(groupCode, (String) v.getTag(), et_upd.getText().toString()));
 
                             //기록...
-                            DicUtils.writeInfoToFile(getContext(), db, groupCode);
+                            //DicUtils.writeInfoToFile(getContext(), db, groupCode);
 
                             changeListView();
 
@@ -230,7 +230,7 @@ public class NoteFragment extends Fragment implements View.OnClickListener {
                                         db.execSQL(DicQuery.getDelNote(code));
 
                                         //기록...
-                                        DicUtils.writeInfoToFile(getContext(), db, groupCode);
+                                        //DicUtils.writeInfoToFile(getContext(), db, groupCode);
                                         changeListView();
 
                                         Toast.makeText(getContext(), "회화노트를 삭제하였습니다.", Toast.LENGTH_SHORT).show();

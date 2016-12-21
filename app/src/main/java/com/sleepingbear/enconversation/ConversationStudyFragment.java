@@ -45,6 +45,8 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
     private int difficult = 1;
     private boolean isStart = false;
 
+    private long adviewTime = 0;
+
     ConversationStudySearchTask task;
 
     public ConversationStudyFragment() {
@@ -127,7 +129,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
 
                 if ( isStart ) {
                     DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
-                    DicUtils.writeInfoToFile(getContext(), db, "C02");
+                    //DicUtils.writeInfoToFile(getContext(), db, "C02");
                 }
                 if ( !cursor.isLast() ) {
                     cursor.moveToNext();
@@ -186,7 +188,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                 if ( foreign.equals( currForeign) ) {
                     if ( isStart ) {
                         DicDb.insConversationStudy(db, currSeq, DicUtils.getDelimiterDate(DicUtils.getCurrentDate(),"."));
-                        DicUtils. writeInfoToFile(getContext(), db, "C02");
+                        //DicUtils. writeInfoToFile(getContext(), db, "C02");
                     }
 
                     LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -211,18 +213,23 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
 
                     // Start loading the ad.
                     mPublisherAdView.loadAd(publisherAdRequestBuilder.build());
+                    adviewTime = System.currentTimeMillis();
 
                     ((Button) dialog_layout.findViewById(R.id.my_b_next)).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if ( !cursor.isLast() ) {
-                                cursor.moveToNext();
-                                conversationShow();
-                            } else {
-                                changeListView(true);
-                            }
+                            if (System.currentTimeMillis() > adviewTime + 2000) {
+                                if (!cursor.isLast()) {
+                                    cursor.moveToNext();
+                                    conversationShow();
+                                } else {
+                                    changeListView(true);
+                                }
 
-                            alertDialog.dismiss();
+                                alertDialog.dismiss();
+                            } else {
+                                Toast.makeText(getActivity(), "광고가 로딩된 후에 '다음 회화'가 가능합니다.", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     });
                     ((Button) dialog_layout.findViewById(R.id.my_b_close)).setOnClickListener(new View.OnClickListener() {

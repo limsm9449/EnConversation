@@ -45,6 +45,8 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
     private String sampleSeq;
     private String sqlWhere;
 
+    private long adviewTime = 0;
+
     NoteStudySearchTask task;
 
     @Override
@@ -188,18 +190,21 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
 
                     // Start loading the ad.
                     mPublisherAdView.loadAd(publisherAdRequestBuilder.build());
+                    adviewTime = System.currentTimeMillis();
 
                     ((Button) dialog_layout.findViewById(R.id.my_b_next)).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if ( !cursor.isLast() ) {
-                                cursor.moveToNext();
-                                conversationShow();
-                            } else {
-                                changeListView();
-                            }
+                            if (System.currentTimeMillis() > adviewTime + 2000) {
+                                if (!cursor.isLast()) {
+                                    cursor.moveToNext();
+                                    conversationShow();
+                                } else {
+                                    changeListView();
+                                }
 
-                            alertDialog.dismiss();
+                                alertDialog.dismiss();
+                            }
                         }
                     });
                     ((Button) dialog_layout.findViewById(R.id.my_b_close)).setOnClickListener(new View.OnClickListener() {

@@ -35,17 +35,10 @@ public class CommConstants {
 
     //코드 등록
     public static String tag_code_ins = "C_CODE_INS" ;
-    public static String tag_code_upd = "C_CODE_UPD" ;
-    //public static String tag_code_del = "C_CODE_DEL" ;
     //회화노트 등록
     public static String tag_note_ins = "C_NOTE_INS" ;
-    public static String tag_note_del = "C_NOTE_DEL" ;
-    public static String tag_note_del_all = "C_NOTE_DEL_ALL" ;
     //단어장 등록
     public static String tag_voc_ins = "C_VOC_INS" ;
-    public static String tag_voc_del = "C_VOC_DEL" ;
-    public static String tag_voc_del_all = "C_VOC_DEL_ALL" ;
 
-    public static String voc_group_code = "VOC" ;
     public static String voc_default_code = "VOC0001" ;
 }
