@@ -261,9 +261,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             DicUtils.dicLog("권한 없음");
             if ( ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ) {
                 Toast.makeText(this, "(중요)파일로 내보내기, 가져오기를 하기 위해서 권한이 필요합니다.", Toast.LENGTH_LONG).show();
+                //사용자가 임의료 권한을 취소한 경우
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.GET_ACCOUNTS}, MY_PERMISSIONS_REQUEST);
+            } else {
+                //최초로 권한을 요청한 경우
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.GET_ACCOUNTS}, MY_PERMISSIONS_REQUEST);
             }
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST);
-            DicUtils.dicLog("2222");
         } else {
             DicUtils.dicLog("권한 있음");
             isCheck = true;
@@ -281,6 +284,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     DicUtils.dicLog("권한 거부");
                     Toast.makeText(this, "파일 권한이 없기 때문에 파일 내보내기, 가져오기를 할 수 없습니다.\n만일 권한 팝업이 안열리면 '다시 묻지 않기'를 선택하셨기 때문입니다.\n어플을 지우고 다시 설치하셔야 합니다.", Toast.LENGTH_LONG).show();
+                    finish();
                 }
                 return;
         }
