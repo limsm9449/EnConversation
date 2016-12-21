@@ -198,7 +198,7 @@ public class PatternActivity extends AppCompatActivity implements TextToSpeech.O
             adapter.notifyDataSetChanged();
         } else if (id == R.id.action_help) {
             Bundle bundle = new Bundle();
-            bundle.putString("SCREEN", "DIC_CATEGORY");
+            bundle.putString("SCREEN", "PATTERN_ACT");
 
             Intent intent = new Intent(getApplication(), HelpActivity.class);
             intent.putExtras(bundle);

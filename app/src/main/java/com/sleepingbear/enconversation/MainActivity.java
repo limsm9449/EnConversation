@@ -381,13 +381,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (id == R.id.action_help) {
             Bundle bundle = new Bundle();
             if ( selectedTab == CommConstants.f_ConversationStudy ) {
-                bundle.putString("SCREEN", "NEWS");
+                bundle.putString("SCREEN", "CONVERSATION_STUDY");
             } else if ( selectedTab == CommConstants.f_Pattern ) {
-                bundle.putString("SCREEN", "CLICKWORD");
+                bundle.putString("SCREEN", "PATTERN");
             } else if ( selectedTab == CommConstants.f_Note ) {
-                bundle.putString("SCREEN", "BOOKMARK");
+                bundle.putString("SCREEN", "NOTE");
             } else if ( selectedTab == CommConstants.f_Conversation ) {
-                bundle.putString("SCREEN", "VOCABULARY");
+                bundle.putString("SCREEN", "CONVERSATION");
             } else if ( selectedTab == CommConstants.f_Vocabulary ) {
                 bundle.putString("SCREEN", "VOCABULARY");
             }
