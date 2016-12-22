@@ -43,8 +43,7 @@
             android:layout_alignParentLeft="false"
             android:layout_alignWithParentIfMissing="false"
             android:layout_alignParentTop="false"
-            android:gravity="center_vertical|left"
-            android:layout_toLeftOf="@+id/my_cb_check" />
+            android:gravity="center_vertical|left" />
 
         <TextView
             android:layout_width="wrap_content"

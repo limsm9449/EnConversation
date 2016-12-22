@@ -61,7 +61,6 @@
                     android:background="@android:color/transparent"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="50dp"
-                    android:layout_toLeftOf="@+id/my_cb_foreign_view"
                     android:layout_alignParentRight="true" />
 
                 <ImageView
