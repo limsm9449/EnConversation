@@ -72,20 +72,11 @@
             android:label="@string/title_activity_patch"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
-        <activity
-            android:name=".MySampleActivity"
-            android:label="@string/title_activity_my_sample"
-            android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme" />
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity
-            android:name=".WebDictionaryActivity"
-            android:label="@string/title_activity_web_dictionary"
-            android:theme="@style/AppTheme.NoActionBar" />
         <!--
      ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -97,18 +88,17 @@
         <activity
             android:name=".PatternActivity"
             android:label="@string/title_activity_pattern"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ConversationNoteActivity"
-            android:label="@string/title_activity_conversation_note"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".NoteActivity"
             android:label="@string/title_activity_note"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".NoteStudyActivity"
             android:label="@string/title_activity_conversation_study"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
