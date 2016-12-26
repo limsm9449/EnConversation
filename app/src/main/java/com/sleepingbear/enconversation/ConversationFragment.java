@@ -21,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -49,6 +48,8 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     private TextToSpeech myTTS;
     DicSearchTask task;
 
+    boolean isRandom = false;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -74,16 +75,9 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
             }
         });
 
-        ImageView iv_clear = (ImageView)mainView.findViewById(R.id.my_f_conv_iv_clear);
-        iv_clear.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                et_search.setText("");
-
-                changeListView(true);
-            }
-        });
-
-        ((ImageButton) mainView.findViewById(R.id.my_f_conv_ib_search)).setOnClickListener(this);
+        ((ImageView)mainView.findViewById(R.id.my_iv_clear)).setOnClickListener(this);
+        ((ImageButton) mainView.findViewById(R.id.my_ib_search)).setOnClickListener(this);
+        ((ImageView) mainView.findViewById(R.id.my_iv_random)).setOnClickListener(this);
         ((ImageView) mainView.findViewById(R.id.my_iv_view)).setOnClickListener(this);
         ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setOnClickListener(this);
 
@@ -127,7 +121,12 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
             }
             sql.append(" WHERE " + condi + CommConstants.sqlCR);
         }
-        sql.append(" ORDER BY ORD" + CommConstants.sqlCR);
+        if ( isRandom ) {
+            sql.append(" ORDER BY RANDOM()" + CommConstants.sqlCR);
+            sql.append(" LIMIT 200" + CommConstants.sqlCR);
+        } else {
+            sql.append(" ORDER BY ORD" + CommConstants.sqlCR);
+        }
         DicUtils.dicSqlLog(sql.toString());
 
         dictionaryCursor = db.rawQuery(sql.toString(), null);
@@ -256,24 +255,33 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        if ( v.getId() == R.id.my_f_conv_ib_search) {
+        isRandom = false;
+
+        if (v.getId() == R.id.my_ib_search) {
             changeListView(true);
-        } else if ( v.getId() == R.id.my_iv_view ) {
-            if ( adapter != null ) {
+        } else if (v.getId() == R.id.my_iv_view) {
+            if (adapter != null) {
                 adapter.setForeignView(true);
                 adapter.notifyDataSetChanged();
             }
 
             ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.GONE);
             ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.VISIBLE);
-        } else if ( v.getId() == R.id.my_iv_hide ) {
-            if ( adapter != null ) {
+        } else if (v.getId() == R.id.my_iv_hide) {
+            if (adapter != null) {
                 adapter.setForeignView(false);
                 adapter.notifyDataSetChanged();
             }
 
             ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.VISIBLE);
             ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
+        }  else if ( v.getId() == R.id.my_iv_random) {
+            et_search.setText("");
+            isRandom = true;
+            changeListView(true);
+        }  else if ( v.getId() == R.id.my_iv_clear) {
+            et_search.setText("");
+            changeListView(true);
         }
     }
 
@@ -325,6 +333,9 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         protected void onPostExecute(Void result) {
             setListView();
 
+            if( isRandom ) {
+                Toast.makeText(getContext(), "Random으로 200개의 예문을 조회하였습니다.", Toast.LENGTH_SHORT).show();
+            }
             ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
             ((ImageView) mainView.findViewById(R.id.my_iv_view)).setVisibility(View.VISIBLE);
 

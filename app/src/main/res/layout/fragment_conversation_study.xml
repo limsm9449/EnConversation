@@ -71,8 +71,8 @@
                         <RadioButton
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:text="Hard"
-                            android:id="@+id/my_rb_hard"
+                            android:text="Difficult"
+                            android:id="@+id/my_rb_difficult"
                             android:background="@drawable/my_toggle_bg"
                             android:layout_weight="1"
                             android:layout_marginTop="1dp"

@@ -75,7 +75,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
 
         ((RadioButton) mainView.findViewById(R.id.my_rb_easy)).setOnClickListener(this);
         ((RadioButton) mainView.findViewById(R.id.my_rb_normal)).setOnClickListener(this);
-        ((RadioButton) mainView.findViewById(R.id.my_rb_hard)).setOnClickListener(this);
+        ((RadioButton) mainView.findViewById(R.id.my_rb_difficult)).setOnClickListener(this);
 
         //리스트 내용 변경
         changeListView(true);
@@ -158,7 +158,7 @@ public class ConversationStudyFragment extends Fragment implements View.OnClickL
                 difficult = 2;
                 changeListView(true);
                 break;
-            case R.id.my_rb_hard:
+            case R.id.my_rb_difficult:
                 difficult = 3;
                 changeListView(true);
                 break;
