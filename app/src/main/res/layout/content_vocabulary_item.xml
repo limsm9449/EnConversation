@@ -6,6 +6,7 @@
     android:paddingTop="8dp"
     android:descendantFocusability="blocksDescendants"
     android:paddingBottom="8dp">
+
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -24,6 +25,7 @@
             android:textAlignment="center"
             android:gravity="start" />
     </RelativeLayout>
+
 
     <RelativeLayout
         android:layout_width="match_parent"

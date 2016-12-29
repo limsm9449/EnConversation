@@ -149,41 +149,6 @@ public class VocabularyActivity extends AppCompatActivity implements View.OnClic
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         listView.setOnItemClickListener(itemClickListener);
 
-        /*
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cur = (Cursor) adapter.getItem(position);
-                final String entryId = cur.getString(cur.getColumnIndexOrThrow("ENTRY_ID"));
-
-                new android.app.AlertDialog.Builder(VocabularyActivity.this)
-                    .setTitle("알림")
-                    .setMessage("삭제하시겠습니까?")
-                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            DicDb.delDicVoc(db, entryId, kind);
-                            DicUtils.writeInfoToFile(getApplicationContext(), "MYWORD_DELETE" + ":" + kind + ":" + entryId);
-
-                            adapter.dataChange();
-
-							isChange = "Y";
-
-                            Toast.makeText(getApplicationContext(), "단어장을 삭제하였습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    })
-                    .show();
-
-                return true;
-            };
-        });
-        */
-
         listView.setSelection(0);
     }
 
@@ -421,10 +386,20 @@ class VocabularyCursorAdapter extends CursorAdapter {
 
     public void dataChange() {
         mCursor.requery();
-        mCursor.move(mCursor.getPosition());
 
-        for ( int i = 0; i < isCheck.length; i++ ) {
-            isCheck[i] = false;
+        isCheck = new boolean[mCursor.getCount()];
+        entryId = new String[mCursor.getCount()];
+
+        if ( mCursor.getCount() > 0 ) {
+            mCursor.moveToFirst();
+            isCheck[mCursor.getPosition()] = false;
+            entryId[mCursor.getPosition()] = mCursor.getString(mCursor.getColumnIndexOrThrow("ENTRY_ID"));
+            while (mCursor.moveToNext()) {
+                isCheck[mCursor.getPosition()] = false;
+                entryId[mCursor.getPosition()] = mCursor.getString(mCursor.getColumnIndexOrThrow("ENTRY_ID"));
+            }
+
+            mCursor.move(mCursor.getPosition());
         }
 
         //변경사항을 반영한다.
@@ -454,10 +429,11 @@ class VocabularyCursorAdapter extends CursorAdapter {
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
                 ViewHolder viewHolder = (ViewHolder)buttonView.getTag();
+
                 isCheck[viewHolder.position] = isChecked;
                 notifyDataSetChanged();
 
-                DicUtils.dicLog("onCheckedChanged : " + viewHolder.position);
+                //DicUtils.dicLog("onCheckedChanged : " + viewHolder.position);
             }
         });
 
@@ -493,6 +469,7 @@ class VocabularyCursorAdapter extends CursorAdapter {
             ((RelativeLayout) view.findViewById(R.id.my_rl_left)).setVisibility(View.GONE);
         }
 
+        ((CheckBox)view.findViewById(R.id.my_cb_check)).setChecked(isCheck[cursor.getPosition()]);
         if ( isCheck[cursor.getPosition()] ) {
             ((CheckBox)view.findViewById(R.id.my_cb_check)).setButtonDrawable(android.R.drawable.checkbox_on_background);
         } else {
