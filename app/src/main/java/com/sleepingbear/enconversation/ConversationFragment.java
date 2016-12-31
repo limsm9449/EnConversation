@@ -68,6 +68,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ( keyCode == KeyEvent.KEYCODE_ENTER ) {
+                    isRandom = false;
                     changeListView(true);
                 }
 
