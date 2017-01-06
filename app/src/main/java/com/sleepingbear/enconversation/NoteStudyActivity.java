@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -44,8 +45,6 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
     private String kind;
     private String sampleSeq;
     private String sqlWhere;
-
-    private long adviewTime = 0;
 
     NoteStudySearchTask task;
 
@@ -194,23 +193,45 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                     PublisherAdRequest.Builder publisherAdRequestBuilder = new PublisherAdRequest.Builder();
                     ((RelativeLayout) dialog_layout.findViewById(R.id.my_rl_admob)).addView(mPublisherAdView);
 
+                    mPublisherAdView.setAdListener(new AdListener() {
+                        @Override
+                        public void onAdLoaded() {
+                            super.onAdLoaded();
+
+                            //개별 조회면은 다음 버튼을 안보이게 해준다.
+                            if ( cursor.getCount() > 1 ) {
+                                ((Button) dialog_layout.findViewById(R.id.my_b_next)).setVisibility(View.VISIBLE);
+                            }
+                            ((Button) dialog_layout.findViewById(R.id.my_b_close)).setVisibility(View.VISIBLE);
+                            ((Button) dialog_layout.findViewById(R.id.my_b_detail)).setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onAdFailedToLoad(int i) {
+                            super.onAdFailedToLoad(i);
+
+                            if ( cursor.getCount() > 1 ) {
+                                ((Button) dialog_layout.findViewById(R.id.my_b_next)).setVisibility(View.VISIBLE);
+                            }
+                            ((Button) dialog_layout.findViewById(R.id.my_b_close)).setVisibility(View.VISIBLE);
+                            ((Button) dialog_layout.findViewById(R.id.my_b_detail)).setVisibility(View.VISIBLE);
+                        }
+                    });
+
                     // Start loading the ad.
                     mPublisherAdView.loadAd(publisherAdRequestBuilder.build());
-                    adviewTime = System.currentTimeMillis();
 
                     ((Button) dialog_layout.findViewById(R.id.my_b_next)).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if (System.currentTimeMillis() > adviewTime + 2000) {
-                                if (!cursor.isLast()) {
-                                    cursor.moveToNext();
-                                    conversationShow();
-                                } else {
-                                    changeListView();
-                                }
-
-                                alertDialog.dismiss();
+                            if (!cursor.isLast()) {
+                                cursor.moveToNext();
+                                conversationShow();
+                            } else {
+                                changeListView();
                             }
+
+                            alertDialog.dismiss();
                         }
                     });
                     ((Button) dialog_layout.findViewById(R.id.my_b_close)).setOnClickListener(new View.OnClickListener() {
@@ -239,10 +260,9 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                         }
                     });
 
-                    //개별 조회면은 다음 버튼을 안보이게 해준다.
-                    if ( cursor.getCount() == 1 ) {
-                        ((Button) dialog_layout.findViewById(R.id.my_b_next)).setVisibility(View.GONE);
-                    }
+                    ((Button) dialog_layout.findViewById(R.id.my_b_next)).setVisibility(View.GONE);
+                    ((Button) dialog_layout.findViewById(R.id.my_b_close)).setVisibility(View.GONE);
+                    ((Button) dialog_layout.findViewById(R.id.my_b_detail)).setVisibility(View.GONE);
 
                     alertDialog.setCanceledOnTouchOutside(false);
                     alertDialog.show();
