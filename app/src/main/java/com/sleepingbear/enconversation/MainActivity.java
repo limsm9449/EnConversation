@@ -520,15 +520,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch ( requestCode ) {
             case CommConstants.s_note :
-                ((NoteFragment) adapter.getItem(CommConstants.f_Note)).changeListView();
-
-                /*
-                if ( "C01".equals(((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode) ) {
-                    DicUtils.writeInfoToFile(getApplicationContext(), db, "C01");
-                } else if ( "C02".equals(((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode) ) {
-                    DicUtils.writeInfoToFile(getApplicationContext(), db, "C02");
+                if ( "C01".equals(((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode) || "C02".equals(((NoteFragment) adapter.getItem(CommConstants.f_Note)).groupCode) ) {
+                    ((NoteFragment) adapter.getItem(CommConstants.f_Note)).changeListView();
                 }
-                */
 
                 break;
             case CommConstants.s_vocabulary :

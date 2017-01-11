@@ -36,6 +36,7 @@ public class PatchActivity extends AppCompatActivity {
         patch.append("" + CommConstants.sqlCR);
         patch.append("- 단어장에서 TTS로 단어, 뜻을 듣는 기능 추가 - 상단 Context Menu에서 TTS 선택" + CommConstants.sqlCR);
         patch.append("- 단어학습에서 '카드형 4지선다 TTS 학습' 기능 추가" + CommConstants.sqlCR);
+        patch.append("- 네이버 회화를 보고 돌아올 경우 리스트가 처음으로 가는 문제점 수정" + CommConstants.sqlCR);
         patch.append("" + CommConstants.sqlCR);
         patch.append("" + CommConstants.sqlCR);
 
