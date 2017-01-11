@@ -339,6 +339,25 @@ public class VocabularyActivity extends AppCompatActivity implements View.OnClic
 
             adapter.editChange(isEditing);
             adapter.notifyDataSetChanged();
+        } else if (id == R.id.action_tts) {
+
+            Cursor cur = (Cursor) adapter.getItem(0);
+
+            String[] words  = new String[cur.getCount()];
+            String[] means  = new String[cur.getCount()];
+            for ( int i = 0; i < cur.getCount(); i++ ) {
+                cur.moveToPosition(i);
+                words[i] = DicUtils.getString(cur.getString(cur.getColumnIndexOrThrow("WORD")));
+                means[i] = DicUtils.getString(cur.getString(cur.getColumnIndexOrThrow("MEAN")));
+            }
+
+            Intent ttsIntent = new Intent(getApplicationContext(), MySpeechService.class);
+            stopService(ttsIntent);
+
+            ttsIntent = new Intent(getApplicationContext(), MySpeechService.class);
+            ttsIntent.putExtra("words", words);
+            ttsIntent.putExtra("means", means);
+            startService(ttsIntent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -346,6 +365,9 @@ public class VocabularyActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onBackPressed() {
+        Intent ttsIntent = new Intent(getApplicationContext(), MySpeechService.class);
+        stopService(ttsIntent);
+
         Intent intent = new Intent(this.getApplication(), VocabularyActivity.class);
         intent.putExtra("isChange", (isChange ? "Y" : "N"));
         setResult(RESULT_OK, intent);
