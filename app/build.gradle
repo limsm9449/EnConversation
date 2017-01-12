@@ -9,13 +9,13 @@ android {
         targetSdkVersion 24
         versionCode 5
         versionName "1.0.5"
-        multiDexEnabled true
+        //multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    dexOptions {
-        javaMaxHeapSize "4g"
-        preDexLibraries = false
-    }
+    //dexOptions {
+    //    javaMaxHeapSize "4g"
+    //    preDexLibraries = false
+    //}
     buildTypes {
         release {
             minifyEnabled false
@@ -34,7 +34,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
     compile 'com.android.support:support-v4:24.2.1'
-    compile 'com.google.android.gms:play-services:10.0.1'
+    //compile 'com.google.android.gms:play-services:10.0.1'
     compile 'com.google.android.gms:play-services-ads:10.0.1'
     compile 'com.android.support:multidex:1.0.0'
     testCompile 'junit:junit:4.12'
