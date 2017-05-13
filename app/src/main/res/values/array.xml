@@ -46,6 +46,7 @@
         <item>카드형 학습</item>
         <item>카드형 OX 학습</item>
         <item>카드형 4지선다 학습</item>
+        <item>카드형 4지선다 TTS 학습</item>
     </string-array>
 
     <string-array name="url">

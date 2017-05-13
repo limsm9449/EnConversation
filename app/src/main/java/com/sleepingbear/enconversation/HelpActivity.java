@@ -208,6 +208,16 @@ public class HelpActivity extends AppCompatActivity {
         }
 
         tempSb.delete(0, tempSb.length());
+        tempSb.append("* 카드형 4지선다 TTS 학습" + CommConstants.sqlCR);
+        tempSb.append("- 카드형 4지선다 TTS 학습입니다." + CommConstants.sqlCR);
+        tempSb.append("" + CommConstants.sqlCR);
+        if ( "STUDY6".equals(b.getString("SCREEN")) ) {
+            CurrentSb.append(tempSb.toString());
+        } else {
+            allSb.append(tempSb.toString());
+        }
+
+        tempSb.delete(0, tempSb.length());
         tempSb.append("* 단어 상세" + CommConstants.sqlCR);
         tempSb.append("- 상단 콤보 메뉴를 선택하시면 네이버 사전, 다음 사전, 예제를 보실 수 있습니다." + CommConstants.sqlCR);
         tempSb.append("" + CommConstants.sqlCR);

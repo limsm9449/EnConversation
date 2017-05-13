@@ -36,7 +36,9 @@ public class PatchActivity extends AppCompatActivity {
         patch.append("- 단어장 상세 부분을 네이버 검색, 다움 검색으로 변경하였습니다." + CommConstants.sqlCR);
         patch.append("- 영어사전, 영어회화, 영어신문을 하나로 통합하여 사용하면 좋을듯해서 '최고의 영어학습' 어플을 새로 만들었습니다. 한개의 어플로 계속 기능개선을 할 예정입니다." + CommConstants.sqlCR);
         patch.append("" + CommConstants.sqlCR);
-        patch.append("" + CommConstants.sqlCR);
+        patch.append("- 어플이 가로로 변경이 되는 문제점 수정 - 가로/세로 변경시 화면 구성 및 오류가 발생" + CommConstants.sqlCR);
+        patch.append("- 단어장에서 TTS로 단어, 뜻을 듣는 기능 추가 - 상단 Context Menu에서 TTS 선택" + CommConstants.sqlCR);
+        patch.append("- 단어학습에서 '카드형 4지선다 TTS 학습' 기능 추가" + CommConstants.sqlCR);
         patch.append("- 네이버 회화를 보고 돌아올 경우 리스트가 처음으로 가는 문제점 수정" + CommConstants.sqlCR);
         patch.append("- 단어장 편집시 전체를 선택하고 이동,삭제,복사를 한 후에 체크를 두번씩 해야 하는 문제점 수정" + CommConstants.sqlCR);
         patch.append("- 2016.12.21 : 영어회화 어플 개발" + CommConstants.sqlCR);
