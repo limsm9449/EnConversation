@@ -58,4 +58,9 @@
         <item>koreaherald</item>
         <item>중앙데일리</item>
     </string-array>
+    <string-array name="wordView">
+        <item>Naver</item>
+        <item>Daum</item>
+        <item>예제</item>
+    </string-array>
 </resources>

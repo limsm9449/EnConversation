@@ -209,9 +209,7 @@ public class HelpActivity extends AppCompatActivity {
 
         tempSb.delete(0, tempSb.length());
         tempSb.append("* 단어 상세" + CommConstants.sqlCR);
-        tempSb.append("- 단어의 뜻, 발음, 상세 뜻, 예제, 기타 예제별로 단어 상세를 보실 수 있습니다." + CommConstants.sqlCR);
-        tempSb.append(" .별표를 클릭하시면 Default 단어장에 추가 됩니다." + CommConstants.sqlCR);
-        tempSb.append(" .별표를 길게 클릭하시면 추가할 단어장을 선택하실 수 있습니다." + CommConstants.sqlCR);
+        tempSb.append("- 상단 콤보 메뉴를 선택하시면 네이버 사전, 다음 사전, 예제를 보실 수 있습니다." + CommConstants.sqlCR);
         tempSb.append("" + CommConstants.sqlCR);
         if ( "WORDVIEW".equals(b.getString("SCREEN")) ) {
             CurrentSb.append(tempSb.toString());
