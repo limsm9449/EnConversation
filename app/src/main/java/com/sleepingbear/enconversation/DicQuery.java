@@ -328,46 +328,23 @@ public class DicQuery {
         return sql.toString();
     }
 
-    public static String getWriteData(String kind) {
+    public static String getWriteData() {
         StringBuffer sql = new StringBuffer();
 
-        DicUtils.dicLog("kind : "  + kind);
-        if ( "C01".equals(kind) || "C02".equals(kind) ) {
-            sql.append("SELECT '" + CommConstants.tag_code_ins + "'||':'||A.CODE_GROUP||':'||A.CODE||':'||A.CODE_NAME WRITE_DATA" + CommConstants.sqlCR);
-            sql.append("  FROM DIC_CODE A" + CommConstants.sqlCR);
-            sql.append(" WHERE CODE_GROUP = '" + kind + "'" + CommConstants.sqlCR);
-            sql.append("   AND CODE NOT IN ('C010001')" + CommConstants.sqlCR);
+        sql.append("SELECT '" + CommConstants.tag_code_ins + "'||':'||A.CODE_GROUP||':'||A.CODE||':'||A.CODE_NAME WRITE_DATA" + CommConstants.sqlCR);
+        sql.append("  FROM DIC_CODE A" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP IN ('VOC','C01','C02')" + CommConstants.sqlCR);
+        sql.append("   AND CODE NOT IN ('VOC0001','C010001')" + CommConstants.sqlCR);
 
-            sql.append("UNION" + CommConstants.sqlCR);
-            sql.append("SELECT '" + CommConstants.tag_note_ins + "'||':'||CODE||':'||SAMPLE_SEQ WRITE_DATA " + CommConstants.sqlCR);
-            sql.append(" FROM DIC_NOTE" + CommConstants.sqlCR);
-            sql.append(" WHERE CODE IN (SELECT CODE FROM DIC_CODE WHERE CODE_GROUP = '" + kind + "')" + CommConstants.sqlCR);
-        } else if ( "VOC".equals(kind) ) {
-            sql.append("SELECT '" + CommConstants.tag_code_ins + "'||':'||A.CODE_GROUP||':'||A.CODE||':'||A.CODE_NAME WRITE_DATA" + CommConstants.sqlCR);
-            sql.append("  FROM DIC_CODE A" + CommConstants.sqlCR);
-            sql.append(" WHERE CODE_GROUP IN ('VOC')" + CommConstants.sqlCR);
-            sql.append("   AND CODE NOT IN ('VOC0001')" + CommConstants.sqlCR);
+        sql.append("UNION" + CommConstants.sqlCR);
+        sql.append("SELECT '" + CommConstants.tag_note_ins + "'||':'||CODE||':'||SAMPLE_SEQ WRITE_DATA " + CommConstants.sqlCR);
+        sql.append(" FROM DIC_NOTE" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE IN (SELECT CODE FROM DIC_CODE WHERE CODE_GROUP IN ('C01','C02') )" + CommConstants.sqlCR);
 
-            sql.append("UNION" + CommConstants.sqlCR);
-            sql.append("SELECT '" + CommConstants.tag_voc_ins + "'||':'||A.KIND||':'||A.ENTRY_ID||':'||A.INS_DATE||':'||A.MEMORIZATION WRITE_DATA " + CommConstants.sqlCR);
-            sql.append(" FROM DIC_VOC A, DIC B" + CommConstants.sqlCR);
-            sql.append(" WHERE A.ENTRY_ID = B.ENTRY_ID" + CommConstants.sqlCR);
-        } else {
-            sql.append("SELECT '" + CommConstants.tag_code_ins + "'||':'||A.CODE_GROUP||':'||A.CODE||':'||A.CODE_NAME WRITE_DATA" + CommConstants.sqlCR);
-            sql.append("  FROM DIC_CODE A" + CommConstants.sqlCR);
-            sql.append(" WHERE CODE_GROUP IN ('VOC','C01','C02')" + CommConstants.sqlCR);
-            sql.append("   AND CODE NOT IN ('VOC0001','C010001')" + CommConstants.sqlCR);
-
-            sql.append("UNION" + CommConstants.sqlCR);
-            sql.append("SELECT '" + CommConstants.tag_note_ins + "'||':'||CODE||':'||SAMPLE_SEQ WRITE_DATA " + CommConstants.sqlCR);
-            sql.append(" FROM DIC_NOTE" + CommConstants.sqlCR);
-            sql.append(" WHERE CODE IN (SELECT CODE FROM DIC_CODE WHERE CODE_GROUP IN ('C01','C02') )" + CommConstants.sqlCR);
-
-            sql.append("UNION" + CommConstants.sqlCR);
-            sql.append("SELECT '" + CommConstants.tag_voc_ins + "'||':'||A.KIND||':'||A.ENTRY_ID||':'||A.INS_DATE||':'||A.MEMORIZATION WRITE_DATA " + CommConstants.sqlCR);
-            sql.append(" FROM DIC_VOC A, DIC B" + CommConstants.sqlCR);
-            sql.append(" WHERE A.ENTRY_ID = B.ENTRY_ID" + CommConstants.sqlCR);
-        }
+        sql.append("UNION" + CommConstants.sqlCR);
+        sql.append("SELECT '" + CommConstants.tag_voc_ins + "'||':'||A.KIND||':'||A.ENTRY_ID||':'||A.INS_DATE||':'||A.MEMORIZATION WRITE_DATA " + CommConstants.sqlCR);
+        sql.append(" FROM DIC_VOC A, DIC B" + CommConstants.sqlCR);
+        sql.append(" WHERE A.ENTRY_ID = B.ENTRY_ID" + CommConstants.sqlCR);
 
         DicUtils.dicSqlLog(sql.toString());
 

@@ -383,6 +383,7 @@ class VocabularyCursorAdapter extends CursorAdapter {
     private boolean isEditing = false;
     private boolean[] isCheck;
     private String[] entryId;
+    int fontSize = 0;
 
     static class ViewHolder {
         protected CheckBox memorizationCheck;
@@ -396,6 +397,8 @@ class VocabularyCursorAdapter extends CursorAdapter {
         super(context, cursor, 0);
         mCursor = cursor;
         mDb = db;
+
+        fontSize = Integer.parseInt( DicUtils.getPreferencesValue( context, CommConstants.preferences_font ) );
 
         isCheck = new boolean[cursor.getCount()];
         entryId = new String[cursor.getCount()];
@@ -497,6 +500,12 @@ class VocabularyCursorAdapter extends CursorAdapter {
         } else {
             ((CheckBox)view.findViewById(R.id.my_cb_check)).setButtonDrawable(android.R.drawable.checkbox_off_background);
         }
+
+        //사이즈 설정
+        ((TextView) view.findViewById(R.id.my_f_bi_tv_bookmark)).setTextSize(fontSize);
+        ((TextView) view.findViewById(R.id.my_c_vi_tv_spelling)).setTextSize(fontSize);
+        ((TextView) view.findViewById(R.id.my_f_bi_tv_date)).setTextSize(fontSize);
+        ((TextView) view.findViewById(R.id.my_c_vi_tv_mean)).setTextSize(fontSize);
     }
 
     public void allCheck(boolean chk) {

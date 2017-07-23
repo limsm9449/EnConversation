@@ -51,6 +51,8 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
     public boolean isMySample = false;
     public boolean isChange = false;
 
+    private int fontSize = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +78,8 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
         notHan = b.getString("foreign");
         han = b.getString("han");
         sampleSeq = b.getString("sampleSeq");
+
+        fontSize = Integer.parseInt( DicUtils.getPreferencesValue( this, CommConstants.preferences_font ) );
 
         changeListView();
 
@@ -127,6 +131,9 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
 
         ((TextView) findViewById(R.id.my_c_sv_tv_foreign)).setText(notHan);
         ((TextView) findViewById(R.id.my_c_sv_tv_han)).setText(han);
+
+        ((TextView) findViewById(R.id.my_c_sv_tv_foreign)).setTextSize(fontSize + 2);
+        ((TextView) findViewById(R.id.my_c_sv_tv_han)).setTextSize(fontSize);
 
         StringBuffer sql = new StringBuffer();
         if ( "".equals(word) ) {
@@ -331,6 +338,7 @@ public class SentenceViewActivity extends AppCompatActivity implements View.OnCl
 class SentenceViewCursorAdapter extends CursorAdapter {
     private SQLiteDatabase mDb;
     private Cursor mCursor;
+    int fontSize = 0;
 
     static class ViewHolder {
         protected String entryId;
@@ -344,6 +352,7 @@ class SentenceViewCursorAdapter extends CursorAdapter {
         super(context, cursor, 0);
         mCursor = cursor;
         mDb = ((SentenceViewActivity)context).db;
+        fontSize = Integer.parseInt( DicUtils.getPreferencesValue( context, CommConstants.preferences_font ) );
     }
 
     public void dataChange() {
@@ -406,5 +415,9 @@ class SentenceViewCursorAdapter extends CursorAdapter {
             ib_myvoc.setImageResource(android.R.drawable.star_off);
             viewHolder.isMyVoc = false;
         }
+
+        ((TextView) view.findViewById(R.id.my_c_svi_word)).setTextSize(fontSize);
+        ((TextView) view.findViewById(R.id.my_c_svi_spelling)).setTextSize(fontSize);
+        ((TextView) view.findViewById(R.id.my_c_svi_mean)).setTextSize(fontSize);
     }
 }

@@ -231,9 +231,12 @@ public class PatternActivity extends AppCompatActivity implements TextToSpeech.O
 class PatternCursorAdapter extends CursorAdapter {
     public HashMap statusData = new HashMap();
     public boolean isForeignView = false;
+    int fontSize = 0;
 
     public PatternCursorAdapter(Context context, Cursor cursor, Activity activity) {
         super(context, cursor, 0);
+
+        fontSize = Integer.parseInt( DicUtils.getPreferencesValue( context, CommConstants.preferences_font ) );
     }
 
     @Override
@@ -251,6 +254,10 @@ class PatternCursorAdapter extends CursorAdapter {
         } else {
             ((TextView) view.findViewById(R.id.my_tv_foreign)).setText("Click..");
         }
+
+        //사이즈 설정
+        ((TextView) view.findViewById(R.id.my_tv_han)).setTextSize(fontSize);
+        ((TextView) view.findViewById(R.id.my_tv_foreign)).setTextSize(fontSize);
     }
 
     public void setForeignView(boolean foreignView) {

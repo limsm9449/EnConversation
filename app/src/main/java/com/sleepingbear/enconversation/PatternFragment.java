@@ -54,20 +54,22 @@ public class PatternFragment extends Fragment {
 
     public void changeListView(boolean isKeyin) {
         if ( isKeyin ) {
-            cursor = db.rawQuery(DicQuery.getPatternList(), null);
+            if ( db != null ) {
+                cursor = db.rawQuery(DicQuery.getPatternList(), null);
 
-            if ( cursor.getCount() == 0 ) {
-                Toast.makeText(getContext(), "검색된 데이타가 없습니다.", Toast.LENGTH_SHORT).show();
+                if (cursor.getCount() == 0) {
+                    Toast.makeText(getContext(), "검색된 데이타가 없습니다.", Toast.LENGTH_SHORT).show();
+                }
+
+                ListView listView = (ListView) mainView.findViewById(R.id.my_f_convation_lv);
+                adapter = new PatternFragCursorAdapter(getContext(), cursor, 0);
+                listView.setAdapter(adapter);
+
+                listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+                listView.setOnItemClickListener(itemClickListener);
+                listView.setOnItemLongClickListener(itemLongClickListener);
+                listView.setSelection(0);
             }
-
-            ListView listView = (ListView) mainView.findViewById(R.id.my_f_convation_lv);
-            adapter = new PatternFragCursorAdapter(getContext(), cursor, 0);
-            listView.setAdapter(adapter);
-
-            listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-            listView.setOnItemClickListener(itemClickListener);
-            listView.setOnItemLongClickListener(itemLongClickListener);
-            listView.setSelection(0);
         }
     }
 
@@ -108,9 +110,12 @@ public class PatternFragment extends Fragment {
 }
 
 class PatternFragCursorAdapter extends CursorAdapter {
+    int fontSize = 0;
 
     public PatternFragCursorAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, 0);
+
+        fontSize = Integer.parseInt( DicUtils.getPreferencesValue( context, CommConstants.preferences_font ) );
     }
 
     @Override
@@ -122,6 +127,10 @@ class PatternFragCursorAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ((TextView) view.findViewById(R.id.my_tv_pattern)).setText(String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("PATTERN"))));
         ((TextView) view.findViewById(R.id.my_tv_pattern_desc)).setText(String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("DESC"))));
+
+        //사이즈 설정
+        ((TextView) view.findViewById(R.id.my_tv_pattern)).setTextSize(fontSize);
+        ((TextView) view.findViewById(R.id.my_tv_pattern_desc)).setTextSize(fontSize);
     }
 
 }

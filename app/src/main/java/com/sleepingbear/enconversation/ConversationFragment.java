@@ -351,9 +351,12 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
 class ConversationCursorAdapter extends CursorAdapter {
     public boolean isForeignView = false;
     public HashMap statusData = new HashMap();
+    int fontSize = 0;
 
     public ConversationCursorAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, 0);
+
+        fontSize = Integer.parseInt( DicUtils.getPreferencesValue( context, CommConstants.preferences_font ) );
     }
 
     @Override
@@ -369,6 +372,10 @@ class ConversationCursorAdapter extends CursorAdapter {
         } else {
             ((TextView) view.findViewById(R.id.my_tv_foreign)).setText("Click..");
         }
+
+        //사이즈 설정
+        ((TextView) view.findViewById(R.id.my_tv_han)).setTextSize(fontSize);
+        ((TextView) view.findViewById(R.id.my_tv_foreign)).setTextSize(fontSize);
     }
 
     public void setForeignView(boolean foreignView) {

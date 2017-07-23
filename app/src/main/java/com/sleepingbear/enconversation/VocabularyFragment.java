@@ -309,6 +309,7 @@ class VocabularyFlagmentCursorAdapter extends CursorAdapter {
     private int mScreenKind;
 
     private Context mContext;
+    int fontSize = 0;
 
     static class ViewHolder {
         protected String kind;
@@ -324,6 +325,8 @@ class VocabularyFlagmentCursorAdapter extends CursorAdapter {
 
         mFragmentManager = fm;
         mScreenKind = screenKind;
+
+        fontSize = Integer.parseInt( DicUtils.getPreferencesValue( context, CommConstants.preferences_font ) );
     }
 
     @Override
@@ -366,5 +369,9 @@ class VocabularyFlagmentCursorAdapter extends CursorAdapter {
 
         TextView tv_cnt = (TextView) view.findViewById(R.id.my_f_cat_tv_cnt);
         tv_cnt.setText(String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow("CNT"))));
+
+        //사이즈 설정
+        ((TextView) view.findViewById(R.id.my_c_s1i_tv_question)).setTextSize(fontSize);
+        ((TextView) view.findViewById(R.id.my_f_cat_tv_cnt)).setTextSize(fontSize);
     }
 }

@@ -452,10 +452,13 @@ class NoteCursorAdapter extends CursorAdapter {
     private boolean isEditing = false;
     public HashMap statusData = new HashMap();
     public boolean isForeignView = false;
+    int fontSize = 0;
 
     public NoteCursorAdapter(Context context, Cursor cursor, SQLiteDatabase db, int flags) {
         super(context, cursor, 0);
         mDb = db;
+
+        fontSize = Integer.parseInt( DicUtils.getPreferencesValue( context, CommConstants.preferences_font ) );
 
         isCheck = new boolean[cursor.getCount()];
         seq = new int[cursor.getCount()];
@@ -531,6 +534,10 @@ class NoteCursorAdapter extends CursorAdapter {
         } else {
             ((RelativeLayout) view.findViewById(R.id.my_rl_left)).setVisibility(View.GONE);
         }
+
+        //사이즈 설정
+        ((TextView) view.findViewById(R.id.my_tv_han)).setTextSize(fontSize);
+        ((TextView) view.findViewById(R.id.my_tv_foreign)).setTextSize(fontSize);
     }
 
     public void allCheck(boolean chk) {

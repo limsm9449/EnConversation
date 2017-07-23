@@ -344,8 +344,12 @@ public class NoteFragment extends Fragment implements View.OnClickListener {
 }
 
 class NoteFragCursorAdapter extends CursorAdapter {
+    int fontSize = 0;
+
     public NoteFragCursorAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, 0);
+
+        fontSize = Integer.parseInt( DicUtils.getPreferencesValue( context, CommConstants.preferences_font ) );
     }
 
 
@@ -359,6 +363,9 @@ class NoteFragCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ((TextView) view.findViewById(R.id.my_tv_kind)).setText(cursor.getString(cursor.getColumnIndexOrThrow("KIND_NAME")));
+
+        //사이즈 설정
+        ((TextView) view.findViewById(R.id.my_tv_kind)).setTextSize(fontSize);
     }
 
 }

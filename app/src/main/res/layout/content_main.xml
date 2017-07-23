@@ -12,9 +12,11 @@
         app:tabGravity="center"
         android:background="@color/colorPrimary"
         android:layout_marginTop="40dp"
-        style="@style/MyCustomTabLayout"
-        app:tabIndicatorColor="@color/tabIndicatorColor"
-        android:layout_height="30dp" />
+        app:tabIndicatorColor="@color/my_spinner"
+        android:layout_height="30dp"
+        app:tabTextColor="@color/black_overlay"
+        app:tabTextAppearance="@style/MineCustomTabText"
+        app:tabSelectedTextColor="@color/my_white" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/main_pager"

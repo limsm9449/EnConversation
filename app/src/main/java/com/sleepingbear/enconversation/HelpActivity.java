@@ -13,6 +13,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 public class HelpActivity extends AppCompatActivity {
+    private int fontSize = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -232,6 +233,9 @@ public class HelpActivity extends AppCompatActivity {
         } else {
             ((TextView) this.findViewById(R.id.my_c_help_tv1)).setText(CurrentSb.toString() + CommConstants.sqlCR + CommConstants.sqlCR + allSb.toString());
         }
+
+        fontSize = Integer.parseInt( DicUtils.getPreferencesValue( this, CommConstants.preferences_font ) );
+        ((TextView) this.findViewById(R.id.my_c_help_tv1)).setTextSize(fontSize);
 
         AdView av = (AdView)this.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();

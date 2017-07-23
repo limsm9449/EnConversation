@@ -191,7 +191,7 @@ public class WordViewActivity extends AppCompatActivity implements View.OnClickL
             }
         });
 
-        spinner.setSelection(0);
+        spinner.setSelection( Integer.parseInt( DicUtils.getPreferencesValue( getApplicationContext(), CommConstants.preferences_wordView ) ) );
 
         return true;
     }
@@ -242,7 +242,8 @@ public class WordViewActivity extends AppCompatActivity implements View.OnClickL
                     if ( webView.canGoBack() ) {
                         webView.goBack();
                     } else {
-                        Toast.makeText(getApplicationContext(), "상단의 Back 버튼을 클릭해주세요.", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(), "상단의 Back 버튼을 클릭해주세요.", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                     return true;
             }
@@ -280,8 +281,12 @@ public class WordViewActivity extends AppCompatActivity implements View.OnClickL
 }
 
 class WordViewActivityCursorAdapter extends CursorAdapter {
+    int fontSize = 0;
+
     public WordViewActivityCursorAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, 0);
+
+        fontSize = Integer.parseInt( DicUtils.getPreferencesValue( context, CommConstants.preferences_font ) );
     }
 
     @Override
@@ -300,5 +305,8 @@ class WordViewActivityCursorAdapter extends CursorAdapter {
         tv_foriegn.setText((cursor.getPosition() + 1) + ". " + sentence1);
         tv_han.setText("   " + sentence2);
 
+        //사이즈 설정
+        tv_foriegn.setTextSize(fontSize);
+        tv_han.setTextSize(fontSize);
     }
 }

@@ -13,6 +13,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 public class PatchActivity extends AppCompatActivity {
+    private int fontSize = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,9 @@ public class PatchActivity extends AppCompatActivity {
         AdView av = (AdView)this.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         av.loadAd(adRequest);
+
+        fontSize = Integer.parseInt( DicUtils.getPreferencesValue( this, CommConstants.preferences_font ) );
+        ((TextView) this.findViewById(R.id.my_c_patch_tv1)).setTextSize(fontSize);
     }
 
     @Override
