@@ -99,7 +99,7 @@
 
         <service android:name=".MySpeechService">
             <intent-filter>
-                <action android:name="com.sleepingbear.ehdictandvoc.MySpeechService" />
+                <action android:name="com.sleepingbear.enconversation.MySpeechService" />
             </intent-filter>
         </service>
         <activity
