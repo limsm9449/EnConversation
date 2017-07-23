@@ -48,6 +48,8 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
 
     NoteStudySearchTask task;
 
+    private int fontSize = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +59,8 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setVisibility(View.GONE);
+
+        fontSize = Integer.parseInt( DicUtils.getPreferencesValue( getApplicationContext(), CommConstants.preferences_font ) );
 
         Bundle b = this.getIntent().getExtras();
         kind = b.getString("kind");
@@ -73,6 +77,9 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
 
         my_tv_han = (TextView) this.findViewById(R.id.my_tv_han);
         my_tv_foreign = (TextView) this.findViewById(R.id.my_tv_foreign);
+
+        my_tv_han.setTextSize(fontSize);
+        my_tv_foreign.setTextSize(fontSize);
 
         ((ImageView) this.findViewById(R.id.my_iv_left)).setOnClickListener(this);
         ((ImageView) this.findViewById(R.id.my_iv_right)).setOnClickListener(this);
@@ -315,13 +322,13 @@ public class NoteStudyActivity extends AppCompatActivity implements View.OnClick
                 btn.setTextColor(Color.rgb(255, 255, 255));
                 btn.setText( DicUtils.getBtnString( foreignArr[i] ) );
                 btn.setAllCaps(false);
-                btn.setTextSize(12);
+                btn.setTextSize(18);
 
                 btn.setLayoutParams((new FlowLayout.LayoutParams(3, 3)));
 
                 btn.setId(i);
                 btn.setTag( DicUtils.getBtnString( foreignArr[i] ) );
-                btn.setGravity(Gravity.LEFT);
+                btn.setGravity(Gravity.TOP);
                 btn.setOnClickListener(this);
                 wordArea.addView(btn);
             }
