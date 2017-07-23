@@ -69,7 +69,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".StudyActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".PatchActivity"
             android:label="@string/title_activity_patch"
