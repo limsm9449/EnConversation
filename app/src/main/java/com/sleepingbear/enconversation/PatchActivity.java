@@ -34,7 +34,7 @@ public class PatchActivity extends AppCompatActivity {
         StringBuffer patch = new StringBuffer();
 
         patch.append("* 신규 패치" + CommConstants.sqlCR);
-        patch.append("- 단어장 상세 부분을 네이버 검색, 다움 검색으로 변경하였습니다." + CommConstants.sqlCR);
+        patch.append("- 단어장 상세 부분을 네이버 검색, Daum 검색, 예제로 변경하였습니다." + CommConstants.sqlCR);
         patch.append("- 영어사전, 영어회화, 영어신문을 하나로 통합하여 사용하면 좋을듯해서 '최고의 영어학습' 어플을 새로 만들었습니다. 한개의 어플로 계속 기능개선을 할 예정입니다." + CommConstants.sqlCR);
         patch.append("" + CommConstants.sqlCR);
         patch.append("- 어플이 가로로 변경이 되는 문제점 수정 - 가로/세로 변경시 화면 구성 및 오류가 발생" + CommConstants.sqlCR);
