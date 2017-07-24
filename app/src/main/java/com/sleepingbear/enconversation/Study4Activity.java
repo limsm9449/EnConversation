@@ -118,6 +118,13 @@ public class Study4Activity extends AppCompatActivity implements View.OnClickLis
             ((RadioButton) findViewById(R.id.my_a_study4_rb_m_not)).setChecked(true);
         }
 
+        int fontSize = Integer.parseInt( DicUtils.getPreferencesValue( this, CommConstants.preferences_font ) );
+        tv_question.setTextSize(fontSize);
+        tv_spelling.setTextSize(fontSize);
+        tv_answer.setTextSize(fontSize);
+        tv_o_cnt.setTextSize(fontSize);
+        tv_x_cnt.setTextSize(fontSize);
+
         sb = (SeekBar) findViewById(R.id.my_a_study4_sb);
         sb.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
         sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {

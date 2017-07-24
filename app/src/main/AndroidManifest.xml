@@ -33,7 +33,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Study1Activity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".Study2Activity"
             android:label="@string/title_activity_study2"
@@ -41,7 +42,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Study3Activity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Study4Activity"
             android:label="@string/title_activity_study4"
