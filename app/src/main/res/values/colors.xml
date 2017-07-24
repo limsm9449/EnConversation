@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#f99735</color>
-    <color name="tabIndicatorColor">#42ffc7</color>
+    <color name="tabIndicatorColor">#2d9778</color>
 
     <color name="webViewMean">#ff4142</color>
 
-    <color name="colorPrimaryDark">#00A0B4</color>
+    <color name="colorPrimaryDark">#5e5d5d</color>
     <color name="textColorPrimary">#FFFFFF</color>
     <color name="windowBackground">#FFFFFF</color>
     <color name="navigationBarColor">#000000</color>
-    <color name="colorAccent">#c8e8ff</color>
+    <color name="colorAccent">#436fbc</color>
 
     <color name="tab_text_act">#ffffff</color>
     <color name="tab_text">#d1e7f7</color>
