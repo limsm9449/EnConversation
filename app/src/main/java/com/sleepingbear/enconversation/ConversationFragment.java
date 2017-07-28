@@ -82,6 +82,8 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         ((ImageView) mainView.findViewById(R.id.my_iv_view)).setOnClickListener(this);
         ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setOnClickListener(this);
 
+        int fontSize = Integer.parseInt( DicUtils.getPreferencesValue( getContext(), CommConstants.preferences_font ) );
+        ((TextView) mainView.findViewById(R.id.my_tv_msg)).setTextSize(fontSize);
 
         ((ImageView) mainView.findViewById(R.id.my_iv_hide)).setVisibility(View.GONE);
 
@@ -94,8 +96,20 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         return mainView;
     }
 
+    public void refreshListView() {
+        if ( "".equals(et_search.getText().toString().trim().toLowerCase()) ) {
+            return;
+        }
+
+    }
+
     public void changeListView(boolean isKeyin) {
         if ( isKeyin ) {
+            if ( "".equals(et_search.getText().toString().trim().toLowerCase()) ) {
+                Toast.makeText(getContext(), "검색할 단어를 입력하세요.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             ((RelativeLayout)mainView.findViewById(R.id.my_f_conv_rl_msg)).setVisibility(View.GONE);
 
             if (task != null) {

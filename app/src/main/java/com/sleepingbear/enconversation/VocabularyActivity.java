@@ -504,7 +504,6 @@ class VocabularyCursorAdapter extends CursorAdapter {
         //사이즈 설정
         ((TextView) view.findViewById(R.id.my_f_bi_tv_bookmark)).setTextSize(fontSize);
         ((TextView) view.findViewById(R.id.my_c_vi_tv_spelling)).setTextSize(fontSize);
-        ((TextView) view.findViewById(R.id.my_f_bi_tv_date)).setTextSize(fontSize);
         ((TextView) view.findViewById(R.id.my_c_vi_tv_mean)).setTextSize(fontSize);
     }
 

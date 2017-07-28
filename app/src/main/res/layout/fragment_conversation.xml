@@ -109,10 +109,10 @@
                 android:id="@+id/my_f_conv_rl_msg">
 
                 <TextView
-                    android:text="검색할 단어를 입력해주세요.\n단어를 입력하지 않고 검색(Enter)을 하시면 전체 회화를 검색합니다."
+                    android:text="검색할 단어를 입력해주세요"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textView11"
+                    android:id="@+id/my_tv_msg"
                     android:textSize="14sp"
                     android:textColor="@android:color/holo_red_light" />
             </RelativeLayout>
